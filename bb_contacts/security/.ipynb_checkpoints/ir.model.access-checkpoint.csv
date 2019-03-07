@@ -1,3 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_bb_contacts_contacts_linkbb_contacts.contacts_link,model_bb_contacts_contacts_link,,1,1,1,1
+access_bb_contacts_contacts_link,bb_contacts.contacts_link,model_bb_contacts_contacts_link,,1,1,1,1
 access_bb_contacts_job,bb_contacts.job,model_bb_contacts_job,,1,1,1,1
