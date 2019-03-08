@@ -18,7 +18,7 @@
 			<xpath expr="//field[@name='website']" position="after">
 				<field name="sector" attrs="{'invisible': [('is_company', '=', False)]}"/>
 				<field name="source" />
-			</xpath>
+           </xpath>
 			
 			<xpath expr="//field[@name='function']" position="before">
 				<xpath expr="//field[@name='title']" postion="move"/>
@@ -32,11 +32,53 @@
 				<field name="jobRole" attrs="{'invisible': [('is_company', '=', True)]}"/>
 				<field name="contactExtention" attrs="{'invisible': [('is_company', '=', True)]}"/>
                 <field name="mailingRestrictions" />
+                
 			</xpath>
             
             <xpath expr="//notebook[1]/page[1]" position="before">
                 <page string="General" autofocus="autofocus">
-                    <field name="contactLinks"/>
+                    <label for="contactLinks"/>
+                    <field name="contactLinks" context="{'default_company': active_id,'default_contact': active_id}">
+                        <tree string="Company">
+                            <field name = 'status'/>
+                            <field name = 'company'/>
+                            <field name = 'contact'/>
+                            <field name = 'jobTitle' />
+                            <field name = 'jobRole'/>
+                            <field name = 'relationship'/>
+                            <field name = 'address'/>
+                            <field name = 'phone'/>
+                            <field name = 'mobile'/>
+                            <field name = 'extension'/>
+                            <field name = 'email'/>
+                            <field name = 'fax'/>
+                        </tree>
+                        <form string="Company">
+                            <sheet>
+                                <group col='4' colspan='4' name='details'>
+                                    
+                                     <field name = 'status'/>
+                                     <field name = 'company'/>
+                                     <field name = 'contact'/>
+                                     <field name = 'jobTitle'/>
+                                     <field name = 'jobRole'/>
+                                     <field name = 'relationship'/>
+                                     <field name = 'address'/>
+                                     <field name = 'phone'/>
+                                     <field name = 'mobile'/>
+                                     <field name = 'extension'/>
+                                     <field name = 'email'/>
+                                     <field name = 'fax'/>
+                                 </group>
+                                 <group string="Employement Details">
+                                     <field name = 'status'/>
+                                     <field name = 'joiningDate'/>
+                                     <field name = 'leavingDate'/>
+                                 </group>
+                            </sheet>
+                        </form>
+                        
+                    </field>
                 </page>
             </xpath>
 		</field>

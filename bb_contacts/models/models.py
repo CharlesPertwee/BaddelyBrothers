@@ -25,7 +25,10 @@ class ContactLink(models.Model):
     joiningDate = fields.Date(string="Joining Date")
     leavingDate = fields.Date(string="Leaving Date")
     
-    contact = fields.Many2one('res.partner','Contact')
+    contact = fields.Many2one('res.partner',string='Contact',domain="[('is_company','=',False)]",required=True)
+    
+    is_company = fields.Boolean('Company')
+    
     
 class Partner(models.Model):
     _inherit = 'res.partner'
@@ -42,10 +45,7 @@ class Partner(models.Model):
     contactExtention = fields.Char('Contact Extention')
     mainContact = fields.Boolean('Main Contact')
     
-    contactLinks = fields.One2many('bb_contacts.contacts_link','contact','Contacts')
-    
-
-
+    contactLinks = fields.Many2many('bb_contacts.contacts_link',string='Contacts')
     
 # class CompanyLink(models.Model):
 #     _name = 'bb_contacts.company_link'
