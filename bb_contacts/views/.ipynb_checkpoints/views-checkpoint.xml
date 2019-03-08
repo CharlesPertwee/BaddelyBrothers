@@ -37,11 +37,9 @@
             
             <xpath expr="//notebook[1]/page[1]" position="before">
                 <page string="General" autofocus="autofocus">
-                    <label for="contactLinks"/>
-                    <field name="contactLinks" context="{'default_company': active_id,'default_contact': active_id}">
-                        <tree string="Company">
+                    <field name="companyLinks" context="{'default_company': active_id}" attrs="{'invisible': [('is_company', '=', False)]}">
+                        <tree string="Companies">
                             <field name = 'status'/>
-                            <field name = 'company'/>
                             <field name = 'contact'/>
                             <field name = 'jobTitle' />
                             <field name = 'jobRole'/>
@@ -58,8 +56,49 @@
                                 <group col='4' colspan='4' name='details'>
                                     
                                      <field name = 'status'/>
+                                     <field name = 'company' invisible="1"/>
+                                     <field name = 'contact' required="1"/>
+                                     <field name = 'jobTitle' required="1"/>
+                                     <field name = 'jobRole'/>
+                                     <field name = 'relationship'/>
+                                     <field name = 'address'/>
+                                     <field name = 'phone'/>
+                                     <field name = 'mobile'/>
+                                     <field name = 'extension'/>
+                                     <field name = 'email'/>
+                                     <field name = 'fax'/>
+                                 </group>
+                                 <group string="Employement Details" invisible="1">
+                                     <field name = 'status'/>
+                                     <field name = 'joiningDate'/>
+                                     <field name = 'leavingDate'/>
+                                 </group>
+                            </sheet>
+                        </form>
+                        
+                    </field>
+                    
+                    <field name="contactLinks" context="{'default_contact': active_id}" attrs="{'invisible': [('is_company', '=', True)]}">
+                        <tree string="Contacts">
+                            <field name = 'status'/>
+                            <field name = 'company'/>
+                            <field name = 'jobTitle' />
+                            <field name = 'jobRole'/>
+                            <field name = 'relationship'/>
+                            <field name = 'address'/>
+                            <field name = 'phone'/>
+                            <field name = 'mobile'/>
+                            <field name = 'extension'/>
+                            <field name = 'email'/>
+                            <field name = 'fax'/>
+                        </tree>
+                        <form string="Company">
+                            <sheet>
+                                <group col='4' colspan='4' name='details'>
+                                    
+                                     <field name = 'status'/>
                                      <field name = 'company'/>
-                                     <field name = 'contact'/>
+                                     <field name = 'contact' invisible="1"/>
                                      <field name = 'jobTitle'/>
                                      <field name = 'jobRole'/>
                                      <field name = 'relationship'/>
