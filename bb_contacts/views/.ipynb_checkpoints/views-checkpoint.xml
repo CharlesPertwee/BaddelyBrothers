@@ -54,8 +54,6 @@
                         <form string="Company">
                             <sheet>
                                 <group col='4' colspan='4' name='details'>
-                                    
-                                     <field name = 'status'/>
                                      <field name = 'company' invisible="1"/>
                                      <field name = 'contact' required="1"/>
                                      <field name = 'jobTitle' required="1"/>
@@ -71,7 +69,7 @@
                                  <group string="Employement Details" invisible="1">
                                      <field name = 'status'/>
                                      <field name = 'joiningDate'/>
-                                     <field name = 'leavingDate'/>
+                                     <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
                                  </group>
                             </sheet>
                         </form>
@@ -95,8 +93,6 @@
                         <form string="Company">
                             <sheet>
                                 <group col='4' colspan='4' name='details'>
-                                    
-                                     <field name = 'status'/>
                                      <field name = 'company'/>
                                      <field name = 'contact' invisible="1"/>
                                      <field name = 'jobTitle'/>
@@ -112,7 +108,7 @@
                                  <group string="Employement Details">
                                      <field name = 'status'/>
                                      <field name = 'joiningDate'/>
-                                     <field name = 'leavingDate'/>
+                                     <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
                                  </group>
                             </sheet>
                         </form>

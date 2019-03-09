@@ -15,13 +15,13 @@ class ContactLink(models.Model):
     company = fields.Many2one('res.partner',string="Company",domain="[('is_company','=',True)]",required=True)
     jobTitle = fields.Many2one('bb_contacts.job',string="Job Title")
     jobRole = fields.Selection([('owner','Bussiness Owner'),('department_manager','Departmental Manager'),('finance_excetive','Finance Executive'),('sale_executive','Sales Executive'),('purchase','Purchase'),('account_executive','Account Executive'),('production','Production'),('complaint_dept','Complaints Dept')],string="Job Role")
-    relationship = fields.Text(string="Relationship")        
+    relationship = fields.Char(string="Relationship")        
     address = fields.Char(string="Address")
-    phone = fields.Integer(string="Phone")
-    mobile = fields.Integer(string="Mobile Phone")
-    extension = fields.Text(string="Extension")
+    phone = fields.Char(string="Phone")
+    mobile = fields.Char(string="Mobile Phone")
+    extension = fields.Integer(string="Extension")
     email = fields.Char(string='E-mail')
-    fax = fields.Integer(string='Fax-No')
+    fax = fields.Char(string='Fax-No')
     joiningDate = fields.Date(string="Joining Date")
     leavingDate = fields.Date(string="Leaving Date")
     
@@ -29,6 +29,12 @@ class ContactLink(models.Model):
     
     contactLink_id = fields.Many2one('res.partner')
     companyLink_id = fields.Many2one('res.partner')
+    
+    #@api.onchange('leavingDate')
+    #def leave_employee(self):
+    #    for record in self:
+    #        if(record.leavingDate):
+    #            record.status = 'past'
     
     @api.model
     def create(self,values):
