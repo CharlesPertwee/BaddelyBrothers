@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from docx import Document
 
 class ContactJobTitle(models.Model):
     _name = 'bb_contacts.job'
@@ -45,6 +46,27 @@ class ContactLink(models.Model):
         #record.company.write(data)
         #record.contact.write(data)
         return record
+    
+    @api.model    
+    def generate_address_label_report(self):
+        pass
+        #document = Document()
+        #for record in self:
+        #    document.add_heading(record.contact,0)
+        #    document.add_heading(record.company,0)
+        #    document.add_page_break()
+        #    
+        #    document.save('Address Label')
+    
+    @api.model
+    def headed_letter_report(self):
+        pass
+    
+    @api.model
+    def blank_letter_report(self):
+        pass
+    
+    
         
 class Partner(models.Model):
     _inherit = 'res.partner'

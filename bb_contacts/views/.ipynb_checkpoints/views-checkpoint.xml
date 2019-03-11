@@ -71,6 +71,21 @@
                                      <field name = 'joiningDate'/>
                                      <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
                                  </group>
+                                 <group string="Documents">
+                                     <div class="container">
+                                         <div class="row">
+                                             <div class="col-sm">
+                                                 <button string="Address Label" name="generate_address_label_report" class="oe_highlight"/>
+                                             </div>
+                                             <div class="col-sm">
+                                                 <button string="Letter(for headed paper)" name="headed_letter_report" class="oe_highlight"/>
+                                             </div>
+                                             <div class="col-sm">
+                                                 <button string="Letter(for blank paper)" name="blank_letter_report" class="oe_highlight"/>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </group>
                             </sheet>
                         </form>
                         
@@ -109,6 +124,21 @@
                                      <field name = 'status'/>
                                      <field name = 'joiningDate'/>
                                      <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
+                                 </group>
+                                 <group string="Documents">
+                                     <div class="container">
+                                         <div class="row">
+                                             <div class="col-sm">
+                                                 <button string="Address Label" name="generate_address_label_report" class="oe_highlight"/>
+                                             </div>
+                                             <div class="col-sm">
+                                                 <button string="Letter(for headed paper)" name="headed_letter_report" class="oe_highlight"/>
+                                             </div>
+                                             <div class="col-sm">
+                                                 <button string="Letter(for blank paper)" name="blank_letter_report" class="oe_highlight"/>
+                                             </div>
+                                         </div>
+                                     </div>
                                  </group>
                             </sheet>
                         </form>
