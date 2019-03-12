@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bb_crm_bb_crm,bb_crm.bb_crm,model_bb_crm_bb_crm,,1,0,0,0

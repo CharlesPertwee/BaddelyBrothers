@@ -59,7 +59,7 @@
                                      <field name = 'jobTitle' required="1"/>
                                      <field name = 'jobRole'/>
                                      <field name = 'relationship'/>
-                                     <field name = 'address' domain="[('type','!=','contact'),('parent_id','=',contact.id)]"/>
+                                     <field name = 'address' invisible="1" domain="[('type','!=','contact'),('parent_id','=',company)]"/>
                                      <field name = 'phone'/>
                                      <field name = 'mobile'/>
                                      <field name = 'extension'/>
@@ -108,12 +108,12 @@
                         <form string="Company">
                             <sheet>
                                 <group col='4' colspan='4' name='details'>
-                                     <field name = 'company'/>
+                                     <field name = 'company' required="1"/>
                                      <field name = 'contact' invisible="1"/>
                                      <field name = 'jobTitle'/>
                                      <field name = 'jobRole'/>
                                      <field name = 'relationship'/>
-                                     <field name = 'address' domain="[('type','!=','contact'),('parent_id','=',contact.id)]"/>
+                                     <field name = 'address' domain="[('type','!=','contact'),('parent_id','=',company)]" required="1"/>
                                      <field name = 'phone'/>
                                      <field name = 'mobile'/>
                                      <field name = 'extension'/>
