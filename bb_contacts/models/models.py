@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from docx import Document
 
+
 class ContactJobTitle(models.Model):
     _name = 'bb_contacts.job'
     _rec_name = 'jobTitle'
@@ -17,7 +18,7 @@ class ContactLink(models.Model):
     jobTitle = fields.Many2one('bb_contacts.job',string="Job Title")
     jobRole = fields.Selection([('owner','Bussiness Owner'),('department_manager','Departmental Manager'),('finance_excetive','Finance Executive'),('sale_executive','Sales Executive'),('purchase','Purchase'),('account_executive','Account Executive'),('production','Production'),('complaint_dept','Complaints Dept')],string="Job Role")
     relationship = fields.Char(string="Relationship")        
-    address = fields.Char(string="Address")
+    address = fields.Many2one('res.partner', string="Address",domain="[('type','!=','contact')]")
     phone = fields.Char(string="Phone")
     mobile = fields.Char(string="Mobile Phone")
     extension = fields.Integer(string="Extension")
@@ -46,25 +47,28 @@ class ContactLink(models.Model):
         #record.company.write(data)
         #record.contact.write(data)
         return record
-    
-    @api.model    
+       
     def generate_address_label_report(self):
-        pass
-        #document = Document()
-        #for record in self:
-        #    document.add_heading(record.contact,0)
-        #    document.add_heading(record.company,0)
-        #    document.add_page_break()
-        #    
-        #    document.save('Address Label')
-    
-    @api.model
+        type = "normal"
+        return{
+            'type':'ir.actions.act_url',
+            'url':'/doc/report/%s/%s'%(self.id,type),
+            'data':self.id,
+            'target':'self',
+        }            
+   
     def headed_letter_report(self):
-        pass
-    
-    @api.model
+        raise Exception("Test")
+        type = "letter"
+        return{
+            'type':'ir.actions.act_url',
+            'url':'/doc/report/%s/%s'%(self.id,type),
+            'data':self.id,
+            'target':'self',
+        }
+   
     def blank_letter_report(self):
-        pass
+        raise Exception('Test Exception 2')
     
     
         
