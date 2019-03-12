@@ -59,7 +59,7 @@
                                      <field name = 'jobTitle' required="1"/>
                                      <field name = 'jobRole'/>
                                      <field name = 'relationship'/>
-                                     <field name = 'address'/>
+                                     <field name = 'address' domain="[('type','!=','contact'),('parent_id','=',contact.id)]"/>
                                      <field name = 'phone'/>
                                      <field name = 'mobile'/>
                                      <field name = 'extension'/>
@@ -71,6 +71,21 @@
                                      <field name = 'joiningDate'/>
                                      <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
                                  </group>
+                                 <!--group string="Documents">
+                                     <div class="container">
+                                         <div class="row">
+                                             <div class="col-sm">
+                                                 <button string="Address Label" name="generate_address_label_report" type="object" class="oe_highlight"/>
+                                             </div>
+                                             <div class="col-sm">
+                                                 <button string="Letter(for headed paper)" name="headed_letter_report" type="object" class="oe_highlight"/>
+                                             </div>
+                                             <div class="col-sm">
+                                                 <button string="Letter(for blank paper)" name="blank_letter_report" type="object" class="oe_highlight"/>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </group-->
                             </sheet>
                         </form>
                         
@@ -98,7 +113,7 @@
                                      <field name = 'jobTitle'/>
                                      <field name = 'jobRole'/>
                                      <field name = 'relationship'/>
-                                     <field name = 'address'/>
+                                     <field name = 'address' domain="[('type','!=','contact'),('parent_id','=',contact.id)]"/>
                                      <field name = 'phone'/>
                                      <field name = 'mobile'/>
                                      <field name = 'extension'/>
@@ -110,6 +125,21 @@
                                      <field name = 'joiningDate'/>
                                      <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
                                  </group>
+                                 <!--group string="Documents">
+                                     <div class="container">
+                                         <div class="row">
+                                             <div class="col-sm">
+                                                 <button string="Address Label" name="generate_address_label_report" type="object" class="oe_highlight"/>
+                                             </div>
+                                             <div class="col-sm">
+                                                 <button string="Letter(for headed paper)" name="headed_letter_report" type="object" class="oe_highlight"/>
+                                             </div>
+                                             <div class="col-sm">
+                                                 <button string="Letter(for blank paper)" name="blank_letter_report" type="object" class="oe_highlight"/>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </group-->
                             </sheet>
                         </form>
                         
