@@ -71,7 +71,7 @@
                                      <field name = 'joiningDate'/>
                                      <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
                                  </group>
-                                 <!--group string="Documents">
+                                 <group string="Documents">
                                      <div class="container">
                                          <div class="row">
                                              <div class="col-sm">
@@ -85,7 +85,7 @@
                                              </div>
                                          </div>
                                      </div>
-                                 </group-->
+                                 </group>
                             </sheet>
                         </form>
                         
@@ -125,7 +125,7 @@
                                      <field name = 'joiningDate'/>
                                      <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
                                  </group>
-                                 <!--group string="Documents">
+                                 <group string="Documents">
                                      <div class="container">
                                          <div class="row">
                                              <div class="col-sm">
@@ -139,7 +139,7 @@
                                              </div>
                                          </div>
                                      </div>
-                                 </group-->
+                                 </group>
                             </sheet>
                         </form>
                         

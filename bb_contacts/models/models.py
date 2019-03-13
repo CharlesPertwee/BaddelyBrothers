@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from docx import Document
+import datetime
 
 
 class ContactJobTitle(models.Model):
@@ -49,26 +50,34 @@ class ContactLink(models.Model):
         return record
        
     def generate_address_label_report(self):
+        date = str(datetime.datetime.now().date())
         type = "normal"
         return{
             'type':'ir.actions.act_url',
-            'url':'/doc/report/%s/%s'%(self.id,type),
+            'url':'/doc/report/%s/%s/%s'%(self.id,type,date),
             'data':self.id,
             'target':'self',
         }            
    
     def headed_letter_report(self):
-        raise Exception("Test")
+        date = str(datetime.datetime.now().date())
         type = "letter"
         return{
             'type':'ir.actions.act_url',
-            'url':'/doc/report/%s/%s'%(self.id,type),
+            'url':'/doc/report/%s/%s/%s'%(self.id,type,date),
             'data':self.id,
             'target':'self',
         }
-   
+    
     def blank_letter_report(self):
-        raise Exception('Test Exception 2')
+        date = str(datetime.datetime.now().date())
+        type = "head_letter"
+        return{
+            'type':'ir.actions.act_url',
+            'url':'/doc/report/%s/%s/%s'%(self.id,type,date),
+            'data':self.id,
+            'target':'self',
+        }
     
     
         
