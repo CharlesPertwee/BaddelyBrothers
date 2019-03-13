@@ -12,7 +12,7 @@
             <xpath expr="//field[@name='stage_id']" position="replace">
                 <field name="stage_id" widget="statusbar"
                             options="{'clickable': '1', 'fold_field': 'fold'}"
-                            domain="['|','&amp;',('team_id', '=', team_id), ('team_id', '=', False),('typeOfLead','=',typeOfLead)]"
+                            domain="['|','&amp;',('team_id', '=', team_id), ('team_id', '=', False),'|',('typeOfLead','=',typeOfLead),('isCommon','=',True)]"
                             attrs="{'invisible': [('active', '=', False)]}"/>
             </xpath>
             
@@ -26,7 +26,8 @@
 		<field name="inherit_id" ref="crm.crm_stage_form"/>
 		<field name="arch" type="xml">
             <xpath expr="//field[@name='fold']" position="after">
-                <field name="typeOfLead" />
+		    <field name="typeOfLead" />
+		    <field name="isCommon" />
             </xpath>
 		</field>
 	 </record>

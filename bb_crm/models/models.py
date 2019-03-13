@@ -13,4 +13,4 @@ class Stages(models.Model):
     _name = 'crm.stage'
     
     typeOfLead = fields.Selection([('Trade Counter','Trade Counter'),('Bespoke','Bespoke')],string="Opportunity Type",default="Trade Counter")
-
+    isCommon = fields.Boolean(string="Is Common")
