@@ -88,6 +88,7 @@ class ContactLink(models.Model):
 class Partner(models.Model):
     _inherit = 'res.partner'
     _name = 'res.partner'
+    _rec_name = 'display_name'
 
     reference = fields.Char('Reference No.')
     vatCountryCode = fields.Char('VAT Country Code')
@@ -103,15 +104,42 @@ class Partner(models.Model):
     companyLinks = fields.One2many('bb_contacts.contacts_link','companyLink_id',string='Comapany History')
     contactLinks = fields.One2many('bb_contacts.contacts_link','contactLink_id',string='Contact History')
     
-    @api.depends('is_company', 'name', 'parent_id.name', 'type', 'company_name')
-    def _compute_display_name(self):
-        diff = dict(show_address=None, show_address_only=None, show_email=None)
-        names = dict(self.with_context(**diff).name_get())
-        for partner in self:
-            if partner.type != 'contact':
-                partner.display_name = partner.street
-            else:
-                partner.display_name = names.get(partner.id)
+    #@api.depends('is_company', 'name', 'parent_id.name', 'type', 'company_name')
+    #def _compute_display_name(self):
+    #    diff = dict(show_address=None, show_address_only=None, show_email=None)
+    #    names = dict(self.with_context(**diff).name_get())
+    #    for partner in self:
+    #        if partner.type != 'contact':
+    #            partner.display_name = partner.street
+    #        else:
+    #            partner.display_name = names.get(partner.id)
+    
+    def _get_name(self):
+        """ Utility method to allow name_get to be overrided without re-browse the partner """
+        partner = self
+        name = partner.name or ''
+
+        if partner.company_name or partner.parent_id:
+            if not name and partner.type in ['invoice', 'delivery', 'other']:
+                name = dict(self.fields_get(['type'])['type']['selection'])[partner.type]
+            if not partner.is_company:
+                name = "%s, %s" % (partner.commercial_company_name or partner.parent_id.name, name)
+        if self._context.get('show_address_only'):
+            name = partner._display_address(without_company=True)
+        if self._context.get('show_address'):
+            name = name + "\n" + partner._display_address(without_company=True)
+        name = name.replace('\n\n', '\n')
+        name = name.replace('\n\n', '\n')
+        if self._context.get('address_inline'):
+            name = name.replace('\n', ', ')
+        if self._context.get('show_email') and partner.email:
+            name = "%s <%s>" % (name, partner.email)
+        if self._context.get('html_format'):
+            name = name.replace('\n', '<br/>')
+        if self._context.get('show_vat') and partner.vat:
+            name = "%s - %s" % (name, partner.vat)
+        name = partner.street if partner.type != 'contact' else name
+        return name
     
     #@api.multi
     #def name_get(self):
