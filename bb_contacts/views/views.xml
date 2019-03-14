@@ -39,6 +39,7 @@
                 <page string="General" autofocus="autofocus">
                     <field name="companyLinks" context="{'default_company': active_id}" attrs="{'invisible': [('is_company', '=', False)]}">
                         <tree string="Companies">
+                            <field name = 'main'/>
                             <field name = 'status'/>
                             <field name = 'contact'/>
                             <field name = 'jobTitle' />
@@ -50,28 +51,42 @@
                             <field name = 'extension'/>
                             <field name = 'email'/>
                             <field name = 'fax'/>
+                            <field name = 'temperament'/>
                         </tree>
                         <form string="Company">
                             <sheet>
-                                <group col='4' colspan='4' name='details'>
-                                     <field name = 'company' invisible="1"/>
-                                     <field name = 'contact' required="1"/>
-                                     <field name = 'jobTitle' required="1"/>
-                                     <field name = 'jobRole'/>
-                                     <field name = 'relationship'/>
-                                     <field name = 'address' invisible="1" domain="[('type','!=','contact'),('parent_id','=',company)]"/>
-                                     <field name = 'phone'/>
-                                     <field name = 'mobile'/>
-                                     <field name = 'extension'/>
-                                     <field name = 'email'/>
-                                     <field name = 'fax'/>
+                                <field name = 'company' invisible="1"/>
+                                <field name = 'address' invisible="1" domain="['|',('id','=',company),'&amp;',('parent_id','=',company),('type','!=','contact')]"/>
+                                <field name = 'relationship' invisible="1"/>
+                                <field name = 'main' invisible="1"/>
+                                <field name = 'temperament' invisible="1"/>
+                                
+                                <group name='details'>
+                                    <group>
+                                        <field name = 'contact' required="1"/>
+                                        <field name = 'jobTitle' required="1"/>
+                                        <field name = 'jobRole'/>
+                                    </group>
+                                    <group>
+                                        <field name = 'email'/>
+                                        <field name = 'phone'/>
+                                        <field name = 'extension'/>
+                                        <field name = 'mobile'/>
+                                        <field name = 'fax'/>
+                                    </group>
                                  </group>
-                                 <group string="Employement Details" invisible="1">
-                                     <field name = 'status'/>
-                                     <field name = 'joiningDate'/>
-                                     <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
+                                 
+                                <group string="Employement Details">
+                                    <group>
+                                        <field name = 'status'/>
+                                    </group>
+                                    <group>
+                                        <field name = 'joiningDate'/>
+                                        <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
+                                    </group>
                                  </group>
-                                 <group string="Documents">
+                                 
+                                <group string="Documents">
                                      <div class="container">
                                          <div class="row">
                                              <div class="col-sm">
@@ -86,13 +101,15 @@
                                          </div>
                                      </div>
                                  </group>
+                                
                             </sheet>
                         </form>
                         
                     </field>
                     
-                    <field name="contactLinks" context="{'default_contact': active_id}" attrs="{'invisible': [('is_company', '=', True)]}">
+                    <field name="contactLinks" context="{'default_contact': active_id, 'default_main': mainContact}" attrs="{'invisible': [('is_company', '=', True)]}">
                         <tree string="Contacts">
+                            <field name = 'main'/>
                             <field name = 'status'/>
                             <field name = 'company'/>
                             <field name = 'jobTitle' />
@@ -104,27 +121,40 @@
                             <field name = 'extension'/>
                             <field name = 'email'/>
                             <field name = 'fax'/>
+                            <field name = 'temperament'/>
                         </tree>
                         <form string="Company">
                             <sheet>
-                                <group col='4' colspan='4' name='details'>
-                                     <field name = 'company' required="1"/>
-                                     <field name = 'contact' invisible="1"/>
-                                     <field name = 'jobTitle'/>
-                                     <field name = 'jobRole'/>
-                                     <field name = 'relationship'/>
-                                     <field name = 'address' domain="[('type','!=','contact'),('parent_id','=',company)]" required="1"/>
-                                     <field name = 'phone'/>
-                                     <field name = 'mobile'/>
-                                     <field name = 'extension'/>
-                                     <field name = 'email'/>
-                                     <field name = 'fax'/>
+                                <field name = 'contact' invisible="1"/>
+                                <field name = 'relationship' invisible="1"/>
+                                <field name = 'main' invisible="1"/>
+                                <field name = 'temperament' invisible="1"/>
+                                <group name='details'>
+                                    <group>
+                                        <field name = 'company' required="1"/>
+                                        <field name = 'address' domain="['|',('id','=',company),'&amp;',('parent_id','=',company),('type','!=','contact')]" required="1"/>
+                                        <field name = 'jobTitle'/> 
+                                        <field name = 'jobRole'/>
+                                    </group>
+                                    <group>
+                                        <field name = 'email'/>
+                                        <field name = 'phone'/>
+                                        <field name = 'extension'/>
+                                        <field name = 'mobile'/>
+                                        <field name = 'fax'/>
+                                    </group>
+                                </group>
+                                
+                                <group string="Employement Details">
+                                    <group>
+                                        <field name = 'status'/>
+                                    </group>
+                                    <group>
+                                        <field name = 'joiningDate'/>
+                                        <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
+                                    </group>
                                  </group>
-                                 <group string="Employement Details">
-                                     <field name = 'status'/>
-                                     <field name = 'joiningDate'/>
-                                     <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
-                                 </group>
+                                 
                                  <group string="Documents">
                                      <div class="container">
                                          <div class="row">
@@ -140,6 +170,7 @@
                                          </div>
                                      </div>
                                  </group>
+                                
                             </sheet>
                         </form>
                         

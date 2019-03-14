@@ -27,8 +27,10 @@ class ContactLink(models.Model):
     fax = fields.Char(string='Fax-No')
     joiningDate = fields.Date(string="Joining Date")
     leavingDate = fields.Date(string="Leaving Date")
+    main = fields.Boolean(string="Main")
+    temperament = fields.Char("Temperament")
     
-    contact = fields.Many2one('res.partner',string='Contact',domain="[('is_company','=',False)]",required=True)
+    contact = fields.Many2one('res.partner',string='Contact',domain="[('is_company','=',False),('type','=','contact')]",required=True)
     
     contactLink_id = fields.Many2one('res.partner')
     companyLink_id = fields.Many2one('res.partner')
@@ -39,10 +41,12 @@ class ContactLink(models.Model):
     #        if(record.leavingDate):
     #            record.status = 'past'
     
+        
     @api.model
     def create(self,values):
         values['contactLink_id'] = values['contact']
         values['companyLink_id'] = values['company']
+        values['main'] = self.env['res.partner'].search([('id','=',values['contact'])]).mainContact
         record = super(ContactLink,self).create(values)
         #data = {'contactLinks': [(4,record.id)]}
         #record.company.write(data)
@@ -96,7 +100,28 @@ class Partner(models.Model):
     contactExtention = fields.Char('Contact Extention')
     mainContact = fields.Boolean('Main Contact')
     
-    companyLinks = fields.One2many('bb_contacts.contacts_link','companyLink_id',string='Comapanies')
-    contactLinks = fields.One2many('bb_contacts.contacts_link','contactLink_id',string='Contacts')
+    companyLinks = fields.One2many('bb_contacts.contacts_link','companyLink_id',string='Comapany History')
+    contactLinks = fields.One2many('bb_contacts.contacts_link','contactLink_id',string='Contact History')
     
-  
+    @api.depends('is_company', 'name', 'parent_id.name', 'type', 'company_name')
+    def _compute_display_name(self):
+        diff = dict(show_address=None, show_address_only=None, show_email=None)
+        names = dict(self.with_context(**diff).name_get())
+        for partner in self:
+            if partner.type != 'contact':
+                partner.display_name = partner.street
+            else:
+                partner.display_name = names.get(partner.id)
+    
+    #@api.multi
+    #def name_get(self):
+    #    result = []
+    #    for record in self:
+    #        name = ""
+    #        if record.type != 'contact':
+    #            name = record.street
+    #        elif record.display_name:
+    #           name = record.display_name
+    #        result.append((record.id,name))
+    #    return result
+
