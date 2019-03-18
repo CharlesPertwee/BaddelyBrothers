@@ -1,32 +1,31 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Contacts Baddely Brothers",
+    'name': "Products Baddely Brothers",
 
     'summary': """
-        Contact customization for Baddely Brothers
+        Product Customizations for Baddely Brothers
+
         """,
 
     'description': """
-        
     """,
 
-    'author': "Squadsoft Tech",
+    'author': "SquadsoftTech",
     'website': "http://www.squadsoft.com",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/12.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Baddely Brothers',
-    'version': '4.3',
+    'version': '0.6',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base','product','stock'],
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
+        # 'security/ir.model.access.csv',
         'views/views.xml',
-        #'views/contact_link.xml',
         'views/templates.xml',
     ],
     # only loaded in demonstration mode

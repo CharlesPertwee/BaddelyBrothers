@@ -13,6 +13,7 @@ class ContactJobTitle(models.Model):
 
 class ContactLink(models.Model):
     _name = 'bb_contacts.contacts_link'
+    _order = "status"
     
     status = fields.Selection([('current','Current'),('past','Past')],required='True',string="State",default="current")
     company = fields.Many2one('res.partner',string="Company",domain="[('is_company','=',True)]",required=True)
@@ -47,6 +48,8 @@ class ContactLink(models.Model):
         values['contactLink_id'] = values['contact']
         values['companyLink_id'] = values['company']
         values['main'] = self.env['res.partner'].search([('id','=',values['contact'])]).mainContact
+        #values['temperament'] = self.env['res.partner'].search([('id','=',values['contact'])]).temperament
+        #values['relationship'] = self.env['res.partner'].search([('id','=',values['contact'])]).relationship
         record = super(ContactLink,self).create(values)
         #data = {'contactLinks': [(4,record.id)]}
         #record.company.write(data)
@@ -89,7 +92,8 @@ class Partner(models.Model):
     _inherit = 'res.partner'
     _name = 'res.partner'
     _rec_name = 'display_name'
-
+    
+    
     reference = fields.Char('Reference No.')
     vatCountryCode = fields.Char('VAT Country Code')
     mailingRestrictions = fields.Boolean('Mailing Restrictions')
@@ -100,19 +104,11 @@ class Partner(models.Model):
     jobRole = fields.Char('Job Role')
     contactExtention = fields.Char('Contact Extention')
     mainContact = fields.Boolean('Main Contact')
+    #temperament = fields.Char("Temperament")
+    #relationship = fields.Char(string="Relationship") 
     
-    companyLinks = fields.One2many('bb_contacts.contacts_link','companyLink_id',string='Comapany History')
+    companyLinks = fields.One2many('bb_contacts.contacts_link','companyLink_id',string='Company History')
     contactLinks = fields.One2many('bb_contacts.contacts_link','contactLink_id',string='Contact History')
-    
-    #@api.depends('is_company', 'name', 'parent_id.name', 'type', 'company_name')
-    #def _compute_display_name(self):
-    #    diff = dict(show_address=None, show_address_only=None, show_email=None)
-    #    names = dict(self.with_context(**diff).name_get())
-    #    for partner in self:
-    #        if partner.type != 'contact':
-    #            partner.display_name = partner.street
-    #        else:
-    #            partner.display_name = names.get(partner.id)
     
     def _get_name(self):
         """ Utility method to allow name_get to be overrided without re-browse the partner """
@@ -141,15 +137,21 @@ class Partner(models.Model):
         name = partner.street if partner.type != 'contact' else name
         return name
     
-    #@api.multi
-    #def name_get(self):
-    #    result = []
-    #    for record in self:
-    #        name = ""
-    #        if record.type != 'contact':
-    #            name = record.street
-    #        elif record.display_name:
-    #           name = record.display_name
-    #        result.append((record.id,name))
-    #    return result
-
+    
+    @api.model
+    def create(self,values):
+        record = super(Partner, self).create(values)
+        if record:
+            if record.type == 'contact':
+                data = {
+                    'status': 'current',
+                    'company': record.parent_id.id, 
+                    'address': record.parent_id.id,
+                    'phone': record.phone,
+                    'mobile': record.mobile,
+                    'email': record.email,
+                    'contact' : record.id
+                }
+                self.env['bb_contacts.contacts_link'].sudo().create(data)
+        return record
+        

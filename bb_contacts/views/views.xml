@@ -45,7 +45,6 @@
                             <field name = 'jobTitle' />
                             <field name = 'jobRole'/>
                             <field name = 'relationship'/>
-                            <field name = 'address'/>
                             <field name = 'phone'/>
                             <field name = 'mobile'/>
                             <field name = 'extension'/>
@@ -55,15 +54,15 @@
                         </tree>
                         <form string="Company">
                             <sheet>
-                                <field name = 'company' invisible="1"/>
-                                <field name = 'address' invisible="1" domain="['|',('id','=',company),'&amp;',('parent_id','=',company),('type','!=','contact')]"/>
+                                <field name = 'company' invisible="1" options="{'no_create_edit': True}"/>
+                                <field name = 'address' invisible="1" domain="['|',('id','=',company),'&amp;',('parent_id','=',company),('type','!=','contact')]" options="{'no_create_edit': True}"/>
                                 <field name = 'relationship' invisible="1"/>
                                 <field name = 'main' invisible="1"/>
                                 <field name = 'temperament' invisible="1"/>
                                 
                                 <group name='details'>
                                     <group>
-                                        <field name = 'contact' required="1"/>
+                                        <field name = 'contact' required="1" options="{'no_create_edit': True}"/>
                                         <field name = 'jobTitle' required="1"/>
                                         <field name = 'jobRole'/>
                                     </group>
@@ -76,7 +75,7 @@
                                     </group>
                                  </group>
                                  
-                                <group string="Employement Details">
+                                <group string="Employment Details">
                                     <group>
                                         <field name = 'status'/>
                                     </group>
@@ -125,14 +124,14 @@
                         </tree>
                         <form string="Company">
                             <sheet>
-                                <field name = 'contact' invisible="1"/>
+                                <field name = 'contact' invisible="1" options="{'no_create_edit': True}"/>
                                 <field name = 'relationship' invisible="1"/>
                                 <field name = 'main' invisible="1"/>
                                 <field name = 'temperament' invisible="1"/>
                                 <group name='details'>
                                     <group>
-                                        <field name = 'company' required="1"/>
-                                        <field name = 'address' domain="['|',('id','=',company),'&amp;',('parent_id','=',company),('type','!=','contact')]" required="1"/>
+                                        <field name = 'company' required="1" options="{'no_create_edit': True}"/>
+                                        <field name = 'address' domain="['|',('id','=',company),'&amp;',('parent_id','=',company),('type','!=','contact')]" required="1" options="{'no_create_edit': True}"/>
                                         <field name = 'jobTitle'/> 
                                         <field name = 'jobRole'/>
                                     </group>
@@ -145,7 +144,7 @@
                                     </group>
                                 </group>
                                 
-                                <group string="Employement Details">
+                                <group string="Employment Details">
                                     <group>
                                         <field name = 'status'/>
                                     </group>
