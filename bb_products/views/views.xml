@@ -25,6 +25,7 @@
             <xpath expr="//field[@name='list_price']" position="after">
                 <field name="margin" />
             </xpath>
+            
      	</field>
 	 </record>
       

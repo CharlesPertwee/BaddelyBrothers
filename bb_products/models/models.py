@@ -10,8 +10,7 @@ class ProductsTemplate(models.Model):
     grammage = fields.Char(string='Grammage (G.S.M)')
     sheetSize = fields.Char(string='Sheet Size')
     margin = fields.Float(string='Margin', compute='_compute_margin')
-
-
+    
     def _compute_margin(self):
         margin = 0
         if self.standard_price == 0:
