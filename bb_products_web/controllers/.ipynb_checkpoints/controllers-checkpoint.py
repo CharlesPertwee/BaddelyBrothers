@@ -24,10 +24,47 @@ PPR = 4   # Products Per Row
 class WebsiteSalesBB(WebsiteSale):
     @http.route(['/shop/cart/update_json'], type='json', auth="public", methods=['POST'], website=True, csrf=False)
     def cart_update_json(self, product_id, line_id=None, add_qty=None, set_qty=None, display=True):
-        product = request.env['product.template'].sudo().search([('id', '=', product_id)])
-        roundOff = product.roundOff if product.roundOff > 0 else 100
+        """This route is called when changing quantity from the cart or adding
+        a product from the wishlist."""
+        
+        
+        order = request.website.sale_get_order(force_create=1)
+        if order.state != 'draft':
+            request.website.sale_reset()
+            return {}
+        
+        line_product = order.order_line.search([('id','=',product_id)])
+        roundOff = line_product.product_id.roundOff if line_product.product_id.roundOff > 0 else 100
         set_qty = math.ceil(set_qty/roundOff) * roundOff
-        return super(WebsiteSalesBB, self).cart_update_json(product_id,line_id,add_qty,set_qty,display)
+        
+        value = order._cart_update(product_id=product_id, line_id=line_id, add_qty=add_qty, set_qty=set_qty)
+        
+        if not order.cart_quantity:
+            request.website.sale_reset()
+            return value
+
+        order = request.website.sale_get_order()
+        value['cart_quantity'] = order.cart_quantity
+        from_currency = order.company_id.currency_id
+        to_currency = order.pricelist_id.currency_id
+
+        if not display:
+            return value
+
+        value['website_sale.cart_lines'] = request.env['ir.ui.view'].render_template("website_sale.cart_lines", {
+            'website_sale_order': order,
+            # compute_currency deprecated (not used in view)
+            'compute_currency': lambda price: from_currency._convert(
+                price, to_currency, order.company_id, fields.Date.today()),
+            'date': fields.Date.today(),
+            'suggested_products': order._cart_accessories()
+        })
+        value['website_sale.short_cart_summary'] = request.env['ir.ui.view'].render_template("website_sale.short_cart_summary", {
+            'website_sale_order': order,
+            'compute_currency': lambda price: from_currency._convert(
+                price, to_currency, order.company_id, fields.Date.today()),
+        })
+        return value
     
     @http.route(['/product_configurator/get_combination_info'], type='json', auth="user", methods=['POST'])
     def get_combination_info(self, product_template_id, product_id, combination, add_qty, pricelist_id, **kw):

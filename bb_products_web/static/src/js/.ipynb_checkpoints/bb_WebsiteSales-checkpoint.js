@@ -38,6 +38,7 @@ odoo.define('bb_products_web.WebsiteSales', function (require) {
                 add_qty: parseInt(qty),
                 pricelist_id: this.pricelistId || false,
             }).then(function (combinationData) {
+                console.log(combinationData);
                 self._onChangeCombination(ev, $parent, combinationData);
                 $component.find('input[name="add_qty"]').val(combinationData['quantity']);
                 $("#roundOff").val(combinationData['roundOff']);
@@ -55,13 +56,12 @@ odoo.define('bb_products_web.WebsiteSales', function (require) {
             if(roundOff == undefined || roundOff.length == 0)
                 roundOff = "100"
             roundOff = parseInt(roundOff);
-            alert(roundOff);
             var $input = $link.closest('.input-group').find("input");
 
             var min = parseFloat($input.data("min") || 0);
             var max = parseFloat($input.data("max") || Infinity);
             var quantity = ($link.has(".fa-minus").length ? -roundOff : roundOff) + parseFloat($input.val() || 0, 10);
-            var newQty = Math.ceil( (quantity > min ? (quantity < max ? quantity : max) : min) /100) * 100;
+            var newQty = (quantity > min ? (quantity < max ? quantity : max) : min);
 
             $input.val(newQty).trigger('change');
             return false;
