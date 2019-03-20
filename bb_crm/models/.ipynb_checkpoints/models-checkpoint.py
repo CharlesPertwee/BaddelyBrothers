@@ -11,24 +11,25 @@ class Leads(models.Model):
         
     @api.multi
     def write(self,vals):
-        stage = self.env['crm.stage'].sudo().search([('id','=',vals['stage_id'])])
-        
-        if (self.typeOfLead == stage.typeOfLead) or (stage.isCommon):
-            # stage change: update date_last_stage_update
-            if 'stage_id' in vals:
-                vals['date_last_stage_update'] = fields.Datetime.now()
-            if vals.get('user_id') and 'date_open' not in vals:
-                vals['date_open'] = fields.Datetime.now()
-            # stage change with new stage: update probability and date_closed
-            if vals.get('stage_id') and 'probability' not in vals:
-                vals.update(self._onchange_stage_id_values(vals.get('stage_id')))
-            if vals.get('probability', 0) >= 100 or not vals.get('active', True):
-                vals['date_closed'] = fields.Datetime.now()
-            elif 'probability' in vals:
-                vals['date_closed'] = False
-            return super(Leads, self).write(vals)
-        else:
-            raise ValidationError(_('Selected opportunity is of type %s, It cannot be moved to the selected stage %s'%(self.typeOfLead,stage.name)))
+        if 'stage_id' in vals.keys():
+            stage = self.env['crm.stage'].sudo().search([('id','=',vals['stage_id'])])
+
+            if (self.typeOfLead == stage.typeOfLead) or (stage.isCommon):
+                # stage change: update date_last_stage_update
+                if 'stage_id' in vals:
+                    vals['date_last_stage_update'] = fields.Datetime.now()
+                if vals.get('user_id') and 'date_open' not in vals:
+                    vals['date_open'] = fields.Datetime.now()
+                # stage change with new stage: update probability and date_closed
+                if vals.get('stage_id') and 'probability' not in vals:
+                    vals.update(self._onchange_stage_id_values(vals.get('stage_id')))
+                if vals.get('probability', 0) >= 100 or not vals.get('active', True):
+                    vals['date_closed'] = fields.Datetime.now()
+                elif 'probability' in vals:
+                    vals['date_closed'] = False
+                return super(Leads, self).write(vals)
+            else:
+                raise ValidationError(_('Selected opportunity is of type %s, It cannot be moved to the selected stage %s'%(self.typeOfLead,stage.name)))
             
         
 class Stages(models.Model):

@@ -142,7 +142,7 @@ class Partner(models.Model):
     def create(self,values):
         record = super(Partner, self).create(values)
         if record:
-            if record.type == 'contact':
+            if record.type == 'contact' and record.company_type == 'person':
                 data = {
                     'status': 'current',
                     'company': record.parent_id.id, 

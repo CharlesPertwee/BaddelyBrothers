@@ -42,6 +42,7 @@ odoo.define('bb_products_web.WebsiteSales', function (require) {
                 self._onChangeCombination(ev, $parent, combinationData);
                 $component.find('input[name="add_qty"]').val(combinationData['quantity']);
                 $("#roundOff").val(combinationData['roundOff']);
+                $("#roundOffMsg").html('This product is sold in batches of '+ combinationData['roundOff'] +' only.')
              });
         },
 

@@ -13,11 +13,13 @@
               </xpath>
               
         </template>
-        <template id="product_quantity_bb" inherit_id="website_sale.product_quantity">
-            <xpath expr="//input" position="attributes">
-                    <attribute name="value">100</attribute>
-               </xpath>
+       
+        <template id="product_quantity" inherit_id="website_sale.product" customize_show="True" name="Select Quantity">
+          <xpath expr="//a[@id='add_to_cart']" position="before">
+              <span style="display:block; color: purple; font-weight: bold;" id="roundOffMsg">This product is sold in batches of 100 only.</span>
+          </xpath>
         </template>
+        
         <template id="cart_lines_bb" inherit_id="website_sale.cart_lines">
             
             <xpath expr="//table" position="replace">
