@@ -18,7 +18,7 @@ class ContactLink(models.Model):
     status = fields.Selection([('current','Current'),('past','Past')],required='True',string="State",default="current")
     company = fields.Many2one('res.partner',string="Company",domain="[('is_company','=',True)]",required=True)
     jobTitle = fields.Many2one('bb_contacts.job',string="Job Title")
-    jobRole = fields.Selection([('owner','Bussiness Owner'),('department_manager','Departmental Manager'),('finance_excetive','Finance Executive'),('sale_executive','Sales Executive'),('purchase','Purchase'),('account_executive','Account Executive'),('production','Production'),('complaint_dept','Complaints Dept')],string="Job Role")
+    jobRole = fields.Selection([('owner','Business Owner'),('department_manager','Departmental Manager'),('finance_excetive','Finance Executive'),('sale_executive','Sales Executive'),('purchase','Purchase'),('account_executive','Account Executive'),('production','Production'),('complaint_dept','Complaints Dept')],string="Job Role")
     relationship = fields.Char(string="Relationship")        
     address = fields.Many2one('res.partner', string="Address",domain="[('type','!=','contact')]")
     phone = fields.Char(string="Phone")
@@ -91,8 +91,6 @@ class ContactLink(models.Model):
 class Partner(models.Model):
     _inherit = 'res.partner'
     _name = 'res.partner'
-    _rec_name = 'display_name'
-    
     
     reference = fields.Char('Reference No.')
     vatCountryCode = fields.Char('VAT Country Code')
@@ -101,14 +99,22 @@ class Partner(models.Model):
     employeeCount = fields.Integer('Number of Employee')
     sector = fields.Selection([('Design/Mktg','Design/Mktg'),('Direct','Direct'),('Government','Government'),('Private','Private'),('Student','Student'),('Supplier','Supplier'),('Trade','Trade'),('Trade-Govt','Trade-Govt'),('Trade-Printer','Trade-Printer'),('Trade-Retail','Trade-Retail')],string='Sector')
     source = fields.Selection([('Web','Web'),('Mailing','Mailing'),('E-Mail','E-Mail'),('Phone','Phone'),('Referral','Referral'),('Ad','Ad')],string='Source')
-    jobRole = fields.Char('Job Role')
+    jobRole = fields.Selection([('owner','Business Owner'),('department_manager','Departmental Manager'),('finance_excetive','Finance Executive'),('sale_executive','Sales Executive'),('purchase','Purchase'),('account_executive','Account Executive'),('production','Production'),('complaint_dept','Complaints Dept')],default="owner",string="Job Role")
     contactExtention = fields.Char('Contact Extention')
     mainContact = fields.Boolean('Main Contact')
-    #temperament = fields.Char("Temperament")
-    #relationship = fields.Char(string="Relationship") 
-    
+    capability = fields.Char('Capability')
+    personalPhone = fields.Char('Personal Phone')
+    personalMobile = fields.Char('Personal Mobile')
+    personalEmail = fields.Char('Personal Email')
+    employeeStatus = fields.Selection([('current','Current'),('past','Past')],required='True',string="State",default="current")
+    joiningDate = fields.Date(string="Joining Date")
+    leavingDate = fields.Date(string="Leaving Date")
     companyLinks = fields.One2many('bb_contacts.contacts_link','companyLink_id',string='Company History')
     contactLinks = fields.One2many('bb_contacts.contacts_link','contactLink_id',string='Contact History')
+    
+    toa = fields.Char('Turnover FY 2016-17')
+    tob = fields.Char('Turnover FY 2017-18')
+    toc = fields.Char('Turnover FY 2018-19')
     
     def _get_name(self):
         """ Utility method to allow name_get to be overrided without re-browse the partner """

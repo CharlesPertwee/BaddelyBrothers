@@ -19,7 +19,7 @@
        
         <template id="product_quantity" inherit_id="website_sale.product" customize_show="True" name="Select Quantity">
           <xpath expr="//a[@id='add_to_cart']" position="before">
-              <span class="roundOffMsg" id="roundOffMsg">This product is sold in batches of 100 only.</span>
+              <span class="roundOffMsg" id="roundOffMsg">Minimum Quantity and multiples of the same this product can be ordered in: 100</span>
           </xpath>
         </template>
         

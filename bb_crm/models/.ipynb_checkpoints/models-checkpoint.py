@@ -30,7 +30,9 @@ class Leads(models.Model):
                 return super(Leads, self).write(vals)
             else:
                 raise ValidationError(_('Selected opportunity is of type %s, It cannot be moved to the selected stage %s'%(self.typeOfLead,stage.name)))
-            
+        else:
+            return super(Leads, self).write(vals)
+         
         
 class Stages(models.Model):
     _inherit = 'crm.stage'
