@@ -7,8 +7,8 @@
         """,
 
     'description': """
-    
-    """,
+       
+       """,
 
     'author': "SquadsoftTech",
     'website': "http://www.squadsoft.com",

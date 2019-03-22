@@ -1,6 +1,9 @@
 <odoo>
     <data>
         <template id="assets_frontend" inherit_id="website.assets_frontend">
+            <xpath expr="link[last()]" position="after">
+                <link rel="stylesheet" type="text/scss" href="/bb_products_web/static/src/scss/bb_WebsiteSales.scss" />
+            </xpath>
             <xpath expr="script[last()]" position="after">
                 <script type="text/javascript" src="/bb_products_web/static/src/js/bb_WebsiteSales.js"></script>
             </xpath>
@@ -16,7 +19,7 @@
        
         <template id="product_quantity" inherit_id="website_sale.product" customize_show="True" name="Select Quantity">
           <xpath expr="//a[@id='add_to_cart']" position="before">
-              <span style="display:block; color: purple; font-weight: bold;" id="roundOffMsg">This product is sold in batches of 100 only.</span>
+              <span class="roundOffMsg" id="roundOffMsg">This product is sold in batches of 100 only.</span>
           </xpath>
         </template>
         
