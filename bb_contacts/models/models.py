@@ -112,9 +112,9 @@ class Partner(models.Model):
     companyLinks = fields.One2many('bb_contacts.contacts_link','companyLink_id',string='Company History')
     contactLinks = fields.One2many('bb_contacts.contacts_link','contactLink_id',string='Contact History')
     
-    toa = fields.Char('Turnover FY 2016-17')
-    tob = fields.Char('Turnover FY 2017-18')
-    toc = fields.Char('Turnover FY 2018-19')
+    #toa = fields.Char('Turnover FY 2016-17')
+    #tob = fields.Char('Turnover FY 2017-18')
+    #toc = fields.Char('Turnover FY 2018-19')
     
     def _get_name(self):
         """ Utility method to allow name_get to be overrided without re-browse the partner """
