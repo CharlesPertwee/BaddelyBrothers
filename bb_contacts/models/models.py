@@ -8,13 +8,15 @@ import datetime
 class ContactJobTitle(models.Model):
     _name = 'bb_contacts.job'
     _rec_name = 'jobTitle'
-    
+    _description = 'Job Titles'
+
     jobTitle = fields.Char(string="Job Title",required=True)
 
 class ContactLink(models.Model):
     _name = 'bb_contacts.contacts_link'
     _order = "status"
-    
+    _description = 'Contact History'
+
     status = fields.Selection([('current','Current'),('past','Past')],required='True',string="State",default="current")
     company = fields.Many2one('res.partner',string="Company",domain="[('is_company','=',True)]",required=True)
     jobTitle = fields.Many2one('bb_contacts.job',string="Job Title")
@@ -106,15 +108,15 @@ class Partner(models.Model):
     personalPhone = fields.Char('Personal Phone')
     personalMobile = fields.Char('Personal Mobile')
     personalEmail = fields.Char('Personal Email')
-    employeeStatus = fields.Selection([('current','Current'),('past','Past')],required='True',string="State",default="current")
+    employeeStatus = fields.Selection([('current','Current'),('past','Past')],required='True',string="Contact Status",default="current")
     joiningDate = fields.Date(string="Joining Date")
     leavingDate = fields.Date(string="Leaving Date")
     companyLinks = fields.One2many('bb_contacts.contacts_link','companyLink_id',string='Company History')
     contactLinks = fields.One2many('bb_contacts.contacts_link','contactLink_id',string='Contact History')
     
-    #toa = fields.Char('Turnover FY 2016-17')
-    #tob = fields.Char('Turnover FY 2017-18')
-    #toc = fields.Char('Turnover FY 2018-19')
+    toa = fields.Char('Turnover FY 2016-17')
+    tob = fields.Char('Turnover FY 2017-18')
+    toc = fields.Char('Turnover FY 2018-19')
     
     def _get_name(self):
         """ Utility method to allow name_get to be overrided without re-browse the partner """

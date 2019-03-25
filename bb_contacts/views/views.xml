@@ -17,9 +17,9 @@
 				<field name="reference" attrs="{'invisible': ['|',('is_company', '=', False),('type','!=','contact')]}"/>
 				<field name="vatCountryCode" attrs="{'invisible': ['|',('is_company', '=', False),('type','!=','contact')]}"/>
 				<field name="employeeCount" attrs="{'invisible': ['|',('is_company', '=', False),('type','!=','contact')]}"/>
-                <!--field name="toa" attrs="{'invisible': ['|',('is_company', '=', False),('type','!=','contact')]}"/>
+                <field name="toa" attrs="{'invisible': ['|',('is_company', '=', False),('type','!=','contact')]}"/>
                 <field name="tob" attrs="{'invisible': ['|',('is_company', '=', False),('type','!=','contact')]}"/>
-                <field name="toc" attrs="{'invisible': ['|',('is_company', '=', False),('type','!=','contact')]}"/-->
+                <field name="toc" attrs="{'invisible': ['|',('is_company', '=', False),('type','!=','contact')]}"/>
                 <field name="personalPhone" attrs="{'invisible': ['|',('is_company', '=', True),('type','!=','contact')]}"/>
                 <field name="personalMobile" attrs="{'invisible': ['|',('is_company', '=', True),('type','!=','contact')]}"/>
                 <field name="personalEmail" attrs="{'invisible': ['|',('is_company', '=', True),('type','!=','contact')]}"/>
