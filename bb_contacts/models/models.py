@@ -96,10 +96,10 @@ class Partner(models.Model):
     
     reference = fields.Char('Reference No.')
     vatCountryCode = fields.Char('VAT Country Code')
-    mailingRestrictions = fields.Boolean('Mailing Restrictions')
+    mailingRestrictions = fields.Boolean('Mailing Restriction')
     faxNumber = fields.Char('Fax Number')
-    employeeCount = fields.Integer('Number of Employee')
-    sector = fields.Selection([('Design/Mktg','Design/Mktg'),('Direct','Direct'),('Government','Government'),('Private','Private'),('Student','Student'),('Supplier','Supplier'),('Trade','Trade'),('Trade-Govt','Trade-Govt'),('Trade-Printer','Trade-Printer'),('Trade-Retail','Trade-Retail')],string='Sector')
+    employeeCount = fields.Integer('Number of Employees')
+    sector = fields.Selection([('Design / Mktg','Design / Mktg'),('Direct','Direct'),('Government','Government'),('Private','Private'),('Student','Student'),('Supplier','Supplier'),('Trade','Trade'),('Trade - Govt','Trade - Govt'),('Trade - Printer','Trade - Printer'),('Trade - Retail','Trade - Retail')],string='Sector')
     source = fields.Selection([('Web','Web'),('Mailing','Mailing'),('E-Mail','E-Mail'),('Phone','Phone'),('Referral','Referral'),('Ad','Ad')],string='Source')
     jobRole = fields.Selection([('owner','Business Owner'),('department_manager','Departmental Manager'),('finance_excetive','Finance Executive'),('sale_executive','Sales Executive'),('purchase','Purchase'),('account_executive','Account Executive'),('production','Production'),('complaint_dept','Complaints Dept')],default="owner",string="Job Role")
     contactExtention = fields.Char('Contact Extention')
@@ -117,6 +117,8 @@ class Partner(models.Model):
     toa = fields.Char('Turnover FY 2016-17')
     tob = fields.Char('Turnover FY 2017-18')
     toc = fields.Char('Turnover FY 2018-19')
+    
+    customerType = fields.Selection([('Price Driven','Price Driven'),('Product Driven','Product Driven'),('Customer Driven','Customer Driven')],string="Customer Type")
     
     def _get_name(self):
         """ Utility method to allow name_get to be overrided without re-browse the partner """
@@ -150,7 +152,7 @@ class Partner(models.Model):
     def create(self,values):
         record = super(Partner, self).create(values)
         if record:
-            if record.type == 'contact' and record.company_type == 'person':
+            if record.type == 'contact' and record.company_type == 'person' and record.parent_id:
                 data = {
                     'status': 'current',
                     'company': record.parent_id.id, 
