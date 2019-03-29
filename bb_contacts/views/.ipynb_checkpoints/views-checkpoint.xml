@@ -1,10 +1,14 @@
 <odoo>
   <data>
+       
 	  <record id="view_partner_form_bb" model="ir.ui.view">
 		<field name="name">res.partner.form.bb</field>
 		<field name="model">res.partner</field>
 		<field name="inherit_id" ref="base.view_partner_form"/>
 		<field name="arch" type="xml">
+            <xpath expr="//button[@name='toggle_active']" position="before">
+                <button name="move_company" string="Move Contact" type="object" attrs="{'invisible': ['|','|',('is_company', '=', True),('type','!=','contact'),('employeeStatus','=','past')]}"/> 
+            </xpath>
             <xpath expr="//field[@name='type']" position="before">
 				<field name="mainContact" attrs="{'invisible': [('is_company', '=', True)]}"/>
 			</xpath>
@@ -26,6 +30,7 @@
 				<field name="capability" attrs="{'invisible': [('supplier', '=', False)]}"/>
                 <field name="joiningDate" attrs="{'invisible': ['|',('is_company', '=', True),('type','!=','contact')]}"/>
                 <field name="leavingDate" attrs="{'invisible': ['|',('is_company', '=', True),('type','!=','contact')]}"/>
+                <field name="history_id" invisible="1"/>
 			</xpath>
 			
 			<xpath expr="//field[@name='website']" position="after">
@@ -45,149 +50,133 @@
 
 			<xpath expr="//field[@name='function']" position="after">
 				<field name="jobRole" attrs="{'invisible': [('is_company', '=', True)]}"/>
-				<field name="contactExtention" attrs="{'invisible': ['|',('is_company', '=', True)]}"/>
                 <field name="mailingRestrictions" attrs="{'invisible': [('type','!=','contact')]}"/>
-                
+				<field name="contactExtention" attrs="{'invisible': ['|',('is_company', '=', True)]}"/>                
 			</xpath>
             
-            <xpath expr="//notebook[1]/page[1]" position="before">
-                <page string="General" autofocus="autofocus" attrs="{'invisible': [('type','!=','contact')]}">
-                    <field name="companyLinks" context="{'default_company': active_id}" attrs="{'invisible': [('is_company', '=', False)]}">
-                        <tree string="Companies">
-                            <field name = 'main'/>
-                            <field name = 'status'/>
-                            <field name = 'contact'/>
-                            <field name = 'jobTitle' />
-                            <field name = 'jobRole'/>
-                            <field name = 'relationship'/>
-                            <field name = 'phone'/>
-                            <field name = 'mobile'/>
-                            <field name = 'extension'/>
-                            <field name = 'email'/>
-                            <field name = 'fax'/>
-                            <field name = 'temperament'/>
-                        </tree>
-                        <form string="Company">
+            <xpath expr="//field[@name='child_ids']" position="replace">
+                <field name="child_ids" mode="kanban" context="{'default_parent_id': active_id, 'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_supplier': supplier, 'default_customer': customer, 'default_lang': lang, 'default_user_id': user_id}">
+                        <kanban>
+                            <field name="id"/>
+                            <field name="color"/>
+                            <field name="name"/>
+                            <field name="title"/>
+                            <field name="type"/>
+                            <field name="email"/>
+                            <field name="parent_id"/>
+                            <field name="is_company"/>
+                            <field name="function"/>
+                            <field name="phone"/>
+                            <field name="street"/>
+                            <field name="street2"/>
+                            <field name="zip"/>
+                            <field name="city"/>
+                            <field name="country_id"/>
+                            <field name="mobile"/>
+                            <field name="state_id"/>
+                            <field name="image_small"/>
+                            <field name="lang"/>
+                            <!-- fields in form x2many view to diminish requests -->
+                            <field name="comment"/>
+                            <field name="customer"/>
+                            <field name="display_name"/>
+                            <field name="supplier"/>
+                            <field name="employeeStatus"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <t t-set="color" t-value="kanban_color(record.color.raw_value)"/>
+                                    <div t-att-class="color + (record.title.raw_value == 1 ? ' oe_kanban_color_alert' : '') + ' oe_kanban_global_click'">
+                                        <div class="o_kanban_image">
+                                            <img alt="" t-if="record.image_small.raw_value" t-att-src="kanban_image('res.partner', 'image_small', record.id.raw_value)"/>
+                                            <t t-if="!record.image_small.raw_value">
+                                                <img alt="Delivery" t-if="record.type.raw_value === 'delivery'" t-att-src='_s + "/base/static/img/truck.png"'/>
+                                                <img alt="Invoice" t-if="record.type.raw_value === 'invoice'" t-att-src='_s + "/base/static/img/money.png"'/>
+                                                <t t-if="record.type.raw_value !== 'invoice' &amp;&amp; record.type.raw_value !== 'delivery'">
+                                                    <img alt="Logo" t-if="record.is_company.raw_value === true" t-att-src='_s + "/base/static/img/company_image.png"'/>
+                                                    <img alt="Avatar" t-if="record.is_company.raw_value === false" t-att-src='_s + "/base/static/img/avatar.png"'/>
+                                                 </t>
+                                            </t>
+                                        </div>
+                                        <div class="oe_kanban_details">
+                                            <field name="name"/>
+                                            <div t-if="record.employeeStatus.raw_value"><field name="employeeStatus"/></div>
+                                            <div t-if="record.email.raw_value"><field name="email" widget="email"/></div>
+                                            <div t-if="record.type.raw_value != 'contact'">
+                                                <div>
+                                                    <field name="zip"/>
+                                                    <field name="city"/>
+                                                </div>
+                                                <field t-if="record.state_id.raw_value" name="state_id"/>
+                                                <field name="country_id"/>
+                                            </div>
+                                            <div t-if="record.phone.raw_value">Phone: <field name="phone"/></div>
+                                            <div t-if="record.mobile.raw_value">Mobile: <field name="mobile"/></div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                        <form string="Contact / Address">
                             <sheet>
-                                <field name = 'company' invisible="1" options="{'no_create_edit': True}"/>
-                                <field name = 'address' invisible="1" domain="['|',('id','=',company),'&amp;',('parent_id','=',company),('type','!=','contact')]" options="{'no_create_edit': True}"/>
-                                <field name = 'relationship' invisible="1"/>
-                                <field name = 'main' invisible="1"/>
-                                <field name = 'temperament' invisible="1"/>
-                                
-                                <group name='details'>
-                                    <group>
-                                        <field name = 'contact' required="1" options="{'no_create_edit': True}"/>
-                                        <field name = 'jobTitle' required="1"/>
-                                        <field name = 'jobRole'/>
+                                        <!-- parent_id and type fields needed in attrs in base_address_city module which overwrites
+                                        _fields_view_get() of partner. It would be better to put those fields there but the web client
+                                        dosen't support when a field is displayed several times in the same view.-->
+                                <field name="type" required="1" widget="radio" options="{'horizontal': true}"/>
+                                <field name="parent_id" invisible="1"/>
+                                <hr/>
+                                <group>
+                                    <group attrs="{'invisible': [('type','=', 'contact')]}">
+                                        <label for="street" string="Address"/>
+                                        <div>
+                                            <div class="o_address_format" name="div_address">
+                                                <field name="street" placeholder="Street..." class="o_address_street"/>
+                                                <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                                <field name="city" placeholder="City" class="o_address_city"/>
+                                                <field name="state_id" class="o_address_state" placeholder="State" options='{"no_open": True}' context="{'country_id': country_id, 'zip': zip}"/>
+                                                <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                                                <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+                                            </div>
+                                        </div>
                                     </group>
                                     <group>
-                                        <field name = 'email'/>
-                                        <field name = 'phone'/>
-                                        <field name = 'extension'/>
-                                        <field name = 'mobile'/>
-                                        <field name = 'fax'/>
-                                    </group>
-                                 </group>
-                                 
-                                <group string="Employment Details">
-                                    <group>
-                                        <field name = 'status'/>
-                                    </group>
-                                    <group>
-                                        <field name = 'joiningDate'/>
-                                        <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
-                                    </group>
-                                 </group>
-                                 
-                                <group string="Documents">
-                                     <div class="container">
-                                         <div class="row">
-                                             <div class="col-sm">
-                                                 <button string="Address Label" name="generate_address_label_report" type="object" class="oe_highlight"/>
-                                             </div>
-                                             <div class="col-sm">
-                                                 <button string="Letter(for headed paper)" name="headed_letter_report" type="object" class="oe_highlight"/>
-                                             </div>
-                                             <div class="col-sm">
-                                                 <button string="Letter(for blank paper)" name="blank_letter_report" type="object" class="oe_highlight"/>
-                                             </div>
-                                         </div>
-                                     </div>
-                                 </group>
-                                
-                            </sheet>
-                        </form>
-                        
-                    </field>
-                    
-                    <field name="contactLinks" context="{'default_contact': active_id, 'default_main': mainContact,'default_status':employeeStatus,'default_jobRole':jobRole,'default_joiningDate':joiningDate,'default_leavingDate':leavingDate}" attrs="{'invisible': [('is_company', '=', True)]}">
-                        <tree string="Contacts">
-                            <field name = 'main'/>
-                            <field name = 'status'/>
-                            <field name = 'company'/>
-                            <field name = 'jobTitle' />
-                            <field name = 'jobRole'/>
-                            <field name = 'relationship'/>
-                            <field name = 'address'/>
-                            <field name = 'phone'/>
-                            <field name = 'mobile'/>
-                            <field name = 'extension'/>
-                            <field name = 'email'/>
-                            <field name = 'fax'/>
-                            <field name = 'temperament'/>
-                        </tree>
-                        <form string="Company">
-                            <sheet>
-                                <field name = 'contact' invisible="1" options="{'no_create_edit': True}"/>
-                                <field name = 'relationship' invisible="1"/>
-                                <field name = 'main' invisible="1"/>
-                                <field name = 'temperament' invisible="1"/>
-                                <group name='details'>
-                                    <group>
-                                        <field name = 'company' required="1" options="{'no_create_edit': True}"/>
-                                        <field name = 'address' domain="['|',('id','=',company),'&amp;',('parent_id','=',company),('type','!=','contact')]" required="1" options="{'no_create_edit': True}"/>
-                                        <field name = 'jobTitle'/> 
-                                        <field name = 'jobRole'/>
-                                    </group>
-                                    <group>
-                                        <field name = 'email'/>
-                                        <field name = 'phone'/>
-                                        <field name = 'extension'/>
-                                        <field name = 'mobile'/>
-                                        <field name = 'fax'/>
+                                        <field name="name" string="Contact Name" attrs="{'required' : [('type', '=', 'contact')]}"/>
+                                        <field name="employeeStatus" string="Contact Status" attrs="{'required' : [('type', '=', 'contact')]}"/>
+                                        <field name="title" placeholder="e.g. Mr."
+                                            attrs="{'invisible': [('type','!=', 'contact')]}"/>
+                                        <field name="function" placeholder="e.g. Sales Director"
+                                            attrs="{'invisible': [('type','!=', 'contact')]}"/>
+                                        <field name="email"/>
+                                        <field name="phone" widget="phone"/>
+                                        <field name="mobile" widget="phone"/>
+                                         <field name="comment" placeholder="internal note..."/>
                                     </group>
                                 </group>
-                                
-                                <group string="Employment Details">
-                                    <group>
-                                        <field name = 'status'/>
-                                    </group>
-                                    <group>
-                                        <field name = 'joiningDate'/>
-                                        <field name = 'leavingDate' attrs="{'invisible': [('status', '=', 'current')]}"/>
-                                    </group>
-                                 </group>
-                                 
-                                 <group string="Documents">
-                                     <div class="container">
-                                         <div class="row">
-                                             <div class="col-sm">
-                                                 <button string="Address Label" name="generate_address_label_report" type="object" class="oe_highlight"/>
-                                             </div>
-                                             <div class="col-sm">
-                                                 <button string="Letter(for headed paper)" name="headed_letter_report" type="object" class="oe_highlight"/>
-                                             </div>
-                                             <div class="col-sm">
-                                                 <button string="Letter(for blank paper)" name="blank_letter_report" type="object" class="oe_highlight"/>
-                                             </div>
-                                         </div>
-                                     </div>
-                                 </group>
-                                
+                                <field name="supplier" invisible="True"/>
+                                <field name="customer" invisible="True"/>
+                                <field name="lang" invisible="True"/>
+                                <field name="image" invisible="True"/>
+                                <field name="user_id" invisible="True"/>
                             </sheet>
                         </form>
-                        
+                    </field>
+            </xpath>
+            
+            <xpath expr="//notebook[1]/page[1]" position="before">
+                <page string="General" autofocus="autofocus" attrs="{'invisible': ['|',('type','!=','contact'),('is_company', '=', True)]}">
+                    <field name="contactHistory" attrs="{'invisible': [('is_company', '=', True)]}">
+                        <tree string="Contacts">
+                            <field name = 'mainContact'/>
+                            <field name = 'employeeStatus'/>
+                            <field name = 'parent_id'/>
+                            <field name = 'function' />
+                            <field name = 'jobRole'/>
+                            <field name = 'street'/>
+                            <field name = 'personalPhone'/>
+                            <field name = 'personalMobile'/>
+                            <field name = 'contactExtention'/>
+                            <field name = 'email'/>
+                            <field name = 'faxNumber'/>
+                        </tree>
                     </field>
                 </page>
             </xpath>

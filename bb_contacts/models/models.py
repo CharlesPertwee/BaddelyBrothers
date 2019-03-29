@@ -4,92 +4,13 @@ from odoo import models, fields, api
 from docx import Document
 import datetime
 
-
-class ContactJobTitle(models.Model):
-    _name = 'bb_contacts.job'
-    _rec_name = 'jobTitle'
-    _description = 'Job Titles'
-
-    jobTitle = fields.Char(string="Job Title",required=True)
-
-class ContactLink(models.Model):
-    _name = 'bb_contacts.contacts_link'
-    _order = "status"
-    _description = 'Contact History'
-
-    status = fields.Selection([('current','Current'),('past','Past')],required='True',string="State",default="current")
-    company = fields.Many2one('res.partner',string="Company",domain="[('is_company','=',True)]",required=True)
-    jobTitle = fields.Many2one('bb_contacts.job',string="Job Title")
-    jobRole = fields.Selection([('owner','Business Owner'),('department_manager','Departmental Manager'),('finance_excetive','Finance Executive'),('sale_executive','Sales Executive'),('purchase','Purchase'),('account_executive','Account Executive'),('production','Production'),('complaint_dept','Complaints Dept')],string="Job Role")
-    relationship = fields.Char(string="Relationship")        
-    address = fields.Many2one('res.partner', string="Address",domain="[('type','!=','contact')]")
-    phone = fields.Char(string="Phone")
-    mobile = fields.Char(string="Mobile Phone")
-    extension = fields.Integer(string="Extension")
-    email = fields.Char(string='E-mail')
-    fax = fields.Char(string='Fax-No')
-    joiningDate = fields.Date(string="Joining Date")
-    leavingDate = fields.Date(string="Leaving Date")
-    main = fields.Boolean(string="Main")
-    temperament = fields.Char("Temperament")
+class HistoryGroup(models.Model):
+    _name = 'bb_contacts.history'
+    _rec_name = 'name'
+    name = fields.Char('Name',required=True)
     
-    contact = fields.Many2one('res.partner',string='Contact',domain="[('is_company','=',False),('type','=','contact')]",required=True)
+    contacts = fields.One2many('res.partner','history_id',string='Contacts')
     
-    contactLink_id = fields.Many2one('res.partner')
-    companyLink_id = fields.Many2one('res.partner')
-    
-    #@api.onchange('leavingDate')
-    #def leave_employee(self):
-    #    for record in self:
-    #        if(record.leavingDate):
-    #            record.status = 'past'
-    
-        
-    @api.model
-    def create(self,values):
-        values['contactLink_id'] = values['contact']
-        values['companyLink_id'] = values['company']
-        values['main'] = self.env['res.partner'].search([('id','=',values['contact'])]).mainContact
-        #values['temperament'] = self.env['res.partner'].search([('id','=',values['contact'])]).temperament
-        #values['relationship'] = self.env['res.partner'].search([('id','=',values['contact'])]).relationship
-        record = super(ContactLink,self).create(values)
-        #data = {'contactLinks': [(4,record.id)]}
-        #record.company.write(data)
-        #record.contact.write(data)
-        return record
-       
-    def generate_address_label_report(self):
-        date = str(datetime.datetime.now().date())
-        type = "normal"
-        return{
-            'type':'ir.actions.act_url',
-            'url':'/doc/report/%s/%s/%s'%(self.id,type,date),
-            'data':self.id,
-            'target':'self',
-        }            
-   
-    def headed_letter_report(self):
-        date = str(datetime.datetime.now().date())
-        type = "letter"
-        return{
-            'type':'ir.actions.act_url',
-            'url':'/doc/report/%s/%s/%s'%(self.id,type,date),
-            'data':self.id,
-            'target':'self',
-        }
-    
-    def blank_letter_report(self):
-        date = str(datetime.datetime.now().date())
-        type = "head_letter"
-        return{
-            'type':'ir.actions.act_url',
-            'url':'/doc/report/%s/%s/%s'%(self.id,type,date),
-            'data':self.id,
-            'target':'self',
-        }
-    
-    
-        
 class Partner(models.Model):
     _inherit = 'res.partner'
     _name = 'res.partner'
@@ -111,14 +32,21 @@ class Partner(models.Model):
     employeeStatus = fields.Selection([('current','Current'),('past','Past')],required='True',string="Contact Status",default="current")
     joiningDate = fields.Date(string="Joining Date")
     leavingDate = fields.Date(string="Leaving Date")
-    companyLinks = fields.One2many('bb_contacts.contacts_link','companyLink_id',string='Company History')
-    contactLinks = fields.One2many('bb_contacts.contacts_link','contactLink_id',string='Contact History')
     
     toa = fields.Char('Turnover FY 2016-17')
     tob = fields.Char('Turnover FY 2017-18')
     toc = fields.Char('Turnover FY 2018-19')
     
+    history_id = fields.Many2one('bb_contacts.history',string='Group')
+    
     customerType = fields.Selection([('Price Driven','Price Driven'),('Product Driven','Product Driven'),('Customer Driven','Customer Driven')],string="Customer Type")
+    
+    #Compute Fields only, doesn't store any data.
+    contact_id = fields.Many2one('res.partner',store=False)
+    contactHistory = fields.One2many('res.partner','history_id',string='Contact Links', compute="_compute_contact_history",store=False)
+    
+    def _compute_contact_history(self):
+        self.contactHistory = self.history_id.contacts
     
     def _get_name(self):
         """ Utility method to allow name_get to be overrided without re-browse the partner """
@@ -152,16 +80,41 @@ class Partner(models.Model):
     def create(self,values):
         record = super(Partner, self).create(values)
         if record:
-            if record.type == 'contact' and record.company_type == 'person' and record.parent_id:
-                data = {
-                    'status': 'current',
-                    'company': record.parent_id.id, 
-                    'address': record.parent_id.id,
-                    'phone': record.phone,
-                    'mobile': record.mobile,
-                    'email': record.email,
-                    'contact' : record.id
-                }
-                self.env['bb_contacts.contacts_link'].sudo().create(data)
+            if (record.type == 'contact' and record.company_type == 'person'):
+                if not record.history_id:
+                    data = {
+                        'name': record.name
+                    }
+                    rec = self.env['bb_contacts.history'].sudo().create(data)
+                    record.write({'history_id':rec.id})
+                else:
+                    records = self.env['bb_contacts.history'].sudo().search([('id','=',record.history_id.id)])
+                    for rec in records.contacts:
+                        if rec.id != record.id:
+                            rec.write({'employeeStatus':'past'})
         return record
+    
+    def move_company(self):
+        data = self.copy()
+        view_id = self.env.ref('bb_contacts.view_partner_form_bb').id
+        
+        #set field values
+        data.parent_id = None
+        data.joiningDate = None
+        data.leavingDate = None
+        
+        return {
+            "name": "Contact Form",
+            "view_type": "form",
+            "view_mode": "form",
+            'views' : [(view_id,'form')],
+            "res_model": "res.partner",
+            'view_id': view_id,
+            "type": "ir.actions.act_window",
+            "res_id": data.id,
+            "target": "new",
+            
+        }
+        
+    
         
