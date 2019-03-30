@@ -7,7 +7,7 @@
 		<field name="inherit_id" ref="base.view_partner_form"/>
 		<field name="arch" type="xml">
             <xpath expr="//button[@name='toggle_active']" position="before">
-                <button name="move_company" string="Move Contact" type="object" attrs="{'invisible': ['|','|',('is_company', '=', True),('name','=',False),('employeeStatus','=','past')]}"/> 
+                <button class="oe_stat_button" icon="fa-random" name="move_company" string="Move Contact" type="object" attrs="{'invisible': ['|','|',('is_company', '=', True),('name','=',False),('employeeStatus','=','past')]}"/> 
             </xpath>
             <xpath expr="//field[@name='type']" position="before">
 				<field name="mainContact" attrs="{'invisible': [('is_company', '=', True)]}"/>
