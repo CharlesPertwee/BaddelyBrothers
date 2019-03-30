@@ -22,7 +22,7 @@ class Partner(models.Model):
     employeeCount = fields.Integer('Number of Employees')
     sector = fields.Selection([('Design / Mktg','Design / Mktg'),('Direct','Direct'),('Government','Government'),('Private','Private'),('Student','Student'),('Supplier','Supplier'),('Trade','Trade'),('Trade - Govt','Trade - Govt'),('Trade - Printer','Trade - Printer'),('Trade - Retail','Trade - Retail')],string='Sector')
     source = fields.Selection([('Web','Web'),('Mailing','Mailing'),('E-Mail','E-Mail'),('Phone','Phone'),('Referral','Referral'),('Ad','Ad')],string='Source')
-    jobRole = fields.Selection([('owner','Business Owner'),('department_manager','Departmental Manager'),('finance_excetive','Finance Executive'),('sale_executive','Sales Executive'),('purchase','Purchase'),('account_executive','Account Executive'),('production','Production'),('complaint_dept','Complaints Dept')],default="owner",string="Job Role")
+    jobRole = fields.Selection([('Business Owner','Business Owner'),('Departmental Manager','Departmental Manager'),('Finance Executive','Finance Executive'),('Sales Executive','Sales Executive'),('Purchasing','Purchasing'),('Accounts Executive','Accounts Executive'),('Production','Production'),('Complaints Dept','Complaints Dept')],default="Business Owner",string="Job Role")
     contactExtention = fields.Char('Contact Extention')
     mainContact = fields.Boolean('Main Contact')
     capability = fields.Char('Capability')
@@ -48,39 +48,11 @@ class Partner(models.Model):
     def _compute_contact_history(self):
         self.contactHistory = self.history_id.contacts
     
-#     def _get_name(self):
-#         """ Utility method to allow name_get to be overrided without re-browse the partner """
-#         partner = self
-#         name = partner.name or ''
-
-#         if partner.company_name or partner.parent_id:
-#             if not name and partner.type in ['invoice', 'delivery', 'other']:
-#                 name = dict(self.fields_get(['type'])['type']['selection'])[partner.type]
-#             if not partner.is_company:
-#                 name = "%s, %s" % (partner.commercial_company_name or partner.parent_id.name, name)
-#         if self._context.get('show_address_only'):
-#             name = partner._display_address(without_company=True)
-#         if self._context.get('show_address'):
-#             name = name + "\n" + partner._display_address(without_company=True)
-#         name = name.replace('\n\n', '\n')
-#         name = name.replace('\n\n', '\n')
-#         if self._context.get('address_inline'):
-#             name = name.replace('\n', ', ')
-#         if self._context.get('show_email') and partner.email:
-#             name = "%s <%s>" % (name, partner.email)
-#         if self._context.get('html_format'):
-#             name = name.replace('\n', '<br/>')
-#         if self._context.get('show_vat') and partner.vat:
-#             name = "%s - %s" % (name, partner.vat)
-#         name = partner.street if partner.type != 'contact' else name
-#         return name
-    
-    
     @api.model
     def create(self,values):
         record = super(Partner, self).create(values)
         if record:
-            if (record.type == 'contact' and record.company_type == 'person'):
+            if (record.name and record.company_type == 'person'):
                 if not record.history_id:
                     data = {
                         'name': record.name
