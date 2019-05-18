@@ -23,7 +23,7 @@ class Partner(models.Model):
     sector = fields.Selection([('Design / Mktg','Design / Mktg'),('Direct','Direct'),('Government','Government'),('Private','Private'),('Student','Student'),('Supplier','Supplier'),('Trade','Trade'),('Trade - Govt','Trade - Govt'),('Trade - Printer','Trade - Printer'),('Trade - Retail','Trade - Retail')],string='Sector')
     source = fields.Selection([('Web','Web'),('Mailing','Mailing'),('E-Mail','E-Mail'),('Phone','Phone'),('Referral','Referral'),('Ad','Ad')],string='Source')
     jobRole = fields.Selection([('Business Owner','Business Owner'),('Departmental Manager','Departmental Manager'),('Finance Executive','Finance Executive'),('Sales Executive','Sales Executive'),('Purchasing','Purchasing'),('Accounts Executive','Accounts Executive'),('Production','Production'),('Complaints Dept','Complaints Dept')],default="Business Owner",string="Job Role")
-    contactExtention = fields.Char('Contact Extention')
+    contactExtention = fields.Char('Phone Extention')
     mainContact = fields.Boolean('Main Contact')
     capability = fields.Char('Capability')
     personalPhone = fields.Char('Personal Phone')
@@ -32,6 +32,7 @@ class Partner(models.Model):
     employeeStatus = fields.Selection([('current','Current'),('past','Past')],required='True',string="Contact Status",default="current")
     joiningDate = fields.Date(string="Joining Date")
     leavingDate = fields.Date(string="Leaving Date")
+    
     
     toa = fields.Char('Turnover FY 2016-17')
     tob = fields.Char('Turnover FY 2017-18')
@@ -64,7 +65,7 @@ class Partner(models.Model):
                     for rec in records.contacts:
                         if rec.id != record.id:
                             rec.write({'employeeStatus':'past'})
-        return record
+        return record            
     
     def move_company(self):
         data = self.copy()
