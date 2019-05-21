@@ -1,0 +1,33 @@
+<odoo>
+	<data>
+		<record id="mrp_workcenter_view_bb" model="ir.ui.view">
+			<field name="name">mrp.workcenter.form.bb</field>
+			<field name="model">mrp.workcenter</field>
+			<field name="inherit_id" ref="mrp.mrp_workcenter_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='name']" position="after">
+					<field name="process_type"/>
+				</xpath>
+				<xpath expr="//notebook[1]/page[1]" position="after">
+					<page string="Quantity Breaks" autofocus="autofocus" attrs="{'invisible':[('process_type','=',False)]}">
+						<field name="qty_break_params" context="{'default_process_type':process_type}">
+							<tree>
+								<field name="qty_greater_than"/>
+								<field name="weight_greater_than"/>
+								<field name="make_ready_time"/>
+								<field name="machine_speed"/>
+								<field name="wash_up_time" invisible="context.get('process_type','print_emboss')"/>
+								<field name="make_ready_overs" attrs="{'invisible' : [('process_type','!=','print_emboss')]}"/>
+								<field name="running_overs_percent" attrs="{'invisible' : [('process_type','!=','print_emboss')]}"/>
+								<field name="standard_price"/>
+								<field name="list_price"/>
+								<field name="margin_percent"/>
+                                <field name="process_type" invisible="1"/>
+							</tree>
+						</field>
+					</page>
+				</xpath>
+			</field>
+		</record>
+	</data>
+</odoo>

@@ -1,0 +1,31 @@
+<odoo>
+	<data>
+        <record model="ir.ui.view" id="bb_process.process_list">
+          <field name="name">process.type.list</field>
+          <field name="model">bb_process.process</field>
+          <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+            </tree>
+          </field>
+        </record>
+        
+        <record model="ir.ui.view" id="bb_process.process_form">
+          <field name="name">process.type.form</field>
+          <field name="model">bb_process.process</field>
+          <field name="arch" type="xml">
+            <form>
+                <sheet>
+                  <field name="name"/>
+                </sheet>
+            </form>
+          </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="bb_process.action_window_process">
+          <field name="name">Process Types</field>
+          <field name="res_model">bb_process_process</field>
+          <field name="view_mode">tree,form</field>
+        </record>
+   </data>
+</odoo>

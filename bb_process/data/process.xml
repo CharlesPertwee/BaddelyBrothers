@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="prepress" model="bb_process.process">
+        <field name="name">Prepress</field>
+    </record>
+    
+    <record id="blank_cutting" model="bb_process.process">
+        <field name="name">Blank Cutting</field>
+    </record>
+    
+    <record id="print_emboss" model="bb_process.process">
+        <field name="name">Print/Emboss</field>
+    </record>
+   
+    <record id="guillotine" model="bb_process.process">
+        <field name="name">Guillotine</field>
+    </record>
+   
+    <record id="outwork" model="bb_process.process">
+        <field name="name">Outwork</field>
+    </record>
+   
+    <record id="envelope" model="bb_process.process">
+        <field name="name">Envelope</field>
+    </record>
+   
+    <record id="gilding" model="bb_process.process">
+        <field name="name">Gilding</field>
+    </record>
+   
+    <record id="duplex" model="bb_process.process">
+        <field name="name">Duplex</field>
+    </record>
+   
+    <record id="window_patching" model="bb_process.process">
+        <field name="name">Window Patching</field>
+    </record>
+    
+    <record id="finishing" model="bb_process.process">
+        <field name="name">Finishing</field>
+    </record>
+   
+    <record id="packing" model="bb_process.process">
+        <field name="name">Packing</field>
+    </record>
+   
+   
+</odoo> 
