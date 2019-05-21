@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bb_process_bb_process,bb_process.bb_process,model_bb_process_bb_process,,1,0,0,0
