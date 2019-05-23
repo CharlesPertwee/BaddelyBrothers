@@ -1,0 +1,68 @@
+<odoo>
+	<data>
+        <record model="ir.ui.view" id="bb_process.qty_list">
+          <field name="name">qty.type.list</field>
+          <field name="model">bb_process.qty_break_params</field>
+          <field name="arch" type="xml">
+            <tree>
+				<field name="qty_greater_than"/>
+				<field name="weight_greater_than"/>
+				<field name="make_ready_time"/>
+				<field name="machine_speed"/>
+				<field name="standard_price"/>
+				<field name="list_price"/>
+				<field name="margin_percent"/>
+        	</tree>
+          </field>
+        </record>
+        
+        <record model="ir.ui.view" id="bb_process.qty_form">
+          <field name="name">qty.type.form</field>
+          <field name="model">bb_process.qty_break_params</field>
+          <field name="arch" type="xml">
+            <form>
+                <field name="process_type" invisible="1"/>
+                <field name="process_id" invisible="1"/>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="qty_greater_than"/>
+                        </group>
+                        <group>
+                            <field name="qty_upto"/>
+                        </group>
+                        <group>
+                            <field name="isDefault"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="weight_greater_than"/>
+                            <field name="make_ready_time"/>
+                            <field name="machine_speed"/> 
+                            <field name="wash_up_time"/>
+                            <field name="make_ready_overs"/>
+                            <field name="running_overs_percent"/>
+                            <field name="standard_price"/> 
+                            <field name="list_price"/> 
+                            <field name="margin_percent"/> 
+                        </group>
+                        <group>
+                            <field name="minimum_price"/>
+                            <field name="time_per_pile"/>
+                            <field name="sheets_per_pile"/>
+                            <field name="margin_percent"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+          </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="bb_process.action_window_qty">
+          <field name="name">Quantity Breaks</field>
+          <field name="res_model">bb_process.qty_break_params</field>
+          <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

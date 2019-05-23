@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class QtyBreakParams(models.Model):
     _name = "bb_process.qty_break_params"
@@ -24,7 +25,17 @@ class QtyBreakParams(models.Model):
     sheets_per_pile = fields.Integer('Sheets Per Pile')
     margin_percent = fields.Float('Margin(%)')
     process_type = fields.Many2one('bb_process.process',string="Process Type",required=True)
-
+    isDefault = fields.Boolean('Default Breaks')
+    
+    #_sql_constraints = [('DefaultQtyBreaks', 'unique(process_id, isDefault)', 'Default Quantity Breaks is already set for this process.') ]
+    
+    @api.constrains('isDefault')
+    def _check_something(self):
+        for record in self:
+            existingRecord = self.search([('process_id','=',record.process_id.id),('isDefault','=',True)])
+            if record.isDefault and existingRecord:
+                raise ValidationError("Default Quantity Breaks is already set for this process.")
+                
     
 class MrpWorkcenter(models.Model):
     _inherit = "mrp.workcenter"

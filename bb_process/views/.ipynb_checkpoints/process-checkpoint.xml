@@ -16,7 +16,16 @@
           <field name="arch" type="xml">
             <form>
                 <sheet>
-                  <field name="name"/>
+                    <div class="oe_button_box" name="button_box">
+                      <button class="oe_stat_button" icon="fa-database" type="action" name="502">
+                        <field name="process_count" string="Processes" widget="statinfo"/>
+                      </button>
+                    </div>
+                  
+                    <h2><field name="name"/></h2>
+                    <group>
+                        <field name="estimate" />
+                    </group>
                 </sheet>
             </form>
           </field>
@@ -24,8 +33,11 @@
         
         <record model="ir.actions.act_window" id="bb_process.action_window_process">
           <field name="name">Process Types</field>
-          <field name="res_model">bb_process_process</field>
+          <field name="res_model">bb_process.process</field>
           <field name="view_mode">tree,form</field>
         </record>
+        
+        <menuitem id="process_types" name="Process" sequence="75" action="bb_process.action_window_process"/>
+        
    </data>
 </odoo>
