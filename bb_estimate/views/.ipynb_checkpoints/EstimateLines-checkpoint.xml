@@ -1,4 +1,521 @@
 <odoo>
     <data>
+        <record id="estimate_line_tree_view" model="ir.ui.view">
+            <field name="name">estimate.line.tree</field>
+            <field name="model">bb_estimate.estimate_line</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="lineName"/>
+                    <field name="customer_description"/>
+                    <field name="total_price_1"/>
+                    <field name="total_price_2"/>
+                    <field name="total_price_3"/>
+                    <field name="total_price_4"/>
+                    <field name="total_price_run_on"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="estimate_line_form_view" model="ir.ui.view">
+            <field name="name">estimate.line.form</field>
+            <field name="model">bb_estimate.estimate_line</field>
+            <field name="arch" type="xml">
+                <form string="Estimate Line">
+                    <sheet>
+                        <!--div class="oe-title">
+                                            <field name="option_type" options="{'horizontal': true}" widget="radio"/>
+                                        </div-->
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-4 oe-title pull-left">
+                                    <field name="option_type" options="{'horizontal': true}" widget="radio" />
+                                </div>
+                                <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','process')]}">
+                                    <div class="form-group">
+                                        <label for="workcenterId" class="col-md-4" />
+                                        <field name="workcenterId" class="col-md-7" />
+                                    </div>
+                                </div>
+                                <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','material')]}">
+                                    <div class="form-group">
+                                        <label for="material" class="col-md-4" />
+                                        <field name="material" class="col-md-7" />
+                                    </div>
+                                </div>
+                            </div>
+                            <notebook colspan="4">
+                                <page string="Description">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="col-md-6">
+                                                <label for="customer_description" class="col-md-6" />
+                                                <field name="customer_description" class="col-md-6" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </page>
+                                <page string="Process" attrs="{'invisible':['|',('option_type','=','process'),('option_type','=',False)]}">
+                                    <!--field name="process_ids">
+                                        <tree string="Material Processes">
+                                            <field name="lineName" />
+                                            <field name="oversOnly" />
+                                            <field name="numberUp" />
+                                            <field name="sheetrequired_1" />
+                                            <field name="sheetrequired_2" />
+                                            <field name="sheetrequired_3" />
+                                            <field name="sheetrequired_4" />
+                                            <field name="sheetrequired_run_on" />
+                                            <field name="overs1" />
+                                            <field name="overs2" />
+                                            <field name="overs3" />
+                                            <field name="overs4" />
+                                            <field name="overs_run_on" />
+                                            <field name="workTwist" />
+                                        </tree>
+                                    </field-->
+                                </page>
+                                <page string="Materials" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
+                                    <!--field name="material_ids">
+                                        <tree string="Process Material">
+                                            <field name="lineName" />
+                                            <field name="oversOnly" />
+                                        </tree>
+                                    </field-->
+                                </page>
+                                <page string="Parameters &amp; Costing" autofocus="autofocus">
+                                    <p style="font-size:10px;">General Parameters</p>
+                                    <hr />
+                                    <div class="row" style="font-size:9.80px;">
+                                        <div class="col" attrs="{'invisible':['&amp;',('material','=',False),('workcenterId','=',False)]}">
+                                            <div class="row">
+                                                <div class="col-md-4" attrs="{'invisible':[('option_type','!=','material')]}">
+                                                    <div class="form-group">
+                                                        <label for="param_number_out" class="col-md-5" style="font-size:10px;" />
+                                                        <field name="param_number_out" class="col-md-6" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4" attrs="{'invisible':[('option_type','!=','process')]}">
+                                                    <div class="form-group">
+                                                        <label for="param_number_up" class="col-md-5" style="font-size:10px;" />
+                                                        <field name="param_number_up" class="col-md-6" readonly="1" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4" attrs="{'invisible':[('option_type','=','material')]}">
+                                                    <div class="form-group">
+                                                        <label for="work_twist" class="col-md-5" style="font-size:10px;" />
+                                                        <field name="work_twist" class="col-md-6" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" attrs="{'invisible':[('option_type','=','material')]}">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="param_number_of_colors" class="col-md-5" style="font-size:10px;" />
+                                                        <field name="param_number_of_colors" class="col-md-6" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="grammage" class="col-md-5" style="font-size:10px;" />
+                                                        <field name="grammage" class="col-md-6" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="param_additional_charge" class="col-md-5" style="font-size:10px;" />
+                                                        <field name="param_additional_charge" class="col-md-6" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" attrs="{'invisible':[('option_type','=','material')]}">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="param_number_of_colors_rev" class="col-md-5" style="font-size:10px;" />
+                                                        <field name="param_number_of_colors_rev" class="col-md-6" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="param_no_of_ink_mixes" class="col-md-5" style="font-size:10px;" />
+                                                        <field name="param_no_of_ink_mixes" class="col-md-6" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="param_die_size" class="col-md-5" style="font-size:10px;" />
+                                                        <field name="param_die_size" class="col-md-6" attrs="{'required':[('option_type','=','process')]}" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="font-size:10px;font-weight:bold;">
+                                            <div class="col">
+                                                <div class="row">
+                                                    <div class="col-md-2">
+                                                        <p>Parameter</p>
+                                                        <hr />
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <p>Qty 1</p>
+                                                        <hr />
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <p>Qty 2</p>
+                                                        <hr />
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <p>Qty 3</p>
+                                                        <hr />
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <p>Qty 4</p>
+                                                        <hr />
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <p>Run on</p>
+                                                        <hr />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp" widget="char" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="quantity_1" readonly="1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="quantity_2" readonly="1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="quantity_3" readonly="1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="quantity_4" readonly="1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="run_on" readonly="1" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" attrs="{'invisible':[('option_type','=','material')]}">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_make_ready_time" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_time_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_time_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_time_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_time_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_time_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" attrs="{'invisible':[('option_type','=','material')]}">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_Speed_sheets" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_machine_speed_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_machine_speed_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_machine_speed_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_machine_speed_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_machine_speed_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" attrs="{'invisible':[('option_type','=','material')]}">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_running_time" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_time_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_time_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_time_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_time_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_time_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" attrs="{'invisible':[('option_type','=','material')]}">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_wash_up_time" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_wash_up_time_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_wash_up_time_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_wash_up_time_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_wash_up_time_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_wash_up_time_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" attrs="{'invisible':[('option_type','=','material')]}">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_make_ready_overs" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_overs_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_overs_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_overs_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_overs_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_make_ready_overs_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" attrs="{'invisible':[('option_type','=','material')]}">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_running_overs" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_overs_percent_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_overs_percent_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_overs_percent_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_overs_percent_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_running_overs_percent_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" attrs="{'invisible':[('option_type','!=','material')]}">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_finished_quantity" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_finished_quantity_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_finished_quantity_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_finished_quantity_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_finished_quantity_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="param_finished_quantity_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_quantity_required" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="quantity_required_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="quantity_required_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="quantity_required_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="quantity_required_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="quantity_required_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_cost_rate" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="cost_per_unit_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="cost_per_unit_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="cost_per_unit_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="cost_per_unit_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="cost_per_unit_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_charge_rate" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="price_per_unit_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="price_per_unit_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="price_per_unit_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="price_per_unit_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="price_per_unit_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_margin" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="margin_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="margin_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="margin_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="margin_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="margin_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_total_cost" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_cost_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_cost_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_cost_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_cost_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_cost_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" attrs="{'invisible':[('option_type','=','material')]}">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_misc_charge" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="mat_charge_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="mat_charge_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="mat_charge_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="mat_charge_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="mat_charge_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_tot_charge" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_run_on" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="temp_tot_charge_1000" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_per_1000_1" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_per_1000_2" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_per_1000_3" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_per_1000_4" />
+                                                    </div>
+                                                    <div class="col-md-2 form-group">
+                                                        <field name="total_price_per_1000_run_on" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </page>
+                            </notebook>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="bb_estimate.action_window_line" model="ir.actions.act_window">
+            <field name="name">Estimate Line</field>
+            <field name="res_model">bb_estimate.estimate_line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Estimate Line</p>
+            </field>
+        </record>
     </data>
 </odoo>

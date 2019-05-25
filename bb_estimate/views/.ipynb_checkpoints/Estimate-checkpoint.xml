@@ -25,123 +25,104 @@
                     <field name="state" widget="statusbar" clickable="True" />
                 </header>
                 <sheet>
-                    <div class="oe_title" id="title">
-                        <label for="title" class="oe_edit_only" />
-                        <h1 id="title">
-                            <field name="title" placeholder="Estimate Title" />
-                        </h1>
-                    </div>
-                    <div class="container" style="padding-top:15px;">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="partner_id" class="col-md-4" />
-                                    <field name="partner_id" domain="[('is_company','=',True)]" class="col-md-7"/>
-                                </div>
-                                <div class="form-group">
-                                    <label for="contact" class="col-md-4" />
-                                    <field name="contact" domain="[('parent_id','=',partner_id)]" class="col-md-7" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="project" class="col-md-4" />
-                                    <field name="project" class="col-md-7" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="invoice_account" class="col-md-4" />
-                                    <field name="invoice_account" class="col-md-7" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="invoice_address" class="col-md-4" />
-                                    <field name="invoice_address" domain="[('type','=','invoice')]" class="col-md-7" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="invoice_contact" class="col-md-4" />
-                                    <field name="invoice_contact" domain="[('parent_id','=',partner_id)]" class="col-md-7" />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="product_type" class="col-md-4" />
-                                    <field name="product_type" domain="[('categ_id.name','=','Finished Goods')]" class="col-md-7" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="estimate_date" class="col-md-4" />
-                                    <field name="estimate_date" class="col-md-7" edit="false"/>
-                                </div>
-                                <div class="form-group">
-                                    <label for="estimator" class="col-md-4" />
-                                    <field name="estimator" class="col-md-7" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="office_copy" class="col-md-4" />
-                                    <field name="office_copy" class="col-md-7" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="estimate_number" class="col-md-4" />
-                                    <field name="estimate_number" class="col-md-7" edit="false"/>
-                                </div>
-                                <div class="form-group">
-                                    <label for="event_date" class="col-md-4" />
-                                    <field name="event_date" class="col-md-7" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="target_dispatch_date" class="col-md-4" />
-                                    <field name="target_dispatch_date" class="col-md-7" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <notebook colspan='4'>
-                        <page string="Estimate Details" autofocus="autofocus">
+                    <h1>
+                        <field name="title" placeholder="Estimate Title" />
+                    </h1>
+                    <group>
+                        <group>
+                            <field name="partner_id" domain="[('is_company','=',True)]" />
+                            <field name="contact" domain="[('parent_id','=',partner_id)]" />
+                            <field name="project" />
+                            <field name="invoice_account" />
+                            <field name="invoice_address" domain="[('type','=','invoice')]" />
+                            <field name="invoice_contact" domain="[('parent_id','=',partner_id)]"/>
+                        </group>
+                        <group>
+                            <field name="product_type" domain="[('categ_id.name','=','Finished Goods')]" />
+                            <field name="estimate_date"/>
+                            <field name="estimator" />
+                            <field name="office_copy" />
+                            <field name="estimate_number"/>
+                            <field name="event_date" />
+                            <field name="target_dispatch_date" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="EstimateDetails" string="Estimate Details">
+                            <group>
+                                <group>
+                                    <field name="quantity_1" />
+                                    <field name="quantity_2" />
+                                    <field name="run_on" />
+                                    <field name="number_up" />
+                                </group>
+                                <group>
+                                    <field name="quantity_3" />
+                                    <field name="quantity_4" />
+                                    <field name="grammage" />
+                                </group>
+                            </group>
                             <div class="container">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="quantity_1" class="col-md-4"/>
-                                            <field name="quantity_1" class="col-md-7"/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="quantity_2" class="col-md-4"/>
-                                            <field name="quantity_2" class="col-md-7"/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="run_on" class="col-md-4"/>
-                                            <field name="run_on" class="col-md-7"/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="number_up" class="col-md-4"/>
-                                            <field name="number_up" class="col-md-7"/>
+                                            <div class='row'>
+                                                <div class='col-md-6'>
+                                                    <label for="working_size" class="col-md-4"/>
+                                                    <field name="working_size" class="col-md-7"/>
+                                                </div>
+                                                <div class='col-md-6'>
+                                                    <div class="row">
+                                                        <div class='form-group'>
+                                                            <label for="working_height"  class="col-md-4"/>
+                                                            <field name="working_height" class="col-md-7"/>
+                                                        </div>
+                                                        <div class='form-group'>
+                                                            <label for="working_width" class="col-md-4"/>
+                                                            <field name="working_width" class="col-md-7"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="quantity_3" class="col-md-4"/>
-                                            <field name="quantity_3" class="col-md-7"/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="quantity_4" class="col-md-4"/>
-                                            <field name="quantity_4" class="col-md-7"/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="grammage" class="col-md-4"/>
-                                            <field name="grammage" class="col-md-7"/>
+                                           <div class='row'>
+                                              <div class='col-md-6'>
+                                                  <label for="finished_size" class="col-md-4"/>
+                                                  <field name="finished_size" class="col-md-7"/>
+                                               </div>
+                                               <div class='col-md-6'>
+                                                   <div class="row">
+                                                       <div class='form-group'>
+                                                           <label for="finished_height" class="col-md-4"/>
+                                                           <field name="finished_height" class="col-md-7"/>
+                                                       </div>
+                                                       <div class='form-group'>
+                                                          <label for="finished_width" class="col-md-4"/>
+                                                          <field name="finished_width" class="col-md-7"/>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                           </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div style="background-color:#FFFFFF; padding-top:10px; padding:10px;">
-                                <field name="estimate_line" context="{'default_quantity_1':quantity_1,'default_quantity_2':quantity_2,'default_run_on':run_on,'default_quantity_3':quantity_3,'default_quantity_4':quantity_4,'default_param_number_up':number_up}" attrs="{'readonly':[('quantity_1','=',0),('quantity_2','=',0),('quantity_3','=',0),('quantity_4','=',0),('number_up','=',0)]}">
-                                    <!--tree>
-                                        <field name="product_display_name"/>
-                                        <field name="customer_description"/>
-                                        <field name="total_price_1"/>
-                                        <field name="total_price_2"/>
-                                        <field name="total_price_3"/>
-                                        <field name="total_price_4"/>
-                                        <field name="total_price_run_on"/>
-                                    </tree-->
-                                </field>
-                            </div>
+                        </page>
+                        <page name="EstimateLines" string="Estimate Lines">
+                            <field name="estimate_line" context="{'default_quantity_1':quantity_1,'default_quantity_2':quantity_2,'default_run_on':run_on,'default_quantity_3':quantity_3,'default_quantity_4':quantity_4,'default_param_number_up':number_up}"  attrs="{'readonly':[('quantity_1','=',0),('quantity_2','=',0),('quantity_3','=',0),('quantity_4','=',0),('number_up','=',0)]}">
+                                <!--tree>
+                                    <field name="lineName"/>
+                                    <field name="customer_description"/>
+                                    <field name="total_price_1"/>
+                                    <field name="total_price_2"/>
+                                    <field name="total_price_3"/>
+                                    <field name="total_price_4"/>
+                                    <field name="total_price_run_on"/>
+                                </tree-->
+                            </field>
                         </page>
                     </notebook>
                 </sheet>
@@ -170,8 +151,7 @@
                                    </div>
                                </div>
                                <div class="o_kanban_record_body">
-                                    
-                                </div>
+                               </div>
                                <div class="o_kanban_record_bottom">
                                     <div class="oe_kanban_bottom_left">
                                     </div>
@@ -209,6 +189,7 @@
     </record>
       
     <menuitem name="Job Estimates" id="bb_estimate_estimates" action="bb_estimate.action_window_estimate"/>
+    <menuitem name="Configurations" id="bb_estimate_config" parent="bb_estimate_estimates"/>
     
   </data>
 </odoo>

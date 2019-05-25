@@ -5,20 +5,20 @@ from odoo.tools.safe_eval import safe_eval, test_python_expr
 from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
 
 class EstimateLogic():
-    def __init__(self,workcenter_Id,qty_params,cost_params,process_type,state_params,qty):
+    def __init__(self,workcenter_Id,qty_params,cost_params,process_type,fieldUpdated,qty):
         self.workcenter_Id = workcenter_Id
         self.qty_params = qty_params
         self.cost_params = cost_params
         self.process_type = process_type
-        self.state_params = state_params
+        self.fieldUpdated = fieldUpdated
         self.qty = qty
         
     def update(self,qty_params,cost_params,qty):
-        self.workcenter_Id = workcenter_Id
+        #self.workcenter_Id = workcenter_Id
         self.qty_params = qty_params
         self.cost_params = cost_params
-        self.process_type = process_type
-        self.state_params = state_params
+        #self.process_type = process_type
+        #self.fieldUpdated = state_params
         self.qty = qty
     
 class ProcessTypes(models.Model):
@@ -53,15 +53,34 @@ class ProcessTypes(models.Model):
             if msg:
                 raise ValidationError(msg)
     
-    def UpdateEstimate(self,workcenter_Id,qty_params,cost_params,process_type,state_params,qty):
-        estimate = EstimateLogic(workcenter_Id,qty_params,cost_params,process_type,state_params,qty)
+    def get_default_field_values(self):
+        param_defaults = {
+            'param_number_up' : 1,
+            'param_additional_charge' : 0.00,
+            'param_number_of_colors' : 1,
+            'param_misc_charge_per_cm2' : 0.0,
+            'param_misc_charge_per_cm2_area' : 0.0,
+            'param_number_out' : 1,
+            'param_printed_material' : False,
+        }    
+        return param_defaults
+    
+    def UpdateEstimate(self,workcenter_Id, qty_params, cost_params, process_type, fieldUpdated, qty):
+        estimate = EstimateLogic(workcenter_Id, qty_params, cost_params, process_type, fieldUpdated, qty)
         eval_context = {
                 'env' : self.env,
-                'model' : self.env['bb_process.process'],
-                'workcenter' : self.env['mrp.workcenter'].search([('Id','=','workcenter_Id')]),
+                'model' : self.env['bb_process.process'].sudo(),
+                'workcenter' : workcenter_Id,
                 'estimate' : estimate
         }
-        safe_eval(action.sudo().estimate.strip(), eval_context, mode="exec", nocopy=True)
+        safe_eval(self.sudo().estimate.strip(), eval_context, mode="exec", nocopy=True)
+        
+        qty_params.update(estimate.qty_params)
+        cost_params.update(estimate.cost_params)
+        
+        #raise Exception(estimate.qty_params)
+        
+        
 
 
     

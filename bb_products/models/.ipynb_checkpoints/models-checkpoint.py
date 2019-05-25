@@ -10,6 +10,11 @@ class ProductsTemplate(models.Model):
     grammage = fields.Char(string='Grammage (G.S.M)')
     sheetSize = fields.Char(string='Sheet Size')
     margin = fields.Float(string='Margin', compute='_compute_margin')
+    sheet_width = fields.Integer(string='Sheet Width(mm)')
+    sheet_height = fields.Integer(string='Sheet Height(mm)')
+    thickness = fields.Float(string='Thickness(microns)')
+    customerDescription = fields.Char('Standard customer Description')
+    jobTicketDescription = fields.Char('Standard Job Ticket Text')
     
     def _compute_margin(self):
         margin = 0
@@ -19,6 +24,7 @@ class ProductsTemplate(models.Model):
             margin = ((self.list_price - self.standard_price)/self.standard_price) * 100
 
         self.margin = margin
+    
 
 
     

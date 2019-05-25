@@ -11,6 +11,8 @@
                 <field name="estimateAvailable" />
                 <field name="grammage" />
                 <field name="sheetSize" />
+                <field name="customerDescription"/>
+                <field name="jobTicketDescription"/>
             </xpath>
             
 		</field>
@@ -26,6 +28,11 @@
                 <field name="margin" />
             </xpath>
             
+            <xpath expr="//field[@name='standard_price']/.." position="after">
+                <field name="sheet_width"/>
+                <field name="sheet_height"/>
+                <field name="thickness"/>
+            </xpath>
      	</field>
 	 </record>
       

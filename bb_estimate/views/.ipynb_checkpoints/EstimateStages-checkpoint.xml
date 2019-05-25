@@ -34,8 +34,8 @@
                <p class="oe_view_nocontent_create">Create New Estimate</p>
             </field>
         </record>
-        <!--
-        <menuitem name="Stage" id="bb_estimate.action_window_stage" parent="bb_estimate_estimates" action="bb_estimate.action_window_stage" />
-        -->
+        
+        <menuitem name="Stage" id="bb_estimate_stage" parent="bb_estimate_config" action="bb_estimate.action_window_stage" />
+       
     </data>
 </odoo>

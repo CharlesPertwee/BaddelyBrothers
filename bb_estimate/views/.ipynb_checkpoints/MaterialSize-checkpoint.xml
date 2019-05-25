@@ -1,0 +1,59 @@
+<odoo>
+    <data>
+        <record id="material_tree_view" model="ir.ui.view">
+          <field name="name">material.tree</field>
+          <field name="model">bb_estimate.material_size</field>
+          <field name="arch" type="xml">
+              <tree string="Material Size">
+                  <field name="name"/>
+                  <field name="width"/>
+                  <field name="height"/>
+                  <field name="isEnvelopeEstimate"/>
+                  <field name="isPrintSize"/>
+                  <field name="isEnquirySize"/>
+              </tree>
+          </field>
+        </record>
+        
+        <record id="material_form_view" model="ir.ui.view">
+          <field name="name">material.form</field>
+          <field name="model">bb_estimate.material_size</field>
+          <field name="arch" type="xml">
+              <form string="Material Size">
+                    <sheet>
+                        <h1>
+                           <field name="name" placeholder="Size Title" />
+                        </h1>
+                        <group>
+                            <group>
+                                <field name="width"/>
+                                <field name="height"/>
+                                <field name="isPrintSize"/>
+                                <field name="isEnquirySize"/>
+                            </group>
+                            <group>
+                                <field name="isEnvelopeEstimate"/>
+                                <field name="flatWidth" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}"/>
+                                <field name="flatHeight" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}"/>
+                                <field name="knifeNumber" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}"/>
+                            </group>
+                        </group>
+                    </sheet>
+              </form>
+          </field>
+      </record>   
+        
+      <record model="ir.actions.act_window" id="bb_estimate.action_window_material">
+          <field name="name">Material Size</field>
+          <field name="res_model">bb_estimate.material_size</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="domain">[]</field>
+          <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create New Material Size</p>
+            </field>
+      </record>
+      
+      <menuitem name="Material Size" id="bb_estimate_material_size" parent="bb_estimate_config" action="bb_estimate.action_window_material" />
+    </data>
+</odoo>
