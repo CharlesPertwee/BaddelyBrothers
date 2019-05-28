@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_bb_process_qty_break_params,bb_process.qty_break_params,model_bb_process_qty_break_params,,1,1,1,1
 access_bb_process_process,bb_process.process,model_bb_process_process,,1,1,1,1
+access_bb_process_boxes,bb_process.boxes,model_bb_process_boxes,,1,1,1,1
+access_bb_process_process_name,bb_process.process_name,model_bb_process_process_name,,1,1,1,1

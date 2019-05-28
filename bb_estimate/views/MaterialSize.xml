@@ -54,6 +54,6 @@
             </field>
       </record>
       
-      <menuitem name="Material Size" id="bb_estimate_material_size" parent="bb_estimate_config" action="bb_estimate.action_window_material" />
+      <menuitem name="Material Size" id="bb_estimate_material_size" parent="bb_estimate.bb_estimate_config" action="bb_estimate.action_window_material" />
     </data>
 </odoo>

@@ -29,12 +29,12 @@ class QtyBreakParams(models.Model):
     
     #_sql_constraints = [('DefaultQtyBreaks', 'unique(process_id, isDefault)', 'Default Quantity Breaks is already set for this process.') ]
     
-    @api.constrains('isDefault')
-    def _check_something(self):
-        for record in self:
-            existingRecord = self.search([('process_id','=',record.process_id.id),('isDefault','=',True)])
-            if record.isDefault and existingRecord:
-                raise ValidationError("Default Quantity Breaks is already set for this process.")
+#     @api.constrains('isDefault')
+#     def _check_something(self):
+#         for record in self:
+#             existingRecord = self.search([('process_id','=',record.process_id.id),('isDefault','=',True)])
+#             if record.isDefault and existingRecord:
+#                 raise ValidationError("Default Quantity Breaks is already set for this process.")
                 
     
 class MrpWorkcenter(models.Model):
@@ -53,3 +53,20 @@ class MrpWorkcenter(models.Model):
     misc_charge_per_cm2 = fields.Float('Misc. Material Charge per cm2', default=0.0)
     ink_mix_time = fields.Float('Ink Mix Time (hours)', default=0.28)
     
+    associatedBoxId = fields.Many2one('bb_process.boxes',string="Packaging Product")
+    sheetsPerBox = fields.Integer('Sheets Per Box')
+    timePerBox = fields.Float('Time Per Box')
+    paper_type = fields.Selection([('white','White'),('printed','Printed')],string="Paper Type")
+    
+    
+class PackingBoxes(models.Model):
+    _name = "bb_process.boxes"
+    
+    name = fields.Char('Name',required=True)
+    customerDescription = fields.Char('Standard Customer Description')
+    jobTicketDescription = fields.Char('Standard Job Ticket Description')
+    boxWeight = fields.Float('Box Weight(kg)')
+    uomId = fields.Many2one('uom.uom',string="Unit of Measure")
+    standardCost = fields.Float('Standard Cost')
+    standardPrice = fields.Float('Standard Price')
+    margin = fields.Float('Margin(%)')

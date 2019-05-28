@@ -111,6 +111,31 @@
                                 </div>
                             </div>
                         </page>
+                        <page string="Envelope Details">
+                            <group>
+                                <group>
+                                    <field name="envelope_type"/>
+                                    <field name="flap_glue_type"/>
+                                    <field name="embossed"/>
+                                </group>
+                                <group>                                    
+                                    <field name="tissue_lined"/>
+                                    <field name="knife_number"/>
+                                    <field name="windowed"/>
+                                </group>
+                            </group>
+                            <group attrs="{'invisible':[('windowed','!=',True)]}">
+                                <group>
+                                    <field name="standardWindowSize"/>
+                                </group>
+                                <group attrs="{'invisible':[('standardWindowSize','!=',True)]}">
+                                    <field name="windowHeight"/>
+                                    <field name="windowWidth"/>
+                                    <field name="windowFlhs"/>
+                                    <field name="windowUp"/>
+                                </group>
+                            </group>
+                        </page>
                         <page name="EstimateLines" string="Estimate Lines">
                             <field name="estimate_line" context="{'default_quantity_1':quantity_1,'default_quantity_2':quantity_2,'default_run_on':run_on,'default_quantity_3':quantity_3,'default_quantity_4':quantity_4,'default_param_number_up':number_up}"  attrs="{'readonly':[('quantity_1','=',0),('quantity_2','=',0),('quantity_3','=',0),('quantity_4','=',0),('number_up','=',0)]}">
                                 <!--tree>

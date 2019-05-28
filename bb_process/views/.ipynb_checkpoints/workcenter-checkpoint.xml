@@ -13,11 +13,16 @@
 						<field name="qty_break_params" context="{'default_process_type':process_type}"/>
 					</page>
                     <page string="Process Information" name="ProcessInfo" attrs="{'invisible':[('process_type','=',False)]}">
-                            <group string="Base Pricing">
+                            <group string="Category Information">
                                 <field name="standard_price"/>
                                 <field name="list_price"/>
                                 <field name="margin_percent"/>
+                                <field name="associatedBoxId" />
+                                <field name="sheetsPerBox" />
+                                <field name="timePerBox" />
+                                <field name="paper_type"/>
                             </group>
+                    
                             <group string="Additional Info">
                                 <field name="additional_charge"/>
                                 <field name="misc_charge_per_cm2"/>

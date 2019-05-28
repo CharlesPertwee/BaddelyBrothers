@@ -10,6 +10,34 @@ DIE_SIZES = [
     ('large','Invitation Die')
 ]
 
+ENVELOPE_TYPES = [
+    ('none', ''),
+    ('diamond', 'Diamond'),
+    ('highcutdiamond','High Cut Diamond'),
+    ('tuck', 'Tuck'),
+    ('pocket', 'Pocket'),
+    ('walletpocket','Walletstyle Pocket'),
+    ('wallet', 'Wallet'),
+    ('banker', 'Banker'),
+    ('tissuelined', 'Tissue Lined, Embossed & Windowed'),
+]
+
+FLAP_GLUE_TYPES = [
+    ('none', ''),
+    ('gummed', 'Gummed'),
+    ('doublegummed','Double Gummed'),
+    ('peel', 'Peel & Stick'),
+    ('ungummed', 'Un-gummed'),
+    ('topless', 'Topless'),
+    ('stringwasher', 'String & Washer'),
+]
+
+TISSUE_LINING_OPTIONS = [
+    ('full', 'Yes - Fully'),
+    ('half', 'Yes - Half'),
+    ('unlined', 'Unlined'),
+]
+
 class Estimate(models.Model):
     _name = 'bb_estimate.estimate'
     _rec_name = 'title'
@@ -65,6 +93,21 @@ class Estimate(models.Model):
     working_width = fields.Integer('Working Width')
     working_height = fields.Integer('Working Height')
     knife_number = fields.Char('Knife Number')
+    
+    envelope_type = fields.Selection(ENVELOPE_TYPES,string="Envelope Type")
+    flap_glue_type = fields.Selection(FLAP_GLUE_TYPES,string="Flap Glue Type")
+    tissue_lined = fields.Selection(TISSUE_LINING_OPTIONS,'Tissue Lined')
+    knife_number = fields.Char('Knife Number')
+    embossed = fields.Boolean('Embossed')
+    windowed = fields.Boolean('Windowed')
+    standardWindowSize = fields.Boolean('Standard Window Size')
+    windowHeight = fields.Float('Window Size: Height(mm)')
+    windowWidth = fields.Float('Window Size:Widht(mm)')
+    windowFlhs = fields.Float('Window Pos: FLHS')
+    windowUp = fields.Float('Window Pos: Up')
+    
+    
+    
     
     @api.onchange('finished_size')
     def finished_size_change(self):
