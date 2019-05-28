@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from odoo.tools.safe_eval import safe_eval, test_python_expr
 from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
+import math
 
 class EstimateLogic():
     def __init__(self,workcenter_Id,qty_params,cost_params,process_type,fieldUpdated,qty):
@@ -20,6 +21,12 @@ class EstimateLogic():
         #self.process_type = process_type
         #self.fieldUpdated = state_params
         self.qty = qty
+
+class ProcessFields(models.Model):
+    _name = 'bb_process.process_name'
+    
+    name = fields.Char('Name',required=True)
+    process_type = fields.Many2one('bb_process.process','Process')
     
 class ProcessTypes(models.Model):
     _name="bb_process.process"
@@ -35,6 +42,7 @@ class ProcessTypes(models.Model):
     name = fields.Char('Name', required=True)
     processes = fields.One2many('mrp.workcenter','process_type',string="Processes")
     process_count = fields.Integer('Processes',compute='_compute_process')
+    requiredFields = fields.One2many('bb_process.process_name','process_type',string="Required Fields")
     
     estimate = fields.Text(string='Estimate Logic', 
                            groups='base.group_system', 
@@ -71,10 +79,10 @@ class ProcessTypes(models.Model):
                 'env' : self.env,
                 'model' : self.env['bb_process.process'].sudo(),
                 'workcenter' : workcenter_Id,
-                'estimate' : estimate
+                'estimate' : estimate,
+                'math': math
         }
         safe_eval(self.sudo().estimate.strip(), eval_context, mode="exec", nocopy=True)
-        
         qty_params.update(estimate.qty_params)
         cost_params.update(estimate.cost_params)
         

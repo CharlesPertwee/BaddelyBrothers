@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <data noupdate="1">
     <record id="prepress" model="bb_process.process">
         <field name="name">Prepress</field>
         <field name="estimate">
@@ -599,5 +600,5 @@ estimate.update(qty_params,cost_params,qty)
         </field>
     </record>
    
-   
+    </data>
 </odoo> 

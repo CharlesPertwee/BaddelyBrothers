@@ -1,0 +1,53 @@
+<odoo>
+	<data>
+        <record model="ir.ui.view" id="boxes_tree_view">
+			<field name="name">bb_process.boxes.tree</field>
+			<field name="model">bb_process.boxes</field>
+			<field name="arch" type="xml">
+				<tree string="Boxes">
+					<field name="name"/>
+					<field name="boxWeight"/>
+					<field name="uomId"/>
+					<field name="standardCost"/>
+					<field name="standardPrice"/>
+					<field name="margin"/>
+				</tree>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="boxes_form_view">
+			<field name="name">bb_process.boxes.form</field>
+			<field name="model">bb_process.boxes</field>
+			<field name="arch" type="xml">
+				<form string="Boxes">
+					<sheet>
+						<h1>
+							<field name="name" placeholder="Box Name"/>
+						</h1>
+						<group>
+							<group>
+								<field name="customerDescription"/>
+								<field name="jobTicketDescription"/>
+								<field name="boxWeight"/>
+								<field name="margin"/>
+							</group>
+							<group>
+								<field name="uomId"/>
+								<field name="standardCost"/>
+								<field name="standardPrice"/>
+							</group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+        
+        <record model="ir.actions.act_window" id="bb_process.packing_boxes">
+          <field name="name">Packing Boxes</field>
+          <field name="res_model">bb_process.boxes</field>
+          <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem  id="packing_box_menu" name="Packing Boxes" parent="bb_estimate.bb_estimate_config" action="bb_process.packing_boxes"/>
+	</data>
+</odoo>
