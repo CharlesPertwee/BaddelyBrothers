@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+import math
+
 DIE_SIZES = [
     ('standard','No Die (No Charge)'),
     ('small','Crest Die'),
@@ -16,19 +18,23 @@ DUPLEX_OPTIONS = [
 ]
 class EstimateLine(models.Model):
     _name = 'bb_estimate.estimate_line'
+    _rec_name = 'lineName'
     
     workcenterId = fields.Many2one('mrp.workcenter', string="Process")
     material = fields.Many2one('product.template', string="Materials")
     estimate_id = fields.Many2one('bb_estimate.estimate','Estimate')
     
+    isExtra = fields.Bool('Extra')
+    extraDescription = fields.Char('Extra Description')
+    
     lineName = fields.Char(string='Process/Material')
     customer_description = fields.Text(string="Customer Description")
 
-    quantity_1 = fields.Char('Quantity 1')
-    quantity_2 = fields.Char('Quantity 2')
-    quantity_3 = fields.Char('Quantity 3')
-    quantity_4 = fields.Char('Quantity 4')
-    run_on = fields.Char('Run On')
+    quantity_1 = fields.Char('Quantity 1',store=True, compute="getEstimateParams")
+    quantity_2 = fields.Char('Quantity 2',store=True, compute="getEstimateParams")
+    quantity_3 = fields.Char('Quantity 3',store=True, compute="getEstimateParams")
+    quantity_4 = fields.Char('Quantity 4',store=True, compute="getEstimateParams")
+    run_on = fields.Char('Run On',store=True, compute="getEstimateParams")
     
     # Parameters for calculation
     param_make_ready_time_1 = fields.Float('Make Ready Time (hours) Qty 1', digits=(10,2))
@@ -36,90 +42,105 @@ class EstimateLine(models.Model):
     param_make_ready_time_3 = fields.Float('Make Ready Time (hours) Qty 3', digits=(10,2))
     param_make_ready_time_4 = fields.Float('Make Ready Time (hours) Qty 4', digits=(10,2))
     param_make_ready_time_run_on = fields.Float('Make Ready Time (hours) Run On', digits=(10,2))
+    req_param_make_ready_time = fields.Boolean('Req Make Ready Time (hours)')
     
     param_machine_speed_1 = fields.Float('Machine Speed Qty 1', digits=(10,2))
     param_machine_speed_2 = fields.Float('Machine Speed Qty 2', digits=(10,2))
     param_machine_speed_3 = fields.Float('Machine Speed Qty 3', digits=(10,2))
     param_machine_speed_4 = fields.Float('Machine Speed Qty 4', digits=(10,2))
     param_machine_speed_run_on = fields.Float('Machine Speed Run On', digits=(10,2))
+    req_param_machine_speed = fields.Boolean('Req Machine Speed')
     
     param_running_time_1 = fields.Float('Running Time Qty 1', digits=(10,2))
     param_running_time_2 = fields.Float('Running Time Qty 2', digits=(10,2))
     param_running_time_3 = fields.Float('Running Time Qty 3', digits=(10,2))
     param_running_time_4 = fields.Float('Running Time Qty 4', digits=(10,2))
     param_running_time_run_on = fields.Float('Running Time Run On', digits=(10,2))
+    req_param_running_time = fields.Boolean('Req Machine Speed')
     
     param_wash_up_time_1 = fields.Float('Wash Up Time (hours) Qty 1', digits=(10,2))
     param_wash_up_time_2 = fields.Float('Wash Up Time (hours) Qty 2', digits=(10,2))
     param_wash_up_time_3 = fields.Float('Wash Up Time (hours) Qty 3', digits=(10,2))
     param_wash_up_time_4 = fields.Float('Wash Up Time (hours) Qty 4', digits=(10,2))
     param_wash_up_time_run_on = fields.Float('Wash Up Time (hours) Run On', digits=(10,2))
+    req_param_wash_up_time = fields.Boolean('Req Wash Up Time (hours)')
     
     param_make_ready_overs_1 = fields.Integer('Make Ready Overs Qty 1')
     param_make_ready_overs_2 = fields.Integer('Make Ready Overs Qty 2')
     param_make_ready_overs_3 = fields.Integer('Make Ready Overs Qty 3')
     param_make_ready_overs_4 = fields.Integer('Make Ready Overs Qty 4')
     param_make_ready_overs_run_on = fields.Integer('Make Ready Overs Run On')
+    req_param_make_ready_overs = fields.Boolean('Req Make Ready Overs')
     
     param_running_overs_percent_1 = fields.Float('Running Overs (%) Qty 1', digits=(10,2))
     param_running_overs_percent_2 = fields.Float('Running Overs (%) Qty 2', digits=(10,2))
     param_running_overs_percent_3 = fields.Float('Running Overs (%) Qty 3', digits=(10,2))
     param_running_overs_percent_4 = fields.Float('Running Overs (%) Qty 4', digits=(10,2))
     param_running_overs_percent_run_on = fields.Float('Running Overs (%) Run On', digits=(10,2))
+    req_param_running_overs_percent = fields.Boolean('Req Running Overs')
     
     param_finished_quantity_1 = fields.Integer('Material Finished Quantity Qty 1')
     param_finished_quantity_2 = fields.Integer('Material Finished Quantity Qty 2')
     param_finished_quantity_3 = fields.Integer('Material Finished Quantity Qty 3')
     param_finished_quantity_4 = fields.Integer('Material Finished Quantity Qty 4')
     param_finished_quantity_run_on = fields.Integer('Material Finished Quantity Run On')
+    req_param_finished_quantity = fields.Boolean('Req Material Finished Quantity')
     
     quantity_required_1 = fields.Float('Quantity/Hours Qty 1', digits=(10,2))
     quantity_required_2 = fields.Float('Quantity/Hours Qty 2', digits=(10,2))
     quantity_required_3 = fields.Float('Quantity/Hours Qty 3', digits=(10,2))
     quantity_required_4 = fields.Float('Quantity/Hours Qty 4', digits=(10,2))
     quantity_required_run_on = fields.Float('Quantity/Hours Run On', digits=(10,2))
+    req_quantity_required = fields.Boolean('Req Quantity/Hours')
     
     cost_per_unit_1 = fields.Float('Cost Rate (GBP) Qty 1', digits=(16,6))
     cost_per_unit_2 = fields.Float('Cost Rate (GBP) Qty 2', digits=(16,6))
     cost_per_unit_3 = fields.Float('Cost Rate (GBP) Qty 3', digits=(16,6))
     cost_per_unit_4 = fields.Float('Cost Rate (GBP) Qty 4', digits=(16,6))
     cost_per_unit_run_on = fields.Float('Cost Rate (GBP) Run On', digits=(16,6))
+    req_cost_per_unit = fields.Boolean('Req Cost Rate (GBP)')
     
     price_per_unit_1 = fields.Float('Charge Rate (GBP) Qty 1', digits=(16,6))       
     price_per_unit_2 = fields.Float('Charge Rate (GBP) Qty 2', digits=(16,6))      
     price_per_unit_3 = fields.Float('Charge Rate (GBP) Qty 3', digits=(16,6))
     price_per_unit_4 = fields.Float('Charge Rate (GBP) Qty 4', digits=(16,6))
     price_per_unit_run_on = fields.Float('Charge Rate (GBP) Run On', digits=(16,6))
+    req_price_per_unit = fields.Boolean('Req Charge Rate (GBP) ')
     
     margin_1 = fields.Float('Margin (%) Qty 1', digits=(10,2))
     margin_2 = fields.Float('Margin (%) Qty 2', digits=(10,2))
     margin_3 = fields.Float('Margin (%) Qty 3', digits=(10,2))
     margin_4 = fields.Float('Margin (%) Qty 4', digits=(10,2))
     margin_run_on = fields.Float('Margin (%) Run On', digits=(10,2))
+    req_margin = fields.Boolean('Req Margin')
     
     total_cost_1 = fields.Float('Cost Qty 1', digits=(16,2))
     total_cost_2 = fields.Float('Cost Qty 2', digits=(16,2))
     total_cost_3 = fields.Float('Cost Qty 3', digits=(16,2))
     total_cost_4 = fields.Float('Cost Qty 4', digits=(16,2))
     total_cost_run_on = fields.Float('Cost Run On', digits=(16,2))
+    req_total_cost = fields.Boolean('Req Cost')
     
     mat_charge_1 = fields.Float('Material Charge Qty 1', digits=(16,2))
     mat_charge_2 = fields.Float('Material Charge Qty 2', digits=(16,2))
     mat_charge_3 = fields.Float('Material Charge Qty 3', digits=(16,2))
     mat_charge_4 = fields.Float('Material Charge Qty 4', digits=(16,2))
     mat_charge_run_on = fields.Float('Material Charge Run On', digits=(16,2))
+    req_mat_charge = fields.Boolean('Req Material Charge')
     
     total_price_1 = fields.Float('Price 1', digits=(16,2))
     total_price_2 = fields.Float('Price 2', digits=(16,2))
     total_price_3 = fields.Float('Price 3', digits=(16,2))
     total_price_4 = fields.Float('Price 4', digits=(16,2))
     total_price_run_on = fields.Float('Price Run On', digits=(16,2))
+    req_total_price = fields.Boolean('Req Price')
     
     total_price_per_1000_1 = fields.Float('Price Per 1000 Qty 1', digits=(16,2))       
     total_price_per_1000_2 = fields.Float('Price Per 1000 Qty 2', digits=(16,2))
     total_price_per_1000_3 = fields.Float('Price Per 1000 Qty 3', digits=(16,2))
     total_price_per_1000_4 = fields.Float('Price Per 1000 Qty 4', digits=(16,2))
     total_price_per_1000_run_on = fields.Float('Price Per 1000 Run On', digits=(16,2))
+    req_total_price_per_1000 = fields.Boolean('Req Price Per 1000')
     
     option_type = fields.Selection([('process','Process'),('material','Material')],string="Select option")
     
@@ -148,7 +169,7 @@ class EstimateLine(models.Model):
     
     
     #General Parameters
-    param_number_up = fields.Integer('Number Up')
+    param_number_up = fields.Integer('Number Up', compute="getEstimateParams")
     req_param_number_up = fields.Boolean('Req Number Up')
     
     param_number_out = fields.Integer('Number out')
@@ -187,6 +208,12 @@ class EstimateLine(models.Model):
     param_number_of_sheets = fields.Integer('Number of Sections')
     req_param_number_of_sheets = fields.Boolean('Number of Sections')
     
+    param_sheets_per_box = fields.Integer('Sheets per Box')
+    req_param_sheets_per_box = fields.Boolean('Req. Sheets per Box')
+    
+    param_time_per_box = fields.Float('Time per Box(Hours)')
+    req_param_time_per_box =fields.Boolean('Req. Time per Box(Hours)')
+    
     param_number_of_cuts = fields.Integer('Number of cuts')
     req_param_number_of_cuts = fields.Boolean('Number of cuts')
     
@@ -202,15 +229,88 @@ class EstimateLine(models.Model):
     param_env_peelandstick = fields.Boolean('Peel & Stick')
     req_param_env_peelandstick = fields.Boolean('Peel & Stick')
     
-    param_env_inlineemboss = fields.Boolean('Window Patching')
+    param_env_inlineemboss = fields.Boolean('In-line Emboss')
     req_param_env_inlineemboss = fields.Boolean('Window Patching')
     
     param_env_gumming = fields.Boolean('Gumming')
     req_param_env_gumming = fields.Boolean('Gumming')
     
     param_material_line_id = fields.Many2one('bb_estimate.estimate_line',string="Material")
-    req_param_material_line_id = fields.Boolean('Peel & Stick')
+    req_param_material_line_id = fields.Boolean('Material')
     
+    @api.onchange('param_additional_charge')
+    def calc_param_additional_charge(self):
+        self.onChangeEventTrigger('param_additional_charge')
+        
+    @api.onchange('param_sheets_per_box')
+    def calc_param_sheets_per_box(self):
+        self.onChangeEventTrigger('param_sheets_per_box')
+        
+    @api.onchange('param_time_per_box')
+    def calc_param_time_per_box(self):
+        self.onChangeEventTrigger('param_time_per_box')
+        
+    @api.onchange('param_env_windowpatching')
+    def calc_param_env_windowpatching(self):
+        self.onChangeEventTrigger('param_env_windowpatching')
+        
+    @api.onchange('param_env_peelandstick')
+    def calc_param_env_peelandstick(self):
+        self.onChangeEventTrigger('param_env_peelandstick')
+        
+    @api.onchange('param_env_inlineemboss')
+    def calc_param_env_inlineemboss(self):
+        self.onChangeEventTrigger('param_env_inlineemboss')
+        
+    @api.onchange('param_env_gumming')
+    def calc_param_env_gumming(self):
+        self.onChangeEventTrigger('param_env_gumming')
+        
+    @api.onchange('grammage')
+    def calc_grammage(self):
+        self.onChangeEventTrigger('param_grammage')
+        
+    @api.onchange('param_number_of_cuts')
+    def calc_param_number_of_cuts(self):
+        self.onChangeEventTrigger('param_number_of_cuts')
+        
+    @api.onchange('param_sheets_per_pile')
+    def calc_param_sheets_per_pile(self):
+        self.onChangeEventTrigger('param_sheets_per_pile')
+        
+    @api.onchange('param_time_per_pile')
+    def calc_param_time_per_pile(self):
+        self.onChangeEventTrigger('param_time_per_pile')
+        
+    @api.onchange('param_material_line_id')
+    def calc_param_material_line_id_charge(self):
+        self.onChangeEventTrigger('param_material_line_id')
+        
+    @api.onchange('param_number_of_sheets')
+    def calc_param_number_of_sheets_change(self):  
+        self.onChangeEventTrigger('param_number_of_sheets')
+    
+    @api.onchange('param_duplex_sheets')
+    def calc_param_duplex_sheets_change(self):  
+        self.onChangeEventTrigger('param_duplex_sheets')
+        
+    @api.onchange('workcenterId')  
+    def calc_workcenterId_change(self):
+        self.UpdateRequiredFields()
+        self.onChangeEventTrigger('workcenterId')
+        
+    @api.onchange('material')  
+    def calc_material_change(self):
+        self.onChangeEventTrigger('material')
+                
+    @api.onchange('param_printed_material')
+    def calc_gen_printed_mat_change(self):
+        self.onChangeEventTrigger('param_printed_material')
+    
+    @api.onchange('param_die_size')  
+    def calc_gen_param_change(self):
+        self.onChangeEventTrigger('param_die_size')
+        
     #Material Methods
     def get_default_field_values(self,material):
         qty_params = {
@@ -242,7 +342,9 @@ class EstimateLine(models.Model):
     #end
     
     def _calc_prices(self,qty_params, cost_params, fieldUpdated, qty):
-        extra_price_per_1000 = qty_params['param_additional_charge'] if qty_params['param_additional_charge'] else 0.0
+        extra_price_per_1000 = 0.0
+        if ('param_additional_charge' in qty_params) and qty_params['param_additional_charge'] != 0:
+            extra_price_per_1000 = qty_params['param_additional_charge'] 
 
         misc_charge_per_sheet = 0.0
         if qty_params.get('param_misc_charge_per_cm2') and gen_params.get('param_misc_charge_per_cm2_area'):
@@ -274,16 +376,29 @@ class EstimateLine(models.Model):
         
         cost_params['total_price'] = (cost_params['price_per_unit'] * cost_params['quantity_required']) +  cost_params['mat_charge']
         
+        if qty != 'run_on' and ('param_minimum_price' in qty_params.keys()) and qty_params['param_minimum_price']:
+            if cost_params['total_price'] < qty_params['param_minimum_price']:
+                cost_params['total_price'] = qty_params['param_minimum_price']
+   
         if cost_params['finished_quantity']:
             if qty_params['param_number_up']:
                 cost_params['total_price_per_1000'] = ((cost_params['total_price'] / float(cost_params['finished_quantity']) * 1000) / (qty_params['param_number_up']) if float(qty_params['param_number_up']) > 0 else 0.0)
             else:
                 cost_params['total_price_per_1000'] = (cost_params['total_price'] / float(cost_params['finished_quantity']) * 1000) if float(cost_params['finished_quantity']) > 0 else 0.0
         else:
-            cost_params['total_price_per_1000'] = 0.0 
-                                                       
-    def get_gen_fields(self):
-        pass    
+            cost_params['total_price_per_1000'] = 0.0
+        
+    @api.depends('estimate_id')                                                   
+    def getEstimateParams(self):
+        for record in self:
+            if record.estimate_id:
+                record.quantity_1 = record.estimate_id.quantity_1
+                record.quantity_2 = record.estimate_id.quantity_2
+                record.quantity_3 = record.estimate_id.quantity_3
+                record.quantity_4 = record.estimate_id.quantity_4
+                record.run_on = record.estimate_id.run_on
+                record.param_number_up = record.estimate_id.number_up
+
     
     def onChangeEventTrigger(self,field):
         for record in self:
@@ -333,101 +448,21 @@ class EstimateLine(models.Model):
                         record.param_number_of_cuts,
                         record.param_sheets_per_pile,
                         record.param_time_per_pile,
+                        record.param_env_windowpatching,
+                        record.param_env_peelandstick,
+                        record.param_env_inlineemboss,
+                        record.param_env_gumming,
+                        record.req_param_env_windowpatching,
+                        record.req_param_env_peelandstick,
+                        record.req_param_env_inlineemboss,
+                        record.req_param_env_gumming,
+                        record.param_sheets_per_box,
+                        record.param_time_per_box,
                         field)
                 
-    @api.onchange('param_additional_charge')
-    def calc_param_additional_charge(self):
-        self.onChangeEventTrigger('param_additional_charge')
-        
-    @api.onchange('param_number_of_cuts')
-    def calc_param_number_of_cuts(self):
-        self.onChangeEventTrigger('param_number_of_cuts')
-        
-    @api.onchange('param_sheets_per_pile')
-    def calc_param_sheets_per_pile(self):
-        self.onChangeEventTrigger('param_sheets_per_pile')
-        
-    @api.onchange('param_time_per_pile')
-    def calc_param_time_per_pile(self):
-        self.onChangeEventTrigger('param_time_per_pile')
-        
-    @api.onchange('param_material_line_id')
-    def calc_param_material_line_id_charge(self):
-        self.onChangeEventTrigger('param_material_line_id')
-        
-    @api.onchange('param_number_of_sheets')
-    def calc_param_number_of_sheets_change(self):  
-        self.onChangeEventTrigger('param_number_of_sheets')
     
-    @api.onchange('param_duplex_sheets')
-    def calc_param_duplex_sheets_change(self):  
-        self.onChangeEventTrigger('param_duplex_sheets')
-        
-    @api.onchange('workcenterId')  
-    def calc_workcenterId_change(self):
-        self.UpdateRequiredFields()
-        self.onChangeEventTrigger('workcenterId')
-        
-    @api.onchange('material')  
-    def calc_material_change(self):
-        self.onChangeEventTrigger('material')
-                
-    @api.onchange('param_printed_material')
-    def calc_gen_printed_mat_change(self):
-        self.onChangeEventTrigger('param_printed_material')
     
-    @api.onchange('param_die_size')  
-    def calc_gen_param_change(self):
-        self.onChangeEventTrigger('param_die_size')
-    
-    @api.onchange('param_make_ready_time_1')
-    def calcColPrice(self):
-        for record in self:
-            qty = '1'
-            self.calc_qty_params(
-                    record.workcenterId,
-                    record.material,
-                    record.quantity_1,
-                    record.param_make_ready_time_1,
-                    record.param_machine_speed_1,
-                    record.param_running_time_1,
-                    record.param_wash_up_time_1,
-                    record.param_make_ready_overs_1,
-                    record.param_running_overs_percent_1,
-                    record.param_finished_quantity_1,
-                    record.quantity_required_1,
-                    record.cost_per_unit_1,
-                    record.price_per_unit_1,
-                    record.margin_1,
-                    record.total_price_1,
-                    record.total_price_per_1000_1,
-                    qty,
-                    record.param_additional_charge,
-                    record.param_number_up,
-                    record.param_number_of_colors,
-                    record.param_number_of_colors_rev,
-                    record.grammage,
-                    record.param_die_size,
-                    record.param_misc_charge_per_cm2,
-                    record.param_no_of_ink_mixes,
-                    int(record.quantity_1),
-                    int(record.quantity_2),
-                    int(record.quantity_3),
-                    int(record.quantity_4),
-                    int(record.run_on),
-                    record.param_number_out,
-                    record.param_working_width,
-                    record.param_working_height,
-                    record.param_printed_material,
-                    record.param_duplex_sheets,
-                    record.param_number_of_sheets,
-                    record.param_material_line_id,
-                    record.param_number_of_cuts,
-                    record.param_sheets_per_pile,
-                    record.param_time_per_pile,
-                    'None') 
-    
-    def calc_qty_params(self,workcenterId,material,finished_quantity,param_make_ready_time,param_machine_speed,param_running_time,param_wash_up_time,param_make_ready_overs,param_running_overs_percent,param_finished_quantity,quantity_required,cost_per_unit,price_per_unit,margin,total_price,total_price_per_1000,qty,param_additional_charge,param_number_up,param_number_of_colors,param_number_of_colors_rev,param_grammage,param_die_size,param_misc_charge_per_cm2,param_no_of_ink_mixes,quantity_1,quantity_2,quantity_3,quantity_4,run_on,param_number_out,param_working_width,param_working_height,param_printed_material,param_duplex_sheets,param_number_of_sheets,param_material_line_id,param_number_of_cuts,param_sheets_per_pile,param_time_per_pile,fieldUpdated):
+    def calc_qty_params(self,workcenterId,material,finished_quantity,param_make_ready_time,param_machine_speed,param_running_time,param_wash_up_time,param_make_ready_overs,param_running_overs_percent,param_finished_quantity,quantity_required,cost_per_unit,price_per_unit,margin,total_price,total_price_per_1000,qty,param_additional_charge,param_number_up,param_number_of_colors,param_number_of_colors_rev,param_grammage,param_die_size,param_misc_charge_per_cm2,param_no_of_ink_mixes,quantity_1,quantity_2,quantity_3,quantity_4,run_on,param_number_out,param_working_width,param_working_height,param_printed_material,param_duplex_sheets,param_number_of_sheets,param_material_line_id,param_number_of_cuts,param_sheets_per_pile,param_time_per_pile,param_env_windowpatching,param_env_peelandstick,param_env_inlineemboss,param_env_gumming,req_param_env_windowpatching,req_param_env_peelandstick,req_param_env_inlineemboss,req_param_env_gumming,param_sheets_per_box,param_time_per_box,fieldUpdated):
         #Variables required for calculations        
         return_values = {}
         process_type = workcenterId.process_type
@@ -439,7 +474,17 @@ class EstimateLine(models.Model):
         qty_params = {
             'workcenterId':workcenterId,
             'param_number_out':param_number_out,
-            'material':material,      
+            'material':material,   
+            'param_env_windowpatching':param_env_windowpatching,
+            'req_param_env_windowpatching':req_param_env_windowpatching,
+            'param_sheets_per_box':param_sheets_per_box,
+            'param_time_per_box':param_time_per_box,
+            'param_env_peelandstick':param_env_peelandstick,
+            'req_param_env_peelandstick':req_param_env_peelandstick,
+            'param_env_inlineemboss':param_env_inlineemboss,
+            'req_param_env_inlineemboss':req_param_env_inlineemboss,
+            'param_env_gumming':param_env_gumming,
+            'req_param_env_gumming':req_param_env_gumming,
             'param_number_up':param_number_up,
             'param_duplex_sheets':param_duplex_sheets,
             'param_number_of_sheets':param_number_of_sheets,
@@ -453,6 +498,7 @@ class EstimateLine(models.Model):
             'param_time_per_pile':param_time_per_pile,
             'param_additional_charge':param_additional_charge,
             'param_die_size':param_die_size,
+            'param_minimum_price': 0,
             'param_misc_charge_per_cm2':param_misc_charge_per_cm2,
             'param_no_of_ink_mixes':param_no_of_ink_mixes,
             'working_width':param_working_width,
@@ -489,7 +535,7 @@ class EstimateLine(models.Model):
             'total_price_per_1000'          : total_price_per_1000
         }
         
-        if float(finished_quantity) > 0.0:        
+        if float(finished_quantity) > 0.0:  
             if self.option_type == 'process':
                 workcenterId.process_type.UpdateEstimate(workcenterId,qty_params,cost_params,process_type,fieldUpdated,qty)
                 return_values['lineName'] = workcenterId.name
@@ -508,15 +554,10 @@ class EstimateLine(models.Model):
                 cost_params['price_per_unit'] = material.list_price
                 cost_params['margin'] = material.margin
                     
-
             self._calc_prices(qty_params, cost_params, fieldUpdated, qty)
             return_values.update(cost_params)
             self.update_values(qty_params,return_values,qty)  
-       
-        
-        
-
-
+    
     def update_values(self,qty_params,return_values,qty):        
         for record in self:
             record['lineName'] = return_values['lineName'] if 'lineName' in return_values else ''
@@ -538,6 +579,13 @@ class EstimateLine(models.Model):
             record['param_number_of_colors'] = qty_params.get('param_number_of_colors') 
             record['param_additional_charge'] = qty_params['param_additional_charge'] if 'param_additional_charge' in qty_params else ''
             record['param_number_out']  = qty_params['param_number_out'] if 'param_number_out' in qty_params else ''
+            record['req_param_env_windowpatching'] = qty_params['req_param_env_windowpatching']
+            record['req_param_env_peelandstick'] = qty_params['req_param_env_peelandstick']
+            record['req_param_env_inlineemboss'] = qty_params['req_param_env_inlineemboss']
+            record['req_param_env_gumming'] = qty_params['req_param_env_gumming']
+            record['param_sheets_per_box'] = qty_params['param_sheets_per_box']
+            record['param_time_per_box'] = qty_params['param_time_per_box']
+            
     
     def UpdateRequiredFields(self):
         for record in self:
@@ -546,4 +594,60 @@ class EstimateLine(models.Model):
                 fields = {x.name:True for x in record.workcenterId.process_type.requiredFields}
                 record.update(model_fields)
                 record.update(fields)
-                
+    
+    def create(self,values):
+        records = super(EstimateLine,self).create(values)
+        for lineId in records:
+            if lineId:
+                if lineId.option_type == 'process':
+                    if lineId.workcenterId.associatedBoxId:
+                        data = {}
+                        material = lineId.workcenterId.associatedBoxId
+                        estimate = lineId.estimate_id
+                        for qty in ['1','2','3','4','run_on']:
+                            if qty == 'run_on':
+                                quantity = 'run_on'
+                            else:
+                                quantity = 'quantity_'+qty
+
+                            if not estimate[quantity]:
+                                continue
+
+                            cost_params={
+                                'finished_quantity':estimate[quantity],
+                                'cost_per_unit':material.standard_price,
+                                'price_per_unit':material.list_price,
+                                'margin':material.margin,
+                            }
+                            
+                            qty_params={
+                                'param_number_up':lineId.param_number_up
+                            }
+
+
+                            cost_params['quantity_required'] = math.ceil(cost_params['finished_quantity'] / float(lineId.param_sheets_per_box))
+
+                            self._calc_prices(qty_params, cost_params, 'None', qty)
+
+                            data.update({
+                                'quantity_required_'+qty    : cost_params['quantity_required'],
+                                'cost_per_unit_'+qty        : material.standard_price,
+                                'price_per_unit_'+qty       : material.list_price,
+                                'margin_'+qty               : material.margin,
+                                'total_cost_'+qty           : cost_params['total_cost'],
+                                'total_price_'+qty          : cost_params['total_price'],
+                                'total_price_per_1000_'+qty : cost_params['total_price_per_1000']
+                                })
+
+
+                        newRecord = {
+                            'estimate_id' : lineId.estimate_id.id,
+                            'material': material.id,
+                            'option_type':'material',
+                            'lineName' : material.name
+                        }
+                        newRecord.update(data)
+                        super(EstimateLine,self).create(newRecord)
+            
+            
+

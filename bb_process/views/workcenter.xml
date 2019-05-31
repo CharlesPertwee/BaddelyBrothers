@@ -10,23 +10,31 @@
 				</xpath>
 				<xpath expr="//notebook[1]/page[1]" position="after">
 					<page string="Quantity Breaks" name="QunatityBreaks" autofocus="autofocus" attrs="{'invisible':[('process_type','=',False)]}">
-						<field name="qty_break_params" context="{'default_process_type':process_type}"/>
+						<field name="qty_break_params"/>
 					</page>
                     <page string="Process Information" name="ProcessInfo" attrs="{'invisible':[('process_type','=',False)]}">
                             <group string="Category Information">
-                                <field name="standard_price"/>
-                                <field name="list_price"/>
-                                <field name="margin_percent"/>
-                                <field name="associatedBoxId" />
-                                <field name="sheetsPerBox" />
-                                <field name="timePerBox" />
-                                <field name="paper_type"/>
+                                <group>
+                                    <field name="standard_price"/>
+                                    <field name="list_price"/>
+                                    <field name="margin_percent"/>
+                                    <field name="associatedBoxId" />
+                                    <field name="sheetsPerBox" />
+                                    <field name="timePerBox" widget="float_time" />
+                                </group>
+                                <group>
+                                    <field name="paper_type"/>
+                                    <field name="windowPatchingAvailable"/>
+                                    <field name="peelStickAvailable"/>
+                                    <field name="inlineEmbossAvailable"/>
+                                    <field name="gummingAvailable"/>
+                                </group>
                             </group>
                     
                             <group string="Additional Info">
                                 <field name="additional_charge"/>
                                 <field name="misc_charge_per_cm2"/>
-                                <field name="ink_mix_time"/>
+                                <field name="ink_mix_time" widget="float_time" />
                             </group>
                         
                     </page>

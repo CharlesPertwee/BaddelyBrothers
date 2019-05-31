@@ -106,7 +106,9 @@ class Estimate(models.Model):
     windowFlhs = fields.Float('Window Pos: FLHS')
     windowUp = fields.Float('Window Pos: Up')
     
-    
+    routings = fields.Many2one('mrp.routing','Generated Routing')
+    bom = fields.Many2one('mrp.bom', 'Generated Bom')
+    manufacturingOrder = fields.Many2one('mrp.production','Job Ticket')
     
     
     @api.onchange('finished_size')
@@ -163,3 +165,8 @@ class Estimate(models.Model):
                     records.contact = contacts
                     records.invoice_contact = contacts
                     break
+    
+    def CreateManufacturingOrder(self):
+        #Routings
+        raise Exception(self.title)
+        #Bom

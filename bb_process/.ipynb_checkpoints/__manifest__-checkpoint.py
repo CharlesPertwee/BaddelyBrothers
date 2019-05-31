@@ -7,6 +7,7 @@
         """,
 
     'description': """
+     
      """,
 
     'author': "Squadsoft Tech",
@@ -25,7 +26,6 @@
     'data': [
         'security/ir.model.access.csv',
         'views/process.xml',
-        'views/Boxes.xml',
         'views/QuantityBreaks.xml',
         'views/workcenter.xml',
         'views/templates.xml',

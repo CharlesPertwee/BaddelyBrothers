@@ -7,7 +7,7 @@
             <tree>
 				<field name="qty_greater_than"/>
 				<field name="weight_greater_than"/>
-				<field name="make_ready_time"/>
+				<field name="make_ready_time" widget="float_time"/>
 				<field name="machine_speed"/>
 				<field name="standard_price"/>
 				<field name="list_price"/>
@@ -21,10 +21,9 @@
           <field name="model">bb_process.qty_break_params</field>
           <field name="arch" type="xml">
             <form>
-                <field name="process_type" invisible="1"/>
                 <field name="process_id" invisible="1"/>
                 <sheet>
-                    <group>
+                    <group col="3">
                         <group>
                             <field name="qty_greater_than"/>
                         </group>
@@ -38,18 +37,17 @@
                     <group>
                         <group>
                             <field name="weight_greater_than"/>
-                            <field name="make_ready_time"/>
+                            <field name="make_ready_time" widget="float_time" />
                             <field name="machine_speed"/> 
-                            <field name="wash_up_time"/>
+                            <field name="wash_up_time" widget="float_time" />
                             <field name="make_ready_overs"/>
                             <field name="running_overs_percent"/>
-                            <field name="standard_price"/> 
-                            <field name="list_price"/> 
-                            <field name="margin_percent"/> 
                         </group>
                         <group>
+                            <field name="standard_price"/> 
+                            <field name="list_price"/> 
                             <field name="minimum_price"/>
-                            <field name="time_per_pile"/>
+                            <field name="time_per_pile" widget="float_time"/>
                             <field name="sheets_per_pile"/>
                             <field name="margin_percent"/>
                         </group>
