@@ -24,7 +24,7 @@ class EstimateLine(models.Model):
     material = fields.Many2one('product.template', string="Materials")
     estimate_id = fields.Many2one('bb_estimate.estimate','Estimate')
     
-    isExtra = fields.Bool('Extra')
+    isExtra = fields.Boolean('Extra')
     extraDescription = fields.Char('Extra Description')
     
     lineName = fields.Char(string='Process/Material')
