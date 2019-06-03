@@ -26,6 +26,9 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                      <button class="oe_stat_button" icon="fa-database" type="object" name="AddLineItem">
+                          <span>Add Line</span>
+                      </button>
                       <button class="oe_stat_button" icon="fa-database" type="object" name="CreateManufacturingOrder">
                           <span>Create MO</span>
                       </button>
@@ -143,7 +146,12 @@
                             </group>
                         </page>
                         <page name="EstimateLines" string="Estimate Lines" attrs="{'invisible':[('id','=',False)]}">
-                            <field name="estimate_line" context="{'default_estimate_id':active_id}" attrs="{'readonly':[('quantity_1','=',0),('quantity_2','=',0),('quantity_3','=',0),('quantity_4','=',0),('number_up','=',0)]}"/>
+                            <field name="estimate_line" readonly="1"/>
+                            <notebook>
+                                <page string="Estimate Line Extras" autofocus="True">
+                                    <field name="estimate_extra_line" readonly="1"/>
+                                </page>
+                            </notebook>
                         </page>
                     </notebook>
                 </sheet>

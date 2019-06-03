@@ -72,8 +72,9 @@ class Estimate(models.Model):
                             , index=True
                             , group_expand='_read_group_state'
                             , default=lambda self: self.env['bb_estimate.stage'].search([])[0])
-    estimate_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Line')
-
+    estimate_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Line',compute="_get_estimate_line")
+    estimate_extra_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Extra Line')
+    
     quantity_1 = fields.Integer('Quantity 1')    
     quantity_2 = fields.Integer('Quantity 2')
     quantity_3 = fields.Integer('Quantity 3')
@@ -110,6 +111,21 @@ class Estimate(models.Model):
     bom = fields.Many2one('mrp.bom', 'Generated Bom')
     manufacturingOrder = fields.Many2one('mrp.production','Job Ticket')
     
+    hasExtra = fields.Boolean('Has Extra',compute="getExtras")
+    
+    @api.depends('hasExtra')
+    def getExtras(self):
+        for record in self:
+            for line in estimate_extra_line:
+                if line.isExtra:
+                    record.hasExtra = True
+    
+    
+    @api.depends('estimate_line','estimate_extra_line')
+    def _get_estimate_line(self):
+        for record in self:
+            record_not_extra = self.env['bb_estimate.estimate_line'].sudo().search([('estimate_id','=',record.id),('isExtra','=',False)])
+            record.estimate_line = record_not_extra
     
     @api.onchange('finished_size')
     def finished_size_change(self):
@@ -167,6 +183,23 @@ class Estimate(models.Model):
                     break
     
     def CreateManufacturingOrder(self):
-        #Routings
-        raise Exception(self.title)
-        #Bom
+        return {
+                'view_type' : 'form',
+                'view_mode' : 'form',
+                'name': 'Convert',
+                'res_model' : 'bb_estimate.wizard_order_convert',
+                'type' : 'ir.actions.act_window',
+                'context' : "{'default_EstimateId' : active_id}",
+                'target' : 'new'
+            }
+        
+    def AddLineItem(self):
+        return {
+                'view_type' : 'form',
+                'view_mode' : 'form',
+                'name': 'Add New Line',
+                'res_model' : 'bb_estimate.estimate_line',
+                'type' : 'ir.actions.act_window',
+                'context' : "{'default_estimate_id' : active_id}",
+                'target' : 'new'
+            }

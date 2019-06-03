@@ -29,7 +29,9 @@
         'views/EstimateStages.xml',
         'views/MaterialSize.xml',
         'views/templates.xml',
+        'wizards/views/OrderConvert.xml',
         'data/Stages.xml',
+        
     ],
     # only loaded in demonstration mode
     'demo': [

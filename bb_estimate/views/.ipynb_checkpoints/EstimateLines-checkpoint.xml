@@ -4,7 +4,8 @@
             <field name="name">estimate.line.tree</field>
             <field name="model">bb_estimate.estimate_line</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree string="Estimate Lines" decoration-warning="isExtra==True">
+                    <field name="isExtra" invisible="1"/>
                     <field name="lineName"/>
                     <field name="customer_description"/>
                     <field name="total_price_1" sum="Total Price 1"/>
@@ -44,6 +45,7 @@
                         <field name="req_param_env_inlineemboss" invisible="1" />
                         <field name="req_param_env_gumming" invisible="1" />
                         <field name="req_param_material_line_id" invisible="1" />
+                        <field name="req_unallocated_finished_quantity" invisible="1" />
                         
                         <field name="req_param_make_ready_time" invisible="1" />
                         <field name="req_param_machine_speed" invisible="1" />
@@ -80,8 +82,8 @@
                                 </div>
                                 <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','material')]}">
                                     <div class="form-group">
-                                        <label for="material" class="col-md-4" />
-                                        <field name="material" class="col-md-7" />
+                                        <label for="MaterialTypes" class="col-md-4" />
+                                        <field name="MaterialTypes" class="col-md-7" />
                                     </div>
                                 </div>
                             </div>
@@ -91,157 +93,156 @@
                                         <field name="customer_description" class="col-md-6" />
                                     </group>
                                 </page>
-                                <page string="Process" attrs="{'invisible':['|',('option_type','=','process'),('option_type','=',False)]}">
-                                </page>
-                                <page string="Materials" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
-                                </page>
-                                <page string="Parameters &amp; Costing" autofocus="autofocus" attrs="{'invisible':['&amp;',('workcenterId','=',False),('material','=',False)]}">
-                                    <p style="font-size:10px;">General Parameters</p>
-                                    <hr />
-                                    <div class="row" style="font-size:9.80px;">
-                                        <div class="col" attrs="{'invisible':['&amp;',('material','=',False),('workcenterId','=',False)]}">
-                                            <div class="row">
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_printed_material','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_printed_material" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_printed_material" class="col-md-6"/>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_number_of_cuts','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_number_of_cuts" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_number_of_cuts" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_sheets_per_pile','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_sheets_per_pile" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_sheets_per_pile" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_time_per_pile','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_time_per_pile" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_time_per_pile" class="col-md-6" widget="float_time"/>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_number_out','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_number_out" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_number_out" class="col-md-6" />
-                                                    </div>
-                                                </div>                                              
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_sheets_per_box','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_sheets_per_box" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_sheets_per_box" class="col-md-6" />
-                                                    </div>
-                                                </div>                                                
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_time_per_box','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_time_per_box" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_time_per_box" class="col-md-6" widget="float_time"/>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_number_up','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_number_up" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_number_up" class="col-md-6" readonly="1" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_work_twist','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="work_twist" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="work_twist" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row" >
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_number_of_colors','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_number_of_colors" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_number_of_colors" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_grammage','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="grammage" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="grammage" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_duplex_sheets','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_duplex_sheets" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_duplex_sheets" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_number_of_sheets','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_number_of_sheets" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_number_of_sheets" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_additional_charge','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_additional_charge" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_additional_charge" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_material_line_id','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_material_line_id" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_material_line_id" class="col-md-6" create_edit="false" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]"/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_env_windowpatching','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_env_windowpatching" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_env_windowpatching" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_env_peelandstick','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_env_peelandstick" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_env_peelandstick" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_env_inlineemboss','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_env_inlineemboss" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_env_inlineemboss" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_env_gumming','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_env_gumming" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_env_gumming" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_number_of_colors_rev','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_number_of_colors_rev" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_number_of_colors_rev" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_no_of_ink_mixes','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_no_of_ink_mixes" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_no_of_ink_mixes" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4" attrs="{'invisible':[('req_param_die_size','=',False)]}">
-                                                    <div class="form-group">
-                                                        <label for="param_die_size" class="col-md-5" style="font-size:10px;" />
-                                                        <field name="param_die_size" class="col-md-6" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>                                    
+                                <page string="Parameters &amp; Costing" autofocus="autofocus" attrs="{'invisible':['&amp;',('workcenterId','=',False),('MaterialTypes','=',False)]}">
+                                    <group col="3" attrs="{'invisible':[('option_type','=','material')]}">
+                                        <group>
+                                            <field name="param_printed_material" attrs="{'invisible':[('req_param_printed_material','=',False)]}"/>
+                                            <field name="param_number_of_cuts" attrs="{'invisible':[('req_param_number_of_cuts','=',False)]}"/>
+                                            <field name="param_sheets_per_pile" attrs="{'invisible':[('req_param_sheets_per_pile','=',False)]}" />
+                                            <field name="param_time_per_pile" attrs="{'invisible':[('req_param_time_per_pile','=',False)]}" />
+                                            <field name="param_number_out" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_number_out','=',False)]}" />
+                                            <field name="param_sheets_per_box" attrs="{'invisible':[('req_param_sheets_per_box','=',False)]}" />
+                                            <field name="param_number_up" readonly="1" attrs="{'invisible':[('req_param_sheets_per_box','=',False)]}" />
+                                            <field name="work_twist" attrs="{'invisible':[('req_work_twist','=',False)]}" />
+                                        </group>
+                                        
+                                        <group>
+                                            <field name="param_number_of_colors" attrs="{'invisible':[('req_param_number_of_colors','=',False)]}" />
+                                            <field name="grammage" attrs="{'invisible':[('req_grammage','=',False)]}" />
+                                            <field name="param_duplex_sheets" attrs="{'invisible':[('req_param_duplex_sheets','=',False)]}" />
+                                            <field name="param_number_of_sheets" attrs="{'invisible':[('req_param_number_of_sheets','=',False)]}" />
+                                            <field name="param_additional_charge" attrs="{'invisible':[('req_param_additional_charge','=',False)]}" />
+                                            <field name="param_material_line_id" create_edit="false" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)]}" />
+                                        </group>
+                                        
+                                        <group>
+                                            <field name="param_env_windowpatching" attrs="{'invisible':[('req_param_env_windowpatching','=',False)]}" />
+                                            <field name="param_env_peelandstick" attrs="{'invisible':[('req_param_env_peelandstick','=',False)]}" />
+                                            <field name="param_env_inlineemboss" attrs="{'invisible':[('req_param_env_inlineemboss','=',False)]}" />
+                                            <field name="param_env_gumming" attrs="{'invisible':[('req_param_env_gumming','=',False)]}" />
+                                        </group>
+
+                                        <group>
+                                            <field name="param_number_of_colors_rev" attrs="{'invisible':[('req_param_number_of_colors_rev','=',False)]}" />
+                                            <field name="param_no_of_ink_mixes" attrs="{'invisible':[('req_param_no_of_ink_mixes','=',False)]}" />
+                                            <field name="param_die_size" attrs="{'invisible':[('req_param_die_size','=',False)]}" />
+                                        </group>
+                                    </group>
+                                    
+                                    <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Stock')]}">
+                                        <group>
+                                            <field name="material" string="Select Material"/>
+                                        </group>
+                                        <group string="Stock Material Properties">
+                                            <group>
+                                                <field name="grammage" />
+                                                <field name="SheetHeight" />
+                                            </group>
+                                            <group>
+                                                <field name="SheetSize" />
+                                                <field name="SheetWidth" />
+                                            </group>
+                                        </group>
+                                        <group string="Material Parameters" col="1">
+                                            <group>
+                                                <field name="param_number_out" />
+                                            </group>
+                                            <group>
+                                                <group>
+                                                    <field name="WhiteCutting" />
+                                                    <field name="PrintedCutting" />
+                                                </group>
+
+                                                <group>
+                                                    <field name="NoWhiteCuts" />
+                                                    <field name="NoPrintedCuts" />
+                                                </group>
+                                            </group>
+                                        </group>
+                                    </group>
+                                    <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Trade Counter')]}">
+                                        <group>
+                                            <field name="material" string="Select Material"/>
+                                        </group>
+                                        <group string="Material Parameters" col="1">
+                                            <group>
+                                                <field name="param_number_out" />
+                                            </group>
+                                            <group >
+                                                <group>
+                                                    <field name="WhiteCutting" />
+                                                    <field name="PrintedCutting" />
+                                                </group>
+
+                                                <group>
+                                                    <field name="NoWhiteCuts" />
+                                                    <field name="NoPrintedCuts" />
+                                                </group>
+                                            </group>
+                                        </group>
+                                    </group>
+                                    <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Non-Stockable')]}">
+                                        <group>
+                                            <field name="NonStockMaterialType" />
+                                        </group>
+                                        <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','=',False)]}">
+                                            <group>
+                                                <field name="MaterialName" colspan="4"/>
+                                            </group>
+                                            <group>
+                                                <group>
+                                                    <field name="SheetSize" />
+                                                    <field name="PurchaseUnit" />
+                                                    <field name="CostRate" />
+                                                    <field name="grammage" />
+                                                    <field name="Margin" />
+                                                </group>
+                                                <group>
+                                                    <field name="SheetHeight" />
+                                                    <field name="SheetWidth" />
+                                                    <field name="CharegeRate" />
+                                                    <field name="Supplier" />
+                                                </group>
+                                            </group>
+                                        </group>
+                                        <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','=',False)]}">
+                                            <group>
+                                                <field name="MaterialName" colspan="4"/>
+                                            </group>
+                                            <group>
+                                                <group>
+                                                    <field name="SheetSize" />
+                                                    <field name="grammage" />
+                                                </group>
+                                                <group>
+                                                    <field name="SheetHeight" />
+                                                    <field name="SheetWidth" />
+                                                </group>
+                                            </group>
+                                        </group>
+                                        <group string="Material Parameters" attrs="{'invisible':[('NonStockMaterialType','=','process')]}">
+                                            <field name="param_number_out" />
+                                            <group>
+                                                <field name="WhiteCutting" />
+                                                <field name="PrintedCutting" />
+                                            </group>
+
+                                            <group>
+                                                <field name="NoWhiteCuts" />
+                                                <field name="NoPrintedCuts" />
+                                            </group>
+                                        </group>
+                                    </group>
+                                    <hr/>
+                                    <group>
+                                        <group>
+                                            <field name="isExtra"/>
+                                        </group>
+                                        <group>
+                                            <field name="extraDescription" />
+                                        </group>
+                                    </group>
+                                    <hr/>
                                     <div class="row" style="font-size:10px;font-weight:bold;">
                                         <div class="col">
                                             <div class="row">
@@ -408,6 +409,26 @@
                                                 </div>
                                                 <div class="col-md-2 form-group">
                                                     <field name="param_running_overs_percent_run_on" />
+                                                </div>
+                                            </div>
+                                            <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_unallocated_finished_quantity','=',False)]}">
+                                                <div class="col-md-2 form-group">
+                                                    <span class="o_field_char o_field_widget o_readonly_modifier">Unallocated Quantity in this Material</span>
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="unallocated_finished_quantity_1" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="unallocated_finished_quantity_2" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="unallocated_finished_quantity_3" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="unallocated_finished_quantity_4" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="unallocated_finished_quantity_run_on" />
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_finished_quantity','=',False)]}">

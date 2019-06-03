@@ -79,6 +79,13 @@ class EstimateLine(models.Model):
     param_running_overs_percent_run_on = fields.Float('Running Overs (%) Run On', digits=(10,2))
     req_param_running_overs_percent = fields.Boolean('Req Running Overs')
     
+    unallocated_finished_quantity_1 = fields.Integer('Unallocated Finished Quantity Qty 1')
+    unallocated_finished_quantity_2 = fields.Integer('Unallocated Finished Quantity Qty 2')
+    unallocated_finished_quantity_3 = fields.Integer('Unallocated Finished Quantity Qty 3')
+    unallocated_finished_quantity_4 = fields.Integer('Unallocated Finished Quantity Qty 4')
+    unallocated_finished_quantity_run_on = fields.Integer('Unallocated Finished Quantity Run On')
+    req_unallocated_finished_quantity = fields.Boolean('Req Unallocated Finished Quantity')
+    
     param_finished_quantity_1 = fields.Integer('Material Finished Quantity Qty 1')
     param_finished_quantity_2 = fields.Integer('Material Finished Quantity Qty 2')
     param_finished_quantity_3 = fields.Integer('Material Finished Quantity Qty 3')
@@ -167,6 +174,23 @@ class EstimateLine(models.Model):
     process_ids = fields.Char('Process')#.One2many('bb_estimate.line_linkage','estimateLineId','Processes')
     material_ids = fields.Char('Material')#.One2many('bb_estimate.line_linkage','estimateLineId','Material')
     
+    #Material Fields
+    MaterialTypes = fields.Selection([('Stock','Stock'),('Trade Counter','Trade Counter'),('Non-Stockable','Non-Stockable')],string="Material Type")
+    SheetHeight = fields.Float('Sheet Height (mm)')
+    SheetWidth = fields.Float('Sheet Width(mm)')
+    SheetSize = fields.Char('Sheet Size')
+    WhiteCutting = fields.Many2one('mrp.workcenter',string="White Cutting", domain="[('paper_type','=','white')]")
+    PrintedCutting = fields.Many2one('mrp.workcenter',string="Printed Cutting", domain="[('paper_type','=','printed')]")
+    NoWhiteCuts = fields.Integer('Number of White Cuts')
+    NoPrintedCuts = fields.Integer('Number of Printed Cuts')
+    NonStockMaterialType = fields.Selection([('Bespoke Material','Bespoke Material'),('Customer Supplied Material','Customer Supplied Material')],string="Non-Stock Material Type")
+    MaterialName = fields.Char('Material')
+    SheetSize = fields.Many2one('bb_estimate.material_size',string="Sheet Size")
+    PurchaseUnit = fields.Many2one('uom.uom',string="Purchase Unit")
+    Supplier = fields.Many2one('res.partner',string="Supplier",domain="[('supplier','=',True)]")
+    CostRate = fields.Float('Cost Rate')
+    CharegeRate = fields.Float('Charge Rate')
+    Margin = fields.Float('Margin')
     
     #General Parameters
     param_number_up = fields.Integer('Number Up', compute="getEstimateParams")
@@ -595,6 +619,7 @@ class EstimateLine(models.Model):
                 record.update(model_fields)
                 record.update(fields)
     
+    @api.model
     def create(self,values):
         records = super(EstimateLine,self).create(values)
         for lineId in records:
@@ -648,6 +673,6 @@ class EstimateLine(models.Model):
                         }
                         newRecord.update(data)
                         super(EstimateLine,self).create(newRecord)
-            
+        return records    
             
 
