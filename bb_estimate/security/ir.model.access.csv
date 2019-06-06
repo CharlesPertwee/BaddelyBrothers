@@ -2,4 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_bb_estimate_stage,bb_estimate.stage,model_bb_estimate_stage,,1,1,1,0
 access_bb_estimate_estimate_line,bb_estimate.estimate_line,model_bb_estimate_estimate_line,,1,1,1,1
 access_bb_estimate_estimate,bb_estimate.estimate,model_bb_estimate_estimate,,1,1,1,0
-access_bb_estimate_material_size,bb_estimate.material_size,model_bb_estimate_material_size,,1,1,1,0
+access_bb_estimate_material_link,bb_estimate.material_link,model_bb_estimate_material_link,,1,1,1,0

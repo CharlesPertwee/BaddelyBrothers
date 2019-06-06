@@ -36,6 +36,8 @@
                                 <field name="name" />
                             </tree>
                         </field>
+                        <field name="MapMaterials" />
+                        <field name="OversOnly" />
                     </group>
                 </sheet>
             </form>

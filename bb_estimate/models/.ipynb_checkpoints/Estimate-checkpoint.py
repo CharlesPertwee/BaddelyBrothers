@@ -57,11 +57,11 @@ class Estimate(models.Model):
     
     #Estimate Summary
     title = fields.Char('Title',required=True)
-    product_type = fields.Many2one('product.product', string='Product Type')
+    product_type = fields.Many2one('product.product', string='Product Type',required=True)
     estimate_date = fields.Date('Estimate Date')
     estimator = fields.Many2one('res.users','Estimator')
     office_copy = fields.Boolean('Office copy')
-    estimate_number = fields.Char('Estimate Number')#, compute='generate_estimate_number')        
+    estimate_number = fields.Char('Estimate Number', compute='_computeEstimateNumber')        
     event_date = fields.Date('Event Date')
     target_dispatch_date = fields.Date('Target Dispatch Date')
     
@@ -72,27 +72,46 @@ class Estimate(models.Model):
                             , index=True
                             , group_expand='_read_group_state'
                             , default=lambda self: self.env['bb_estimate.stage'].search([])[0])
-    estimate_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Line',compute="_get_estimate_line")
-    estimate_extra_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Extra Line')
+    estimate_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Line')
+    #estimate_extra_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Extra Line')
     
     quantity_1 = fields.Integer('Quantity 1')    
     quantity_2 = fields.Integer('Quantity 2')
     quantity_3 = fields.Integer('Quantity 3')
     quantity_4 = fields.Integer('Quantity 4')
     run_on =  fields.Integer('Run on')
+    
+    total_price_1 = fields.Float('Total Price 1',store=True,compute="_get_estimate_line")
+    total_price_2 = fields.Float('Total Price 2',store=True,compute="_get_estimate_line")
+    total_price_3 = fields.Float('Total Price 3',store=True,compute="_get_estimate_line")
+    total_price_4 = fields.Float('Total Price 4',store=True,compute="_get_estimate_line")
+    total_price_run_on = fields.Float('Run On',store=True,compute="_get_estimate_line")
+    
+    total_cost_1 = fields.Float('Total Cost 1',store=True,compute="_get_estimate_line")
+    total_cost_2 = fields.Float('Total Cost 2',store=True,compute="_get_estimate_line")
+    total_cost_3 = fields.Float('Total Cost 3',store=True,compute="_get_estimate_line")
+    total_cost_4 = fields.Float('Total Cost 4',store=True,compute="_get_estimate_line")
+    total_cost_run_on = fields.Float('Run On',store=True,compute="_get_estimate_line")
+    
+    unAllocated_1 = fields.Integer('Un Allocated Quantity 1',store=True,compute="_get_estimate_line")
+    unAllocated_2 = fields.Integer('Un Allocated Quantity 1',store=True,compute="_get_estimate_line")
+    unAllocated_3 = fields.Integer('Un Allocated Quantity 1',store=True,compute="_get_estimate_line")
+    unAllocated_4 = fields.Integer('Un Allocated Quantity 1',store=True,compute="_get_estimate_line")
+    unAllocated_run_on = fields.Integer('Un Allocated Quantity 1',store=True,compute="_get_estimate_line")
+    
     nett_value_1 = fields.Float('Nett Value') 
     nett_value_2 = fields.Float('Nett Value 1')
     nett_value_3 = fields.Float('Nett Value 3')
     nett_value_4 = fields.Float('Nett Value 4')
 
-    number_up = fields.Integer('Number up')
-    grammage = fields.Integer('Grammage(g.s.m)')
-    finished_size = fields.Many2one('bb_estimate.material_size','Finished Size')
-    finished_width = fields.Integer('Finished Width')
-    finished_height = fields.Integer('Finished Height')
-    working_size = fields.Many2one('bb_estimate.material_size','Working Size')
-    working_width = fields.Integer('Working Width')
-    working_height = fields.Integer('Working Height')
+    number_up = fields.Integer('Number up', default=1 ,required=True )
+    grammage = fields.Integer('Grammage(g.s.m)', required=True)
+    finished_size = fields.Many2one('bb_products.material_size','Finished Size', required=True)
+    finished_width = fields.Integer('Finished Width', required=True)
+    finished_height = fields.Integer('Finished Height', required=True)
+    working_size = fields.Many2one('bb_products.material_size','Working Size', required=True)
+    working_width = fields.Integer('Working Width', required=True)
+    working_height = fields.Integer('Working Height', required=True)
     knife_number = fields.Char('Knife Number')
     
     envelope_type = fields.Selection(ENVELOPE_TYPES,string="Envelope Type")
@@ -113,20 +132,34 @@ class Estimate(models.Model):
     
     hasExtra = fields.Boolean('Has Extra',compute="getExtras")
     
+    
+    def _get_estimate_summary(self):
+        raise Exception('test')
+
+    def _computeEstimateNumber(self):
+        for record in self:
+            record.estimate_number = 'EST%d'%(record.id)
+    
     @api.depends('hasExtra')
     def getExtras(self):
         for record in self:
-            for line in estimate_extra_line:
+            for line in record.estimate_line:
                 if line.isExtra:
                     record.hasExtra = True
     
     
-    @api.depends('estimate_line','estimate_extra_line')
+    @api.depends('estimate_line')
     def _get_estimate_line(self):
         for record in self:
-            record_not_extra = self.env['bb_estimate.estimate_line'].sudo().search([('estimate_id','=',record.id),('isExtra','=',False)])
-            record.estimate_line = record_not_extra
-    
+            #totals
+            for qty in ['1','2','3','4','run_on']:
+                record['total_price_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line])
+                record['total_cost_'+qty] = sum([x['total_cost_'+qty] for x in record.estimate_line])
+                if qty != 'run_on':
+                    record['unAllocated_'+qty] = record['quantity_'+qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
+                else:
+                    record['unAllocated_'+qty] = record[qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
+                    
     @api.onchange('finished_size')
     def finished_size_change(self):
         for record in self:
@@ -200,6 +233,6 @@ class Estimate(models.Model):
                 'name': 'Add New Line',
                 'res_model' : 'bb_estimate.estimate_line',
                 'type' : 'ir.actions.act_window',
-                'context' : "{'default_estimate_id' : active_id}",
+                'context' : "{'default_estimate_id' : active_id,'default_grammage' : %d}"%(self.grammage),
                 'target' : 'new'
             }

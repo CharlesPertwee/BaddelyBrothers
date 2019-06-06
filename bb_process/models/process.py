@@ -43,6 +43,8 @@ class ProcessTypes(models.Model):
     processes = fields.One2many('mrp.workcenter','process_type',string="Processes")
     process_count = fields.Integer('Processes',compute='_compute_process')
     requiredFields = fields.One2many('bb_process.process_name','process_type',string="Required Fields")
+    MapMaterials = fields.Boolean('Requires Material')
+    OversOnly = fields.Boolean('Overs only')
     
     estimate = fields.Text(string='Estimate Logic', 
                            groups='base.group_system', 
@@ -88,7 +90,29 @@ class ProcessTypes(models.Model):
         
         #raise Exception(estimate.qty_params)
         
+    def get_white_cuts_for_number_out(self,number_out):
+        number_out_to_cuts = {
+            1:2, 2:2, 3:3, 4:4, 5:5, 6:5,
+            7:6, 8:6, 9:8, 10:8, 11:10, 12:10, 
+            13:12, 14:12, 15:14, 16:14, 17:16, 
+            18:16, 19:18, 20:18, 21:19, 22:20,
+            23:20, 24:20, 25:20
+        }
+        if number_out in number_out_to_cuts:
+            return number_out_to_cuts[number_out]
+        else:
+            return 2 
         
+    def get_printed_cuts_for_number_up(self,number_up):
+        number_up_to_cuts = {
+            1:4, 2:6, 3:8, 4:8, 5:10, 6:10, 
+            7:10, 8:10, 9:12, 10:12, 11:14, 12:14,
+        }
+        number_up = int(float(number_up))
+        if number_up in number_up_to_cuts:
+            return number_up_to_cuts[number_up]
+        else:
+            return 0   
 
 
     

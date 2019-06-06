@@ -22,7 +22,11 @@ if estimate.fieldUpdated in ['workcenterId']:
     else:
         cost_params['quantity_required'] = 0.00
 
+cost_params['params_working_sheets_needed'] = 0
+qty_params['params_working_sheets_needed'] = 0
+qty_params['params_overs_needed'] = 0
 estimate.update(qty_params,cost_params,qty)
+
 
         </field>
     </record>
@@ -89,6 +93,9 @@ elif estimate.fieldUpdated == 'param_printed_material':
 
 cost_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params)
 sheets_to_process = int(cost_params['finished_quantity']) / int(qty_params['param_number_out'])
+
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params)
+qty_params['params_overs_needed'] = 0
 
 if cost_params['param_machine_speed'] :
     cost_params['param_running_time'] = sheets_to_process / int(cost_params['param_machine_speed'])
@@ -188,6 +195,10 @@ if estimate.fieldUpdated in fields:
          cost_params['param_make_ready_time'] += ink_mix_time
     
 sheets_to_process = calculate_working_sheets_needed(qty_params,cost_params, qty) + calculate_overs_needed(qty_params,cost_params, qty)
+
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
 
 if cost_params['param_machine_speed'] :
     cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
@@ -298,6 +309,11 @@ if qty_params['param_material_line_id']:
         total_hours = ((qty_params['param_time_per_pile'] + cutting_time_per_pile) * piles_to_process) + cost_params['param_make_ready_time']
 
     cost_params['quantity_required'] = round(total_hours, 2)
+
+cost_params['params_working_sheets_needed'] = 0
+qty_params['params_working_sheets_needed'] = 0
+qty_params['params_overs_needed'] = 0
+
 estimate.update(qty_params,cost_params,qty)
         </field>
     </record>
@@ -316,7 +332,11 @@ if estimate.fieldUpdated in ['workcenterId']:
     cost_params['price_per_unit'] = workcenter.list_price
     cost_params['margin'] = workcenter.margin_percent
     cost_params['quantity_required'] = 1.0
-    
+
+cost_params['params_working_sheets_needed'] = 0
+qty_params['params_working_sheets_needed'] = 0
+qty_params['params_overs_needed'] = 0
+
 estimate.update(qty_params,cost_params,qty)
         </field>
     </record>
@@ -408,8 +428,11 @@ if estimate.fieldUpdated == 'workcenterId':
     qty_params['req_param_env_inlineemboss'] = workcenter.inlineEmbossAvailable
     qty_params['req_param_env_gumming'] = workcenter.gummingAvailable
 
-sheets_to_process = calculate_working_sheets_needed(qty_params, cost_params, qty) \
-                        + calculate_overs_needed(qty_params, cost_params, qty)
+sheets_to_process = calculate_working_sheets_needed(qty_params, cost_params, qty) + calculate_overs_needed(qty_params, cost_params, qty)
+
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
 
 if cost_params['param_machine_speed'] :
     cost_params['param_running_time'] = sheets_to_process / int(cost_params['param_machine_speed'])
@@ -421,7 +444,7 @@ total_hours = cost_params['param_make_ready_time'] + cost_params['param_running_
 
 cost_params['quantity_required'] = round(total_hours, 2)
 
-estimate.update(qty_params,cost_params,qty)       
+estimate.update(qty_params,cost_params,qty)    
         </field>
     </record>
    
@@ -486,8 +509,11 @@ qty_params['param_number_up'] = 1
 if estimate.fieldUpdated in ['workcenterId','param_grammage']:
     load_qty_break_params(workcenter, qty_params, cost_params, qty)
 
-sheets_to_process = int(calculate_working_sheets_needed(qty_params, cost_params, qty)) \
-                        + calculate_overs_needed(qty_params, cost_params, qty)
+sheets_to_process = int(calculate_working_sheets_needed(qty_params, cost_params, qty)) + calculate_overs_needed(qty_params, cost_params, qty)
+
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
 
 if cost_params['param_machine_speed'] :
     cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
@@ -498,7 +524,7 @@ total_hours = cost_params['param_make_ready_time'] + cost_params['param_running_
 
 cost_params['quantity_required'] = round(total_hours, 2)
 
-estimate.update(qty_params,cost_params,qty) 
+estimate.update(qty_params,cost_params,qty)
         </field>
     </record>
    
@@ -573,6 +599,10 @@ working_sheets = (calculate_working_sheets_needed(qty_params, cost_params, qty) 
 
 sheets_to_process = working_sheets + calculate_overs_needed(qty_params, cost_params, qty)
 
+cost_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params, cost_params, qty) + calculate_overs_needed(qty_params, cost_params, qty)
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
+
 if cost_params['param_machine_speed'] :
     cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
 else :
@@ -645,8 +675,10 @@ qty_params['param_number_up'] = 1
 if estimate.fieldUpdated in ['workcenterId']:
     load_qty_break_params(workcenter, qty_params, cost_params, qty)
 
-sheets_to_process = calculate_working_sheets_needed( qty_params, cost_params, qty) \
-                        + calculate_overs_needed(qty_params, cost_params, qty)
+sheets_to_process = calculate_working_sheets_needed( qty_params, cost_params, qty) + calculate_overs_needed(qty_params, cost_params, qty)
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
 
 if cost_params['param_machine_speed'] :
     cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
@@ -686,6 +718,9 @@ if estimate.fieldUpdated in ['workcenterId']:
         cost_params['margin'] = process.margin_percent
 
 sheets_to_process = calculate_working_sheets_needed(qty_params, cost_params, qty) 
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = 0
 
 if cost_params['param_machine_speed'] :
     cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
@@ -714,6 +749,12 @@ if estimate.fieldUpdated in ['workcenterId']:
     qty_params['margin'] = workcenter.margin_percent
 
 sheets_to_process = int(cost_params['finished_quantity'])
+
+cost_params['params_working_sheets_needed'] = 0
+qty_params['params_working_sheets_needed'] = 0
+qty_params['params_overs_needed'] = 0
+
+cost_params['params_working_sheets_needed'] = 0
 
 number_of_boxes = sheets_to_process / float(qty_params['param_sheets_per_box'])
 

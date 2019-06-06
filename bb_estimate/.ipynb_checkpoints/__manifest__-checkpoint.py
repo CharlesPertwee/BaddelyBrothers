@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','bb_process','product','mrp'],
+    'depends': ['base','bb_process','bb_products','product','mrp','purchase','project','uom'],
 
     # always loaded
     'data': [
@@ -27,7 +27,7 @@
         'views/EstimateLines.xml',
         'views/Estimate.xml',
         'views/EstimateStages.xml',
-        'views/MaterialSize.xml',
+        'views/EstimateMaterialLink.xml',
         'views/templates.xml',
         'wizards/views/OrderConvert.xml',
         'data/Stages.xml',

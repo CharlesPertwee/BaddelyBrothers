@@ -3,7 +3,7 @@
 from odoo import models, fields, api
 
 class ProductSize(models.Model):
-    _name = 'bb_estimate.material_size'
+    _name = 'bb_products.material_size'
     
     name = fields.Char('Size Name')
     width = fields.Integer('Width(m.m)')

@@ -2,7 +2,7 @@
     <data>
         <record id="material_tree_view" model="ir.ui.view">
           <field name="name">material.tree</field>
-          <field name="model">bb_estimate.material_size</field>
+          <field name="model">bb_products.material_size</field>
           <field name="arch" type="xml">
               <tree string="Material Size">
                   <field name="name"/>
@@ -17,7 +17,7 @@
         
         <record id="material_form_view" model="ir.ui.view">
           <field name="name">material.form</field>
-          <field name="model">bb_estimate.material_size</field>
+          <field name="model">bb_products.material_size</field>
           <field name="arch" type="xml">
               <form string="Material Size">
                     <sheet>
@@ -43,9 +43,9 @@
           </field>
       </record>   
         
-      <record model="ir.actions.act_window" id="bb_estimate.action_window_material">
+      <record model="ir.actions.act_window" id="bb_products.action_window_material">
           <field name="name">Material Size</field>
-          <field name="res_model">bb_estimate.material_size</field>
+          <field name="res_model">bb_products.material_size</field>
           <field name="view_type">form</field>
           <field name="view_mode">tree,form</field>
           <field name="domain">[]</field>
@@ -54,6 +54,7 @@
             </field>
       </record>
       
-      <menuitem name="Material Size" id="bb_estimate_material_size" parent="bb_estimate.bb_estimate_config" action="bb_estimate.action_window_material" />
+      <menuitem name="Material Size" id="bb_product_material_size" parent="stock.menu_stock_inventory_control" action="bb_products.action_window_material" />
+    
     </data>
 </odoo>

@@ -1,0 +1,53 @@
+<odoo>
+    <data>
+        <record id="link_tree_view" model="ir.ui.view">
+            <field name="name">material.link.form</field>
+            <field name="model">bb_estimate.material_link</field>
+            <field name="arch" type="xml">
+                <tree string="Stages">
+                    <field name="materialLine" />
+                    <field name="processLine" />
+                    <field name="overs_only" />
+                    <field name="working_sheets_quantity_1" />
+                    <field name="working_sheets_quantity_2" />
+                    <field name="working_sheets_quantity_3" />
+                    <field name="working_sheets_quantity_4" />
+                    <field name="working_sheets_quantity_run_on" />
+                    <field name="overs_quantity_1" />
+                    <field name="overs_quantity_2" />
+                    <field name="overs_quantity_3" />
+                    <field name="overs_quantity_4" />
+                    <field name="overs_quantity_run_on" />
+                    <field name="work_twist" />
+                </tree>
+            </field>
+        </record>
+        
+        <record id="link_form_view" model="ir.ui.view">
+            <field name="name">material.link.tree</field>
+            <field name="model">bb_estimate.material_link</field>
+            <field name="arch" type="xml">
+                <form string="Stages">
+                    <sheet>
+                        <group>
+                            <field name="estimate" />
+                            <field name="materialLine" />
+                            <field name="processLine" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="bb_estimate.action_window_link">
+            <field name="name">Estimate Material Link</field>
+            <field name="res_model">bb_estimate.material_link</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+               <p class="oe_view_nocontent_create">Create New Link</p>
+            </field>
+        </record>
+    </data>
+</odoo>

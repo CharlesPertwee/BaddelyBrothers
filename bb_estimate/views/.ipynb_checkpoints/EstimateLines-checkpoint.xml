@@ -4,8 +4,9 @@
             <field name="name">estimate.line.tree</field>
             <field name="model">bb_estimate.estimate_line</field>
             <field name="arch" type="xml">
-                <tree string="Estimate Lines" decoration-warning="isExtra==True">
+                <tree string="Estimate Lines" decoration-warning="isExtra==True" create="false">
                     <field name="isExtra" invisible="1"/>
+                    <field name="Sequence" widget="handle"/>
                     <field name="lineName"/>
                     <field name="customer_description"/>
                     <field name="total_price_1" sum="Total Price 1"/>
@@ -93,6 +94,19 @@
                                         <field name="customer_description" class="col-md-6" />
                                     </group>
                                 </page>
+
+                                <page string="Materials" attrs="{'invisible':['|',('option_type','=','process'),('option_type','=',False)]}">
+                                    <sheet>
+                                        <field name="material_ids" />
+                                    </sheet>
+                                </page>
+
+                                <page string="Materials" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
+                                    <sheet>
+                                        <field name="process_ids" />
+                                    </sheet>
+                                </page>
+
                                 <page string="Parameters &amp; Costing" autofocus="autofocus" attrs="{'invisible':['&amp;',('workcenterId','=',False),('MaterialTypes','=',False)]}">
                                     <group col="3" attrs="{'invisible':[('option_type','=','material')]}">
                                         <group>
@@ -131,16 +145,16 @@
                                     
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Stock')]}">
                                         <group>
-                                            <field name="material" string="Select Material"/>
+                                            <field name="material" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/>
                                         </group>
                                         <group string="Stock Material Properties">
                                             <group>
-                                                <field name="grammage" />
-                                                <field name="SheetHeight" />
+                                                <field name="grammage" readonly="1"/>
+                                                <field name="SheetHeight" readonly="1"/>
                                             </group>
                                             <group>
-                                                <field name="SheetSize" />
-                                                <field name="SheetWidth" />
+                                                <field name="SheetSize" readonly="1"/>
+                                                <field name="SheetWidth" readonly="1"/>
                                             </group>
                                         </group>
                                         <group string="Material Parameters" col="1">
@@ -149,20 +163,20 @@
                                             </group>
                                             <group>
                                                 <group>
-                                                    <field name="WhiteCutting" />
-                                                    <field name="PrintedCutting" />
+                                                    <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
                                                 <group>
-                                                    <field name="NoWhiteCuts" />
-                                                    <field name="NoPrintedCuts" />
+                                                    <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)]}"/>
+                                                    <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
                                     </group>
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Trade Counter')]}">
                                         <group>
-                                            <field name="material" string="Select Material"/>
+                                            <field name="material" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Trade Counter')]}"/>
                                         </group>
                                         <group string="Material Parameters" col="1">
                                             <group>
@@ -170,66 +184,66 @@
                                             </group>
                                             <group >
                                                 <group>
-                                                    <field name="WhiteCutting" />
-                                                    <field name="PrintedCutting" />
+                                                    <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
                                                 <group>
-                                                    <field name="NoWhiteCuts" />
-                                                    <field name="NoPrintedCuts" />
+                                                    <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)]}"/>
+                                                    <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
                                     </group>
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Non-Stockable')]}">
                                         <group>
-                                            <field name="NonStockMaterialType" />
+                                            <field name="NonStockMaterialType" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable')]}"/>
                                         </group>
                                         <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','=',False)]}">
                                             <group>
-                                                <field name="MaterialName" colspan="4"/>
+                                                <field name="MaterialName" colspan="4" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
                                             </group>
                                             <group>
                                                 <group>
-                                                    <field name="SheetSize" />
-                                                    <field name="PurchaseUnit" />
-                                                    <field name="CostRate" />
-                                                    <field name="grammage" />
-                                                    <field name="Margin" />
+                                                    <field name="SheetSize" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
+                                                    <field name="PurchaseUnit" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
+                                                    <field name="CostRate" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}" />
+                                                    <field name="grammage" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
+                                                    <field name="Margin" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
                                                 </group>
                                                 <group>
-                                                    <field name="SheetHeight" />
-                                                    <field name="SheetWidth" />
-                                                    <field name="CharegeRate" />
-                                                    <field name="Supplier" />
+                                                    <field name="SheetHeight" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
+                                                    <field name="SheetWidth" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
+                                                    <field name="CharegeRate" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
+                                                    <field name="Supplier" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
                                         <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','=',False)]}">
                                             <group>
-                                                <field name="MaterialName" colspan="4"/>
+                                                <field name="MaterialName" colspan="4" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)]}"/>
                                             </group>
                                             <group>
                                                 <group>
-                                                    <field name="SheetSize" />
-                                                    <field name="grammage" />
+                                                    <field name="SheetSize" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)]}"/>
+                                                    <field name="grammage" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)]}"/>
                                                 </group>
                                                 <group>
-                                                    <field name="SheetHeight" />
-                                                    <field name="SheetWidth" />
+                                                    <field name="SheetHeight" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)]}"/>
+                                                    <field name="SheetWidth" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
                                         <group string="Material Parameters" attrs="{'invisible':[('NonStockMaterialType','=','process')]}">
                                             <field name="param_number_out" />
                                             <group>
-                                                <field name="WhiteCutting" />
-                                                <field name="PrintedCutting" />
-                                            </group>
+                                                    <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                </group>
 
                                             <group>
-                                                <field name="NoWhiteCuts" />
-                                                <field name="NoPrintedCuts" />
+                                                <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)]}"/>
+                                                <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)]}"/>
                                             </group>
                                         </group>
                                     </group>

@@ -16,18 +16,19 @@ DUPLEX_OPTIONS = [
     ('four', '4 Sheets'),
     ('five', '5 Sheets'),
 ]
+
 class EstimateLine(models.Model):
     _name = 'bb_estimate.estimate_line'
     _rec_name = 'lineName'
     
     workcenterId = fields.Many2one('mrp.workcenter', string="Process")
-    material = fields.Many2one('product.template', string="Materials")
+    material = fields.Many2one('product.product', string="Materials")
     estimate_id = fields.Many2one('bb_estimate.estimate','Estimate')
     
     isExtra = fields.Boolean('Extra')
     extraDescription = fields.Char('Extra Description')
     
-    lineName = fields.Char(string='Process/Material')
+    lineName = fields.Char(string='Process/Material',compute="_computeName")
     customer_description = fields.Text(string="Customer Description")
 
     quantity_1 = fields.Char('Quantity 1',store=True, compute="getEstimateParams")
@@ -151,13 +152,13 @@ class EstimateLine(models.Model):
     
     option_type = fields.Selection([('process','Process'),('material','Material')],string="Select option")
     
-    param_finished_size = fields.Many2one('bb_estimate.material_size','Finished Size')
-    param_finished_width = fields.Integer('Finished Width')
-    param_finished_height = fields.Integer('Finished Height')
-    param_working_size = fields.Many2one('bb_estimate.material_size','Working Size')
-    param_working_width = fields.Integer('Working Width')
-    param_working_height = fields.Integer('Working Height')
-    param_knife_number = fields.Char('Knife Number')
+    param_finished_size = fields.Many2one('bb_products.material_size','Finished Size',compute="compute_sizes")
+    param_finished_width = fields.Integer('Finished Width',compute="compute_sizes")
+    param_finished_height = fields.Integer('Finished Height',compute="compute_sizes")
+    param_working_size = fields.Many2one('bb_products.material_size','Working Size',compute="compute_sizes")
+    param_working_width = fields.Integer('Working Width',compute="compute_sizes")
+    param_working_height = fields.Integer('Working Height',compute="compute_sizes")
+    param_knife_number = fields.Char('Knife Number',compute="compute_sizes")
     
     process_working_sheets_quantity_1 = fields.Integer('Process Working Sheets Required Qty 1')
     process_working_sheets_quantity_2 = fields.Integer('Process Working Sheets Required Qty 2')
@@ -171,26 +172,27 @@ class EstimateLine(models.Model):
     process_overs_quantity_4 = fields.Integer('Process Overs 4')
     process_overs_quantity_run_on = fields.Integer('Process Overs Run On')
     
-    process_ids = fields.Char('Process')#.One2many('bb_estimate.line_linkage','estimateLineId','Processes')
-    material_ids = fields.Char('Material')#.One2many('bb_estimate.line_linkage','estimateLineId','Material')
+    process_ids = fields.One2many('bb_estimate.material_link','processLine','Processes')
+    material_ids = fields.One2many('bb_estimate.material_link','materialLine','Material')
     
     #Material Fields
     MaterialTypes = fields.Selection([('Stock','Stock'),('Trade Counter','Trade Counter'),('Non-Stockable','Non-Stockable')],string="Material Type")
     SheetHeight = fields.Float('Sheet Height (mm)')
     SheetWidth = fields.Float('Sheet Width(mm)')
-    SheetSize = fields.Char('Sheet Size')
     WhiteCutting = fields.Many2one('mrp.workcenter',string="White Cutting", domain="[('paper_type','=','white')]")
     PrintedCutting = fields.Many2one('mrp.workcenter',string="Printed Cutting", domain="[('paper_type','=','printed')]")
     NoWhiteCuts = fields.Integer('Number of White Cuts')
     NoPrintedCuts = fields.Integer('Number of Printed Cuts')
     NonStockMaterialType = fields.Selection([('Bespoke Material','Bespoke Material'),('Customer Supplied Material','Customer Supplied Material')],string="Non-Stock Material Type")
     MaterialName = fields.Char('Material')
-    SheetSize = fields.Many2one('bb_estimate.material_size',string="Sheet Size")
+    SheetSize = fields.Many2one('bb_products.material_size',string="Sheet Size")
     PurchaseUnit = fields.Many2one('uom.uom',string="Purchase Unit")
     Supplier = fields.Many2one('res.partner',string="Supplier",domain="[('supplier','=',True)]")
     CostRate = fields.Float('Cost Rate')
     CharegeRate = fields.Float('Charge Rate')
     Margin = fields.Float('Margin')
+    
+    Sequence = fields.Integer('Sequence', default=1, help='Gives the sequence order when displaying a product list')
     
     #General Parameters
     param_number_up = fields.Integer('Number Up', compute="getEstimateParams")
@@ -262,6 +264,77 @@ class EstimateLine(models.Model):
     param_material_line_id = fields.Many2one('bb_estimate.estimate_line',string="Material")
     req_param_material_line_id = fields.Boolean('Material')
     
+    @api.depends('workcenterId','material')
+    def _computeName(self):
+        for record in self:
+            if record.option_type == 'process':
+                record.lineName = record.workcenterId.name
+            elif record.option_type == 'material':
+                record.lineName = record.material.name
+    
+    @api.depends('estimate_id')
+    def compute_sizes(self):
+        for record in self:
+            if record.estimate_id:
+                record.param_finished_size = record.estimate_id.finished_size
+                record.param_finished_width = record.estimate_id.finished_width
+                record.param_finished_height = record.estimate_id.finished_height
+                record.param_working_size = record.estimate_id.working_size
+                record.param_working_width = record.estimate_id.working_width
+                record.param_working_height = record.estimate_id.working_height
+                
+    def calc_material_fields(self):
+        for record in self:
+            record.grammage = record.material.grammage
+            record.SheetHeight = record.material.sheet_height
+            record.SheetWidth = record.material.sheet_width
+            record.SheetSize = record.material.sheetSize
+            #record.param_number_out = self.get_number_out(record.material)
+            if record.WhiteCutting:
+                record.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
+            if record.PrintedCutting:
+                record.NoPrintedCuts = self.PrintedCutting.process_type.get_printed_cuts_for_number_up(record.param_number_up)
+    
+    @api.onchange('param_finished_quantity_1')
+    def _onChangeQuantities1(self):
+        self.unallocated_finished_quantity_1 = self.estimate_id.unAllocated_1
+        if float(self.unallocated_finished_quantity_1) != 0.0:
+            ratio = self.param_finished_quantity_1 / float(self.unallocated_finished_quantity_1)
+            self.param_finished_quantity_2 = self.estimate_id.unAllocated_2 * ratio
+            self.param_finished_quantity_3 = self.estimate_id.unAllocated_3 * ratio
+            self.param_finished_quantity_4 = self.estimate_id.unAllocated_4 * ratio
+            self.param_finished_quantity_run_on = self.estimate_id.unAllocated_run_on * ratio
+            
+    
+    @api.onchange('param_finished_quantity_2')
+    def _onChangeQuantities2(self):
+        self.unallocated_finished_quantity_2 = self.estimate_id.unAllocated_2
+    
+    @api.onchange('param_finished_quantity_3')
+    def _onChangeQuantities3(self):
+        self.unallocated_finished_quantity_3 = self.estimate_id.unAllocated_3
+    
+    @api.onchange('param_finished_quantity_4')
+    def _onChangeQuantities4(self):
+        self.unallocated_finished_quantity_4 = self.estimate_id.unAllocated_4
+    
+    @api.onchange('param_finished_quantity_run_on')
+    def _onChangeQuantitiesRunOn(self):
+        self.unallocated_finished_quantity_run_on = self.estimate_id.unAllocated_run_on
+    
+    @api.onchange('param_number_out')
+    def _onChangeNumberOut(self):
+        if self.WhiteCutting:
+            self.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(self.param_number_out)
+        if self.PrintedCutting:
+            self.NoPrintedCuts = self.PrintedCutting.process_type.get_printed_cuts_for_number_up(self.param_number_up)
+    
+    @api.onchange('SheetSize')
+    def _onChangeSheetSize(self):
+        if self.SheetSize:
+            self.SheetHeight = self.SheetSize.height
+            self.SheetWidth = self.SheetSize.width
+    
     @api.onchange('param_additional_charge')
     def calc_param_additional_charge(self):
         self.onChangeEventTrigger('param_additional_charge')
@@ -325,6 +398,7 @@ class EstimateLine(models.Model):
         
     @api.onchange('material')  
     def calc_material_change(self):
+        self.calc_material_fields()        
         self.onChangeEventTrigger('material')
                 
     @api.onchange('param_printed_material')
@@ -363,6 +437,51 @@ class EstimateLine(models.Model):
             else:
                 cost_param['cost_per_unit'] = material.standard_price * material.uom_id.factor_inv
                 cost_param['price_per_unit'] = material.standard_price * material.uom_id.factor_inv
+                
+        if fieldUpdated in ['material','param_number_out','param_finished_quantity','process_ids']:
+            cost_param['quantity_required'] = 0.0
+            if not qty_param['param_number_out']:
+                qty_param['param_number_out'] = 1
+            
+            if cost_param['finished_quantity']:
+                finished_quantity_ratio = float(cost_param['param_finished_quantity'] / float(cost_param['finished_quantity']))
+            else:
+                finished_quantity_ratio = 0.0
+                
+            old_value = 0.0
+            new_value = 0.0
+            qty_required = 0.0
+            if qty == '1':
+                old_value = cost_param['quantity_required']
+            elif qty == '2':
+                old_value = cost_param['quantity_required']
+            elif qty == '3':
+                old_value = cost_param['quantity_required']
+            elif qty == '4':
+                old_value = cost_param['quantity_required']
+            elif qty == 'run_on':
+                old_value = cost_param['quantity_required']
+            
+            for process in self.material_ids:
+                if process['overs_quantity_'+qty]:
+                    qty_required += float(process['overs_quantity_'+qty])
+                if not process['overs_only']:
+                    if process['working_sheets_quantity_'+qty] and str(process['working_sheets_quantity_'+qty]) != 'False':
+                        qty_required += float(process['working_sheets_quantity_'+qty])
+            
+            # Calculate the number of full size sheets required
+            if 'work_twist' in cost_param and cost_param['work_twist']:
+                cost_param['quantity_required'] = math.ceil(( math.ceil(qty_required * finished_quantity_ratio) / float(qty_param['param_number_out']) ) / 2)
+                new_value = cost_param['quantity_required']
+            else:
+                cost_param['quantity_required'] = math.ceil( math.ceil(qty_required * finished_quantity_ratio) / float(qty_param['param_number_out']) )
+                new_value = cost_param['quantity_required']
+            
+            if 'material_ids' not in qty_param and old_value != new_value:
+                message = "Qty %s from %s to %s" % (qty, old_value, new_value)
+                #self.pool.get('estimate.log').create(cr, uid, {'estimate_id': estimate_id, 'estimate_line_id': estimate_line_id, 'name': message,         })
+            
+                
     #end
     
     def _calc_prices(self,qty_params, cost_params, fieldUpdated, qty):
@@ -562,11 +681,11 @@ class EstimateLine(models.Model):
         if float(finished_quantity) > 0.0:  
             if self.option_type == 'process':
                 workcenterId.process_type.UpdateEstimate(workcenterId,qty_params,cost_params,process_type,fieldUpdated,qty)
-                return_values['lineName'] = workcenterId.name
+                #return_values['lineName'] = workcenterId.name
 
             elif self.option_type == 'material':
                 self.update_field_values(material,qty_params,cost_params,fieldUpdated,qty)
-                return_values['lineName'] = material.name
+                #return_values['lineName'] = material.name
 
             elif fieldUpdated == 'workcenterId':
                 cost_params['cost_per_unit'] = workcenterId.standard_price
@@ -584,7 +703,7 @@ class EstimateLine(models.Model):
     
     def update_values(self,qty_params,return_values,qty):        
         for record in self:
-            record['lineName'] = return_values['lineName'] if 'lineName' in return_values else ''
+            #record['lineName'] = return_values['lineName']
             record['customer_description'] = return_values['customer_description'] if 'customer_description' in return_values else ''
             record['param_make_ready_time_'+qty] = return_values['param_make_ready_time'] if qty != 'run_on' else None
             record['param_machine_speed_'+qty] = return_values['param_machine_speed'] if 'param_machine_speed' in return_values else ''
@@ -609,6 +728,9 @@ class EstimateLine(models.Model):
             record['req_param_env_gumming'] = qty_params['req_param_env_gumming']
             record['param_sheets_per_box'] = qty_params['param_sheets_per_box']
             record['param_time_per_box'] = qty_params['param_time_per_box']
+            record['param_sheets_per_pile'] = qty_params['param_sheets_per_pile']
+            record['param_time_per_pile'] = qty_params['param_time_per_pile']
+            record['param_number_of_cuts'] = qty_params['param_number_of_cuts']
             
     
     def UpdateRequiredFields(self):
@@ -619,6 +741,77 @@ class EstimateLine(models.Model):
                 record.update(model_fields)
                 record.update(fields)
     
+    def CreateLink(self,line,work_twist):
+        link = self.env['bb_estimate.material_link'].sudo()
+        processes = line.estimate_id.estimate_line.search([('estimate_id','=',line.estimate_id.id),('option_type','=','process')])
+        added_working_sheets = False
+        for process in processes:
+            if process.workcenterId and process.workcenterId.process_type:
+                if process.work_twist:
+                    work_twist = True
+                if process.workcenterId.process_type.MapMaterials:
+                    newLink = {
+                        'materialLine' : line.id,
+                        'processLine' : process.id,
+                        'estimate': line.estimate_id.id,
+                    }
+                    if not added_working_sheets and process.workcenterId.process_type.OversOnly:
+                        newLink['overs_only'] = False
+                        added_working_sheets = True
+                    else:
+                        newLink['overs_only'] = True
+                    
+                    link.create(newLink)
+                    
+    def RecalculatePrices(self,line,work_twist):
+        if line.option_type and line.option_type == "material":
+            estimate = line.estimate_id
+            
+            write_vals = {}
+
+            gen_params = {
+                'process_ids'               : line.process_ids or [],
+                'param_number_out'          : line.param_number_out or 1,
+                'param_number_up'           : line.param_number_up or 1,
+            }
+
+            # Re-calculate the totals for each quantity
+            for qty in ['1','2','3','4','run_on']:
+
+                if qty == 'run_on':
+                    qty_field = 'run_on'
+                else:
+                    qty_field = 'quantity_'+qty
+                
+                if not estimate[qty_field]:
+                    continue
+                
+                qty_params = {
+                    'finished_quantity'         : estimate[qty_field],
+                    'param_finished_quantity'   : line['param_finished_quantity_'+qty],
+                    'quantity_required'         : 0.0,
+                    'cost_per_unit'             : line['cost_per_unit_'+qty],
+                    'price_per_unit'            : line['price_per_unit_'+qty],
+                    'margin'                    : line['margin_'+qty],
+                    'work_twist'                : work_twist,
+                }
+                
+                line.update_field_values(line.material,gen_params,qty_params,'param_finished_quantity',qty)
+                
+                line._calc_prices(gen_params, qty_params, 'material', qty)
+                
+                write_vals.update({
+                    'quantity_required_'+qty    : qty_params['quantity_required'],
+                    'cost_per_unit_'+qty        : qty_params['cost_per_unit'],
+                    'price_per_unit_'+qty       : qty_params['price_per_unit'],
+                    'margin_'+qty               : qty_params['margin'],
+                    'total_cost_'+qty           : qty_params['total_cost'],
+                    'total_price_'+qty          : qty_params['total_price'],
+                    'total_price_per_1000_'+qty : qty_params['total_price_per_1000'],
+                })
+            
+            line.write(write_vals)
+            
     @api.model
     def create(self,values):
         records = super(EstimateLine,self).create(values)
@@ -673,6 +866,75 @@ class EstimateLine(models.Model):
                         }
                         newRecord.update(data)
                         super(EstimateLine,self).create(newRecord)
-        return records    
-            
+                        
+                elif lineId.option_type == 'material':
+                    if lineId.MaterialTypes == 'Non-Stockable':
+                        product = self.env['product.product'].sudo()
+                        seller = self.env['product.supplierinfo'].sudo()
+                        newProduct = {
+                            'name' : lineId.MaterialName,
+                            'type': 'consu',
+                            'default_code': lineId.estimate_id.estimate_number,
+                            'grammage' : lineId.grammage,
+                            'sheetSize' : lineId.SheetSize.id,
+                            'sheet_width' : lineId.SheetWidth,
+                            'sheet_height' : lineId.SheetHeight,
+                            #'uom_id' : lineId.PurchaseUnit.id,
+                            #'uom_po_id' : lineId.PurchaseUnit.id,
+                            'standand_price': lineId.CostRate,
+                            'list_price': lineId.CharegeRate,
+                            #'' : ,
+                            #'route_ids': #Operations Many2many
+                        }
+                        if lineId.PurchaseUnit:
+                            newProduct['uom_id'] = lineId.PurchaseUnit.id
+                            newProduct['uom_po_id'] = lineId.PurchaseUnit.id
 
+                        productId = product.create(newProduct)
+                        
+                        if productId and lineId.Supplier:
+                            seller = {
+                                'product_id' : productId.id,
+                                'product_tmpl_id' : productId.product_tmpl_id.id,
+                                'product_name' : lineId.MaterialName,
+                                'price': lineId.CharegeRate,
+                                'name' : lineId.Supplier.id
+                            }
+                            lineId.write({'material':productId.id})
+                            lineId.calc_material_change()
+                            dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}
+                            lineId.write(dictLine)
+                        elif productId:
+                            lineId.write({'material':productId.id})    
+                            lineId.calc_material_change()
+                            dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}
+                            lineId.write(dictLine)      
+                        
+                        
+                    if lineId.WhiteCutting:
+                        newProcess = {
+                            'option_type' : 'process',
+                            'workcenterId' : lineId.WhiteCutting.id,
+                            'param_material_line_id' : lineId.id,
+                            #'param_number_of_cuts' : lineId.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
+                        }
+                        process = self.create(newProcess)
+                        process.calc_workcenterId_change()
+                        dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
+                        process.write(dictProcess)
+                    
+                    if lineId.PrintedCutting:
+                        newProcess = {
+                            'option_type' : 'process',
+                            'workcenterId' : lineId.PrintedCutting.id,
+                            'param_material_line_id' : lineId.id,
+                        }
+                        process = self.create(newProcess)
+                        process.calc_workcenterId_change()
+                        dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
+                        process.write(dictProcess)
+
+                    work_twist = False
+                    self.CreateLink(lineId,work_twist)
+                    self.RecalculatePrices(lineId,work_twist)
+        return records    

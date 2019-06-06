@@ -26,10 +26,10 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                      <button class="oe_stat_button" icon="fa-database" type="object" name="AddLineItem">
+                      <button class="oe_stat_button" icon="fa-database" type="object" name="AddLineItem" attrs="{'invisible':[('id','=',False)]}">
                           <span>Add Line</span>
                       </button>
-                      <button class="oe_stat_button" icon="fa-database" type="object" name="CreateManufacturingOrder">
+                      <button class="oe_stat_button" icon="fa-database" type="object" name="CreateManufacturingOrder" attrs="{'invisible':[('manufacturingOrder','!=',False)]}">
                           <span>Create MO</span>
                       </button>
                     </div>
@@ -47,7 +47,7 @@
                             <field name="invoice_contact" domain="[('parent_id','=',partner_id)]"/>
                         </group>
                         <group>
-                            <field name="product_type" domain="[('categ_id.name','=','Finished Goods')]" />
+                            <field name="product_type"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
                             <field name="estimate_date"/>
                             <field name="estimator" />
                             <field name="office_copy" />
@@ -146,12 +146,46 @@
                             </group>
                         </page>
                         <page name="EstimateLines" string="Estimate Lines" attrs="{'invisible':[('id','=',False)]}">
-                            <field name="estimate_line" readonly="1"/>
-                            <notebook>
+                            <field name="estimate_line"/>
+<!--                             <notebook>
                                 <page string="Estimate Line Extras" autofocus="True">
-                                    <field name="estimate_extra_line" readonly="1"/>
+                                    <field name="estimate_extra_line"/>
                                 </page>
-                            </notebook>
+                            </notebook> -->
+                        </page>
+                        <page string="Order Details" attrs="{'invisible':[('manufacturingOrder','=',False)]}">
+                            <sheet>
+                                <group>
+                                    <field name="manufacturingOrder" readonly="1"/>
+                                    <field name="routings" readonly="1"/>
+                                    <field name="bom" readonly="1"/>
+                                </group>
+                            </sheet>
+                        </page>
+                        <page string="Estimate Summary">
+                            <sheet>
+                                <group>
+                                    <group>
+                                        <field name="total_price_1" readonly="1"/>
+                                        <field name="total_price_2" readonly="1"/>
+                                        <field name="total_price_3" readonly="1"/>
+                                        <field name="total_price_4" readonly="1"/>
+                                        <field name="total_price_run_on" readonly="1"/>
+                                        <field name="total_cost_1" readonly="1"/>
+                                        <field name="total_cost_2" readonly="1"/>
+                                        <field name="total_cost_3" readonly="1"/>
+                                        <field name="total_cost_4" readonly="1"/>
+                                        <field name="total_cost_run_on" readonly="1"/> 
+                                    </group>
+                                    <group>
+                                        <field name="unAllocated_1" />
+                                        <field name="unAllocated_2" />
+                                        <field name="unAllocated_3" />
+                                        <field name="unAllocated_4" />
+                                        <field name="unAllocated_run_on" />
+                                     </group>
+                                </group>
+                            </sheet>
                         </page>
                     </notebook>
                 </sheet>

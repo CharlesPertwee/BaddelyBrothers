@@ -8,17 +8,21 @@
                     <sheet>
                         <field name="EstimateId" invisible="1"/>
                         <field name="HasExtra" invisible="1"/>
+                        <h5>Final Quantity Selection</h5>
+                        <hr/>
                         <group>
-                            <h5>Final Quantity Selection</h5>
-                            <hr/>
                             <field name="QuantityRequired"/>
                             <field name="ExtrasApplied" attrs="{'invisible':[('HasExtra','=',False)]}"/>
                         </group>
+                        <h5>Run On Quantity</h5>
+                        <hr/>
                         <group>
                             <field name="RunOnQuantity"/>
                             <field name="RunOnPrice"/>
                             <field name="RunOnRequired"/>
                         </group>
+                        <h5>Totals</h5>
+                        <hr/>
                         <group>
                             <field name="TotalQuantity"/>
                             <field name="TotalPrice"/>
