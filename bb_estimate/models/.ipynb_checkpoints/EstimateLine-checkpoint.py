@@ -17,20 +17,39 @@ DUPLEX_OPTIONS = [
     ('five', '5 Sheets'),
 ]
 
+LINE_DOCUMENT_CATEGORIES = [
+    ('Origination', 'Origination'),
+    ('Material', 'Material'),
+    ('Process','Process'),
+    ('Finishing','Finishing'),
+    ('Packing','Packing'),
+    ('Despatch','Despatch'),
+]
+
 class EstimateLine(models.Model):
     _name = 'bb_estimate.estimate_line'
     _rec_name = 'lineName'
+    _description = 'Estimate Lines'
+    _order = "Sequence, id"
     
     workcenterId = fields.Many2one('mrp.workcenter', string="Process")
     material = fields.Many2one('product.product', string="Materials")
     estimate_id = fields.Many2one('bb_estimate.estimate','Estimate')
+    isEnvelope = fields.Boolean('Is Envelope',related="estimate_id.product_type.isEnvelope")
     
     isExtra = fields.Boolean('Extra')
     extraDescription = fields.Char('Extra Description')
     
     lineName = fields.Char(string='Process/Material',compute="_computeName")
-    customer_description = fields.Text(string="Customer Description")
-
+    customer_description = fields.Char(string="Customer Description",required=True)
+    documentCatergory = fields.Selection(LINE_DOCUMENT_CATEGORIES,'Letter Category',related="workcenterId.documentCatergory")
+    JobTicketText = field.Char('Job Ticket Text',required=True)
+    StandardCustomerDescription = fields.Char('Standard Customer Description',required=True)
+    StandardJobDescription = fields.Char('Standard Job Ticket Text',required=True)
+    UseStadandardDescription = fields.Boolean('Use Standard Descriptions?',required=True)
+    Details = fields.Text('Details and Notes')
+    EstimatorNotes = fields.Text('Notes for Estimator')
+    
     quantity_1 = fields.Char('Quantity 1',store=True, compute="getEstimateParams")
     quantity_2 = fields.Char('Quantity 2',store=True, compute="getEstimateParams")
     quantity_3 = fields.Char('Quantity 3',store=True, compute="getEstimateParams")
@@ -165,12 +184,14 @@ class EstimateLine(models.Model):
     process_working_sheets_quantity_3 = fields.Integer('Process Working Sheets Required Qty 3')
     process_working_sheets_quantity_4 = fields.Integer('Process Working Sheets Required Qty 4')
     process_working_sheets_quantity_run_on = fields.Integer('Process Working Sheets Required Run On')
+    req_process_working_sheets_quantity = fields.Boolean('Process Required')
     
     process_overs_quantity_1 = fields.Integer('Process Overs 1')
     process_overs_quantity_2 = fields.Integer('Process Overs 2')
     process_overs_quantity_3 = fields.Integer('Process Overs 3')
     process_overs_quantity_4 = fields.Integer('Process Overs 4')
     process_overs_quantity_run_on = fields.Integer('Process Overs Run On')
+    req_process_overs_quantity = fields.Boolean('Overs Quantity')
     
     process_ids = fields.One2many('bb_estimate.material_link','processLine','Processes')
     material_ids = fields.One2many('bb_estimate.material_link','materialLine','Material')
@@ -263,6 +284,20 @@ class EstimateLine(models.Model):
     
     param_material_line_id = fields.Many2one('bb_estimate.estimate_line',string="Material")
     req_param_material_line_id = fields.Boolean('Material')
+    
+    def GenerateMaterialDetails(self,line):
+        name = False
+        Grammage = False
+        if line.customer_description:
+            name = line.customer_description
+        else:
+            name = line.material.name
+        
+        if line.option_type == 'material':
+            Grammage = line.material.grammage
+        if Grammage:
+            name =  '%s %s gsm' % (name, Grammage)
+        return name
     
     @api.depends('workcenterId','material')
     def _computeName(self):
@@ -490,8 +525,8 @@ class EstimateLine(models.Model):
             extra_price_per_1000 = qty_params['param_additional_charge'] 
 
         misc_charge_per_sheet = 0.0
-        if qty_params.get('param_misc_charge_per_cm2') and gen_params.get('param_misc_charge_per_cm2_area'):
-            misc_charge_per_sheet = gen_params['param_misc_charge_per_cm2'] * gen_params['param_misc_charge_per_cm2_area']  
+        if qty_params.get('param_misc_charge_per_cm2') and qty_params.get('param_misc_charge_per_cm2_area'):
+            misc_charge_per_sheet = qty_params['param_misc_charge_per_cm2'] * qty_params['param_misc_charge_per_cm2_area']  
 
         number_of_sheets = cost_params['params_working_sheets_needed'] if 'params_working_sheets_needed' in cost_params else 0.0
 
@@ -681,12 +716,10 @@ class EstimateLine(models.Model):
         if float(finished_quantity) > 0.0:  
             if self.option_type == 'process':
                 workcenterId.process_type.UpdateEstimate(workcenterId,qty_params,cost_params,process_type,fieldUpdated,qty)
-                #return_values['lineName'] = workcenterId.name
-
+                
             elif self.option_type == 'material':
                 self.update_field_values(material,qty_params,cost_params,fieldUpdated,qty)
-                #return_values['lineName'] = material.name
-
+                
             elif fieldUpdated == 'workcenterId':
                 cost_params['cost_per_unit'] = workcenterId.standard_price
                 cost_params['price_per_unit'] = workcenterId.list_price
@@ -701,9 +734,8 @@ class EstimateLine(models.Model):
             return_values.update(cost_params)
             self.update_values(qty_params,return_values,qty)  
     
-    def update_values(self,qty_params,return_values,qty):        
+    def update_values(self,qty_params,return_values,qty):    
         for record in self:
-            #record['lineName'] = return_values['lineName']
             record['customer_description'] = return_values['customer_description'] if 'customer_description' in return_values else ''
             record['param_make_ready_time_'+qty] = return_values['param_make_ready_time'] if qty != 'run_on' else None
             record['param_machine_speed_'+qty] = return_values['param_machine_speed'] if 'param_machine_speed' in return_values else ''
@@ -731,8 +763,9 @@ class EstimateLine(models.Model):
             record['param_sheets_per_pile'] = qty_params['param_sheets_per_pile']
             record['param_time_per_pile'] = qty_params['param_time_per_pile']
             record['param_number_of_cuts'] = qty_params['param_number_of_cuts']
+            record['process_working_sheets_quantity_'+qty] = qty_params['params_working_sheets_needed'] if 'params_working_sheets_needed' in qty_params else 0
+            record['process_overs_quantity_'+qty] = qty_params['params_overs_needed'] if 'params_working_sheets_needed' in qty_params else 0
             
-    
     def UpdateRequiredFields(self):
         for record in self:
             if record.workcenterId:
@@ -871,21 +904,21 @@ class EstimateLine(models.Model):
                     if lineId.MaterialTypes == 'Non-Stockable':
                         product = self.env['product.product'].sudo()
                         seller = self.env['product.supplierinfo'].sudo()
+                        mto =self.env['stock.location.route'].sudo().search([('name','=','Make To Order')])
                         newProduct = {
                             'name' : lineId.MaterialName,
-                            'type': 'consu',
+                            'type': 'product',
                             'default_code': lineId.estimate_id.estimate_number,
                             'grammage' : lineId.grammage,
                             'sheetSize' : lineId.SheetSize.id,
                             'sheet_width' : lineId.SheetWidth,
                             'sheet_height' : lineId.SheetHeight,
-                            #'uom_id' : lineId.PurchaseUnit.id,
-                            #'uom_po_id' : lineId.PurchaseUnit.id,
                             'standand_price': lineId.CostRate,
                             'list_price': lineId.CharegeRate,
-                            #'' : ,
-                            #'route_ids': #Operations Many2many
+                            'productType': 'Non-Stock'
                         }
+                        if mto and lineId.NonStockMaterialType == 'Bespoke Material':
+                            newProduct['route_ids'] = [(4,mto.id)]
                         if lineId.PurchaseUnit:
                             newProduct['uom_id'] = lineId.PurchaseUnit.id
                             newProduct['uom_po_id'] = lineId.PurchaseUnit.id
@@ -893,13 +926,15 @@ class EstimateLine(models.Model):
                         productId = product.create(newProduct)
                         
                         if productId and lineId.Supplier:
-                            seller = {
+                            newSeller = {
                                 'product_id' : productId.id,
                                 'product_tmpl_id' : productId.product_tmpl_id.id,
                                 'product_name' : lineId.MaterialName,
                                 'price': lineId.CharegeRate,
                                 'name' : lineId.Supplier.id
                             }
+                            seller.create(newSeller)
+
                             lineId.write({'material':productId.id})
                             lineId.calc_material_change()
                             dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}

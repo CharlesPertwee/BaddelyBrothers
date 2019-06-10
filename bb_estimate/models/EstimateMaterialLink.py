@@ -4,6 +4,7 @@ from odoo import models, fields, api
 
 class MaterialLink(models.Model):
     _name = 'bb_estimate.material_link'
+    _description = 'Estimate Material Link'
     
     materialLine = fields.Many2one('bb_estimate.estimate_line',string="Material",domain="[('option_type','=','material')]", required=True)
     processLine = fields.Many2one('bb_estimate.estimate_line',string="Process",domain="[('option_type','=','process')]", required=True)

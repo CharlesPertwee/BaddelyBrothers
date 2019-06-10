@@ -1,5 +1,14 @@
 <odoo>
   <data>
+      <report
+        id="report_estimate"
+        model="bb_estimate.estimate"
+        string="Estimate Letter"
+        report_type="qweb-pdf"
+        name="bb_estimate.estimate_letter"
+        file="mrp_account.mrp_cost_structure"
+      />
+          
     <record id="estimate_tree_view" model="ir.ui.view">
         <field name="name">estimate.tree</field>
         <field name="model">bb_estimate.estimate</field>
@@ -21,15 +30,17 @@
         <field name="model">bb_estimate.estimate</field>
         <field name="arch" type="xml">
             <form string="Estimate">
+                <field name="isEnvelope" invisible="1" />
+                <field name="showMo" invisible="1" />
                 <header>
                     <field name="state" widget="statusbar" clickable="True" />
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                      <button class="oe_stat_button" icon="fa-database" type="object" name="AddLineItem" attrs="{'invisible':[('id','=',False)]}">
+                      <button class="oe_stat_button" icon="fa-database" type="object" name="AddLineItem" attrs="{'invisible':['|',('id','=',False),('manufacturingOrder','!=',False)]}">
                           <span>Add Line</span>
                       </button>
-                      <button class="oe_stat_button" icon="fa-database" type="object" name="CreateManufacturingOrder" attrs="{'invisible':[('manufacturingOrder','!=',False)]}">
+                      <button class="oe_stat_button" icon="fa-database" type="object" name="CreateManufacturingOrder" attrs="{'invisible':['|',('showMo','=',False),('manufacturingOrder','!=',False)]}">
                           <span>Create MO</span>
                       </button>
                     </div>
@@ -42,18 +53,18 @@
                             <field name="partner_id" domain="[('is_company','=',True)]" />
                             <field name="contact" domain="[('parent_id','=',partner_id)]" />
                             <field name="project" />
-                            <field name="invoice_account" />
-                            <field name="invoice_address" domain="[('type','=','invoice')]" />
-                            <field name="invoice_contact" domain="[('parent_id','=',partner_id)]"/>
+                            <field name="invoice_account" required="1"/>
+                            <field name="invoice_address" domain="[('type','=','invoice')]" required="1"/>
+                            <field name="invoice_contact" domain="[('parent_id','=',partner_id)]" required="1"/>
                         </group>
                         <group>
-                            <field name="product_type"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
-                            <field name="estimate_date"/>
-                            <field name="estimator" />
+                            <field name="product_type" domain="[('productType','=','Finished')]" required="1"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
+                            <field name="estimate_date" required="1"/>
+                            <field name="estimator" required="1"/>
                             <field name="office_copy" />
-                            <field name="estimate_number"/>
+                            <field name="estimate_number" required="1"/>
                             <field name="event_date" />
-                            <field name="target_dispatch_date" />
+                            <field name="target_dispatch_date" required="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -120,7 +131,7 @@
                                 </div>
                             </div>
                         </page>
-                        <page string="Envelope Details" invisible="1">
+                        <page string="Envelope Details" attrs="{'invisible':[('isEnvelope','=',False)]}">
                             <group>
                                 <group>
                                     <field name="envelope_type"/>
@@ -147,24 +158,23 @@
                         </page>
                         <page name="EstimateLines" string="Estimate Lines" attrs="{'invisible':[('id','=',False)]}">
                             <field name="estimate_line"/>
-<!--                             <notebook>
-                                <page string="Estimate Line Extras" autofocus="True">
-                                    <field name="estimate_extra_line"/>
-                                </page>
-                            </notebook> -->
+                        </page>
+                        <page string="Estimate Conditions" attrs="{'invisible':[('id','=',False)]}">
+                            <field name="estimateConditions"/>
                         </page>
                         <page string="Order Details" attrs="{'invisible':[('manufacturingOrder','=',False)]}">
                             <sheet>
                                 <group>
                                     <field name="manufacturingOrder" readonly="1"/>
+                                    <field name="salesOrder" readonly="1" />
                                     <field name="routings" readonly="1"/>
                                     <field name="bom" readonly="1"/>
                                 </group>
                             </sheet>
                         </page>
-                        <page string="Estimate Summary">
+                        <page string="Estimate Summary" invisible="1">
                             <sheet>
-                                <group>
+                                <group col="3">
                                     <group>
                                         <field name="total_price_1" readonly="1"/>
                                         <field name="total_price_2" readonly="1"/>
@@ -184,11 +194,42 @@
                                         <field name="unAllocated_4" />
                                         <field name="unAllocated_run_on" />
                                      </group>
+                                    <group>
+                                        <field name="selectedQuantity" readonly="1"/>
+                                        <field name="selectedRunOn" readonly="1"/>
+                                        <field name="selectedPrice" readonly="1"/>
+                                        <field name="selectedRatio" readonly="1"/>
+                                    </group>
                                 </group>
                             </sheet>
                         </page>
                     </notebook>
+                    <group>
+                        <group>
+                            <field name="EnquiryComments" />
+                        </group>
+                        <group>
+                            <field name="SpecialInstuction" />
+                            <field name="PackingInstruction" />
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="Delivery" />
+                            <field name="DeliveryContact" />
+                        </group>
+                        
+                        <group>
+                            <field name="DeliveryMethod" />
+                            <field name="DeliveryLabel" />
+                        </group>
+                    </group>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
     </record>  

@@ -28,6 +28,7 @@
                                     <field name="peelStickAvailable"/>
                                     <field name="inlineEmbossAvailable"/>
                                     <field name="gummingAvailable"/>
+                                    <field name="documentCatergory"/>
                                 </group>
                             </group>
                     

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-
+import odoo
 from odoo import models, fields, api
+from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
 
 class OrderConvert(models.TransientModel):
     _name = "bb_estimate.wizard_order_convert"
@@ -18,26 +19,24 @@ class OrderConvert(models.TransientModel):
     TotalQuantity = fields.Integer('Total Quantity',compute="changeQuanitity")
     TotalPrice = fields.Float('Total Price',compute="changeQuanitity")
     
-    RunOnQuantity = fields.Integer('Run on Quantity',readonly=True)
-    RunOnPrice = fields.Float('Run on Price(GBP)',readonly=True)
+    RunOnQuantity = fields.Integer('Run on Quantity',related="EstimateId.run_on")
+    RunOnPrice = fields.Float('Run on Price(GBP)',related="EstimateId.total_price_run_on")
     RunOnRequired = fields.Integer('Run on Quantity Required', required=True)
     
     ExtrasApplied = fields.Boolean('Extras Applied to the Estimate')
-    HasExtra = fields.Boolean('Has Extra',compute="getEstimateExtra")
+    HasExtra = fields.Boolean('Has Extra',related="EstimateId.hasExtra")
     
     @api.depends('EstimateId')
     def getEstimateExtra(self):
         for record in self:
-            if record.EstimateId:
-                record.HasExtra = record.EstimateId.hasExtra
-                record.RunOnQuantity = record.EstimateId.run_on
-                record.RunOnPrice = record.EstimateId.total_price_run_on
-    
+            if record.HasExtra:
+                raise ValidationError("This order contains Extra's. If you want to remove them then, this is the moment.")
+                
     @api.onchange('QuantityRequired','RunOnRequired')
     def changeQuanitity(self):
-        ratio = 1.0
+        ratio = 0.0
         for record in self:
-            if record.EstimateId and record.EstimateId['run_on']:
+            if record.EstimateId and record.EstimateId['run_on'] > 0:
                 ratio = record.RunOnRequired / record.EstimateId['run_on']
                 
             if record.QuantityRequired:
@@ -46,20 +45,28 @@ class OrderConvert(models.TransientModel):
             elif record.RunOnRequired:
                 record.TotalQuantity = record.RunOnRequired
                 record.TotalPrice = record.RunOnPrice + (record.RunOnPrice * ratio)
-
+            
     def CreateOrder(self):
         processes = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','process')])
         materials = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','material')])
+        
+        runOnRatio = 0.0
+        
+        if self.RunOnRequired > 0 and self.EstimateId['run_on'] > 0:
+            runOnRatio = (self.RunOnRequired / self.EstimateId['run_on'])
+        
+        totalPrice = self.TotalPrice #+ (self.RunOnPrice * runOnRatio)
         
         routing = self.env['mrp.routing'].sudo()
         bom = self.env['mrp.bom'].sudo()
         operation = self.env['mrp.routing.workcenter'].sudo()
         components = self.env['mrp.bom.line'].sudo()
         order = self.env['mrp.production'].sudo()
-        
+        sales = self.env['sale.order'].sudo()
+
         #routes
         newRoute = {
-            'name': 'route_%s'%(self.EstimateId.estimate_number),
+            'name': 'Route_%s'%(self.EstimateId.estimate_number),
             'active': True,
             'code' : self.EstimateId.estimate_number,
         }
@@ -73,8 +80,9 @@ class OrderConvert(models.TransientModel):
                     'sequence' : process.Sequence,
                     'routing_id' : routeId.id,
                     'time_mode' : 'manual',
-                    'time_cycle_manual' : process['quantity_required_'+self.QuantityRequired],
+                    'time_cycle_manual' : (process['quantity_required_'+self.QuantityRequired] + (process['quantity_required_run_on'] * runOnRatio)),
                     'batch' : 'no',
+                    'EstimateLineId' : process.id
                 }
                 operation.create(newOperation)
         
@@ -84,7 +92,7 @@ class OrderConvert(models.TransientModel):
             'active' : True,
             'code' : self.EstimateId.estimate_number,
             'product_tmpl_id' : self.EstimateId.product_type.product_tmpl_id.id,
-            'product_qty' : self.EstimateId['quantity_'+self.QuantityRequired],
+            'product_qty' : self.TotalQuantity,#self.EstimateId['quantity_'+self.QuantityRequired],
             'ready_to_produce' : 'all_available',
         }
         
@@ -98,13 +106,15 @@ class OrderConvert(models.TransientModel):
                 newMaterial = {
                     'sequence': material.Sequence,
                     'product_id':material.material.id,
-                    'product_qty' : material['quantity_required_'+self.QuantityRequired],
+                    'product_qty' : material['quantity_required_'+self.QuantityRequired] + (material['quantity_required_run_on'] * runOnRatio),
                     'routing_id' : routeId.id,
                     'bom_id' : bomId.id,
+                    'EstimateLineId': material.id
                 }
                 if material.material.uom_id:
                     newMaterial['product_uom_id'] = material.material.uom_id.id
                 components.create(newMaterial)
+        
         newOrder = {
             'name' : self.EstimateId.estimate_number,
             'origin' : 'Estimate Workflow',
@@ -113,16 +123,46 @@ class OrderConvert(models.TransientModel):
             'product_qty' : self.TotalQuantity,
             'product_tmpl_id' : self.EstimateId.product_type.product_tmpl_id.id,
             'product_id' : self.EstimateId.product_type.id,
-            'product_uom_id':  self.EstimateId.product_type.uom_id.id
+            'product_uom_id':  self.EstimateId.product_type.uom_id.id,
+            'Estimate' : self.EstimateId.id
             
         }
+        
         mo = order.create(newOrder)
-        data = {}
+        
+        data = {
+            'selectedQuantity': self.QuantityRequired,
+            'selectedRunOn': self.RunOnRequired,
+            'selectedPrice': totalPrice,
+            'selectedRatio' : runOnRatio
+        }
+        
         if mo:
             data['manufacturingOrder'] = mo.id
         if routeId:
             data['routings'] = routeId.id
         if bomId:
             data['bom'] = bomId.id
-        self.EstimateId.write(data)
         
+        
+        #Sales Order
+        salesProduct = {
+            'product_id': self.EstimateId.product_type.id,
+            'product_uom_qty': self.TotalQuantity,
+            'price_unit': totalPrice/self.TotalQuantity,
+
+        }
+        newSales = {
+            'partner_id': self.EstimateId.partner_id.id,
+            'partner_invoice_id': self.EstimateId.invoice_account.id,
+            'partner_shipping_id': self.EstimateId.Delivery.id,
+            'amount_untaxed': totalPrice,
+            'carrier_id': self.EstimateId.DeliveryMethod.id,
+            'order_line':[(0,0,salesProduct)]
+        }
+
+        salesId = sales.create(newSales)
+        if salesId:
+            data['salesOrder'] = salesId.id
+            
+        self.EstimateId.write(data)

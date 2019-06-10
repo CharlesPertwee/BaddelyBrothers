@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="required" model="bb_estimate.stage">
-        <field name="name">Estimate Required</field>
-    </record>
-    
-    <record id="in_progress" model="bb_estimate.stage">
-        <field name="name">Estimate In Progress</field>
-    </record>
-    
-    <record id="provided" model="bb_estimate.stage">
-        <field name="name">Estimate Provided</field>
-    </record>
-   
-    <record id="accepted" model="bb_estimate.stage">
-        <field name="name">Estimate Accepted</field>
-    </record>
-   
-    <record id="converted" model="bb_estimate.stage">
-        <field name="name">Estimate Converted</field>
-    </record>
-   
-    <record id="declined" model="bb_estimate.stage">
-        <field name="name">Estimate Declined</field>
-    </record>
+    <data noupdate="1">
+        <record id="required" model="bb_estimate.stage">
+            <field name="name">Estimate Required</field>
+        </record>
+
+        <record id="in_progress" model="bb_estimate.stage">
+            <field name="name">Estimate In Progress</field>
+        </record>
+
+        <record id="provided" model="bb_estimate.stage">
+            <field name="name">Estimate Provided</field>
+        </record>
+
+        <record id="accepted" model="bb_estimate.stage">
+            <field name="name">Estimate Accepted</field>
+        </record>
+
+        <record id="converted" model="bb_estimate.stage">
+            <field name="name">Estimate Converted</field>
+        </record>
+
+        <record id="declined" model="bb_estimate.stage">
+            <field name="name">Estimate Declined</field>
+        </record>
+    </data>
 </odoo> 

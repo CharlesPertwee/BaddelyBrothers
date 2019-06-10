@@ -3,6 +3,15 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
+LINE_DOCUMENT_CATEGORIES = [
+    ('Origination', 'Origination'),
+    ('Material', 'Material'),
+    ('Process','Process'),
+    ('Finishing','Finishing'),
+    ('Packing','Packing'),
+    ('Despatch','Despatch'),
+]
+
 class QtyBreakParams(models.Model):
     _name = "bb_process.qty_break_params"
     
@@ -61,3 +70,5 @@ class MrpWorkcenter(models.Model):
     peelStickAvailable = fields.Boolean('Peel and Stick')
     inlineEmbossAvailable = fields.Boolean('In-line Emboss Available')
     gummingAvailable = fields.Boolean('Gumming Available')
+    
+    documentCatergory = fields.Selection(LINE_DOCUMENT_CATEGORIES,'Letter Category',default="Process")

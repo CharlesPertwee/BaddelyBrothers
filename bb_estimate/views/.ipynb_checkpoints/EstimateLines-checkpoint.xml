@@ -67,9 +67,9 @@
                         <field name="req_mat_charge" invisible="1" />
                         <field name="req_total_price" invisible="1" />
                         <field name="req_total_price_per_1000" invisible="1" />
-                        <!--div class="oe-title">
-                                            <field name="option_type" options="{'horizontal': true}" widget="radio"/>
-                                        </div-->
+                        <field name="req_process_working_sheets_quantity" invisible="1" />
+                        <field name="req_process_overs_quantity" invisible="1" />
+                        <field name="isEnvelope" invisible="1" />
                         <div class="container">
                             <div class="row">
                                 <div class="col-md-4 oe-title pull-left">
@@ -78,7 +78,7 @@
                                 <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','process')]}">
                                     <div class="form-group">
                                         <label for="workcenterId" class="col-md-4" />
-                                        <field name="workcenterId" class="col-md-7" />
+                                        <field name="workcenterId" class="col-md-7" domain="[('process_type','!=',False)]"/>
                                     </div>
                                 </div>
                                 <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','material')]}">
@@ -91,8 +91,21 @@
                             <notebook colspan="4">
                                 <page string="Description">
                                     <group>
-                                        <field name="customer_description" class="col-md-6" />
+                                        <field name="customer_description" />
+                                        <field name="JobTicketText" />
+                                        <field name="documentCatergory" />
                                     </group>
+                                    <group>
+                                        <field name="StandardCustomerDescription" />
+                                        <field name="StandardJobDescription" />
+                                        <field name="UseStadandardDescription" />
+                                    </group>
+                                    
+                                    <label for="Details" />
+                                    <field name="Details" />
+                                    
+                                    <label for="EstimatorNotes" />
+                                    <field name="EstimatorNotes" />
                                 </page>
 
                                 <page string="Materials" attrs="{'invisible':['|',('option_type','=','process'),('option_type','=',False)]}">
@@ -101,7 +114,7 @@
                                     </sheet>
                                 </page>
 
-                                <page string="Materials" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
+                                <page string="Process" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
                                     <sheet>
                                         <field name="process_ids" />
                                     </sheet>
@@ -145,7 +158,7 @@
                                     
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Stock')]}">
                                         <group>
-                                            <field name="material" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/>
+                                            <field name="material" domain="['&amp;',('productType','=','Stock'),('productType','!=',False)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/>
                                         </group>
                                         <group string="Stock Material Properties">
                                             <group>
@@ -162,12 +175,12 @@
                                                 <field name="param_number_out" />
                                             </group>
                                             <group>
-                                                <group>
+                                                <group attrs="{'invisible':[('isEnvelope','=',True)]}">
                                                     <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                     <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
-                                                <group>
+                                                <group attrs="{'invisible':[('isEnvelope','=',True)]}">
                                                     <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)]}"/>
                                                     <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)]}"/>
                                                 </group>
@@ -176,19 +189,19 @@
                                     </group>
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Trade Counter')]}">
                                         <group>
-                                            <field name="material" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Trade Counter')]}"/>
+                                            <field name="material" domain="['&amp;',('productType','=','Trade Counter'),('productType','!=',False)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Trade Counter')]}"/>
                                         </group>
                                         <group string="Material Parameters" col="1">
                                             <group>
                                                 <field name="param_number_out" />
                                             </group>
                                             <group >
-                                                <group>
+                                                <group attrs="{'invisible':[('isEnvelope','=',True)]}">
                                                     <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                     <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
-                                                <group>
+                                                <group attrs="{'invisible':[('isEnvelope','=',True)]}">
                                                     <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)]}"/>
                                                     <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)]}"/>
                                                 </group>
@@ -236,12 +249,12 @@
                                         </group>
                                         <group string="Material Parameters" attrs="{'invisible':[('NonStockMaterialType','=','process')]}">
                                             <field name="param_number_out" />
-                                            <group>
-                                                    <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                    <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                </group>
+                                            <group attrs="{'invisible':[('isEnvelope','=',True)]}">
+                                                <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                            </group>
 
-                                            <group>
+                                            <group attrs="{'invisible':[('isEnvelope','=',True)]}">
                                                 <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)]}"/>
                                                 <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)]}"/>
                                             </group>
@@ -383,6 +396,48 @@
                                                 </div>
                                                 <div class="col-md-2 form-group">
                                                     <field name="param_wash_up_time_run_on" widget="float_time"/>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row" attrs="{'invisible':[('req_process_working_sheets_quantity','=',False)]}">
+                                                <div class="col-md-2 form-group">
+                                                    <span class="o_field_char o_field_widget o_readonly_modifier">Working Sheets</span>
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_working_sheets_quantity_1" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_working_sheets_quantity_2" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_working_sheets_quantity_3" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_working_sheets_quantity_4" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_working_sheets_quantity_run_on" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row" attrs="{'invisible':[('req_process_overs_quantity','=',False)]}">
+                                                <div class="col-md-2 form-group">
+                                                    <span class="o_field_char o_field_widget o_readonly_modifier">Overs Quantity</span>
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_overs_quantity_1" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_overs_quantity_2" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_overs_quantity_3" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_overs_quantity_4" />
+                                                </div>
+                                                <div class="col-md-2 form-group">
+                                                    <field name="process_overs_quantity_run_on" />
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['|',('option_type','=','material'),('req_param_make_ready_overs','=',False)]}">

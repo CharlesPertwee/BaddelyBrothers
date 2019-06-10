@@ -1,0 +1,148 @@
+<odoo>
+    <template id="mrp_cost_structure">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="estimate">
+                    <div class="page" t-if="estimate.Estimate">
+                        <div class="table-responsive">
+                            <table style="border: 1px black solid;" class="table">
+                                <tbody>
+                                    <tr>
+                                        <td style="border: 1px black solid;">
+                                          <span>Date Required:</span><br/>
+                                          <span><b><span t-field="estimate.Estimate.target_dispatch_date" /></b></span><br/>
+                                          <span>Office Contact:</span><br/>
+                                          <span><b><span t-field="estimate.Estimate.estimator.name" /></b></span><br/>
+                                          <span>Office Copy:</span><br/>
+                                          <span><b><span t-field="estimate.Estimate.office_copy" /></b></span><br/>
+                                        </td>
+                                        <td style="border: 1px black solid;">
+                                          <center>BB623302</center>
+                                        </td>
+                                        <td style="border: 1px black solid;">
+                                          Date: <span t-field="estimate.create_date" /><br/>
+                                          Estimate no. <span t-field="estimate.Estimate.estimate_number" /><br/>
+                                        </td>
+                                        <td style="border: 1px black solid;">
+                                          Invoice No: <br/>
+                                          Invoice Date: 
+                                        </td>
+                                        <td style="border: 1px black solid;">
+                                          Sales / Prod Code: <br/>
+                                          Prev Inv Ref: <br/>
+
+                                        </td>
+                                    </tr>
+                                  <tr>
+                                    <td colspan="3" style="border: 1px black solid;">
+                                      Customer: <span t-field="estimate.Estimate.partner_id.name"/> Project:<span class="text-right" t-field="estimate.Estimate.project.name"></span>
+                                    </td>
+                                    <td colspan="2" style="border: 1px black solid;">
+                                      Customer O/No: <span t-field="estimate.name"/>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td colspan="5" style="border: 1px black solid;;padding:0px;">
+                                      <table class="table">
+                                        <tbody>
+                                          <tr>
+                                            <td style="border: 1px black solid; width:40%" >
+                                              Job Title: <b><span t-field="estimate.Estimate.title" /></b>
+                                            </td>
+                                            <td>
+                                              <u>Process</u>
+                                            </td>
+                                            <td>
+                                              <u>Supplier</u>
+                                            </td>
+                                            <td>
+                                              <u>Order NO</u>
+                                            </td>
+                                            <td>
+                                              <u>Qty Rec'd</u>
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                              <td style="border: 1px black solid; width:40%">
+                                                  Job Type: <span /><br/>
+                                                  Spec: <span /><br/>
+                                                  Quantity: <span t-esc="estimate.Estimate['quantity'+estimate.Estimate.selectedQuantity] + estimate.Estimate.selectedRunOn"/><br/>
+                                                  Finished Size: <span t-field="estimate.Estimate.finished_height" /> X <span t-field="estimate.Estimate.finished_width" /><br/><br/>
+                                                  <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                      <t t-if="line.option_type and line.option_type == 'material' and line.material.categ_id.name != 'Box'">
+                                                          <span t-esc="line.GenerateMaterialDetails(line)" /><br/>
+                                                      </t>
+                                                  </t>
+                                                  <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                      <t t-if="line.option_type and line.option_type == 'process' and line.JobTicketText">
+                                                          <span t-field="line.JobTicketText" /><br/>
+                                                      </t>
+                                                  </t>
+                                              </td>
+                                              <td>
+                                                  <!-- material -->
+                                                  <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                      <t t-if="line.option_type and line.option_type == 'material' and line.material.categ_id.name != 'Box' and (not (line.NonStockMaterialType and line.NonStockMaterialType == 'Customer Supplied Material'))">
+                                                          <span t-esc="line.GenerateMaterialDetails(line)" /><br/>
+                                                      </t>
+                                                  </t>
+                                                  <!-- end --->
+                                                  <!-- process -->
+                                                   <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                      <t t-if="line.option_type and line.option_type == 'process'">
+                                                          <span t-esc="line.lineName" /><br/>
+                                                      </t>
+                                                  </t>
+                                                  <!-- end -->
+                                                  <span t-esc="estimate.Estimate.GenerateEnvelopeDetails(estimate.Estimate)" />
+                                              </td>
+                                              <td>
+                                                  <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                      <t t-if="line.Supplier">
+                                                          <span t-esc="line.Supplier.name" /><br/>
+                                                      </t>
+                                                      <t t-else="">
+                                                         <br/>
+                                                      </t>
+                                                  </t>
+                                                  
+                                              </td>
+                                              <td>
+                                                  <!-- Purchase -->
+                                              </td>
+                                              <td>
+                                                  <!-- Qty -->
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                            <td style="border: 1px black solid; width:40%">
+                                                <span t-field="estimate.Estimate.SpecialInstuction" />
+                                            </td>
+                                            <td colspan="4" style="border-bottom: 1px black solid;">
+                                                <span t-field="estimate.Estimate.PackingInstruction" />
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                    <tr>
+                                        <td colspan="5">
+                                            Stock Description / Cutting Instructions: <span t-esc="'Knife Number: '+ estimate.Estimate.knife_number if estimate.Estimate.knife_number else ''" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    
+</odoo

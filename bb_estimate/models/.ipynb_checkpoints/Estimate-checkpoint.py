@@ -40,7 +40,10 @@ TISSUE_LINING_OPTIONS = [
 
 class Estimate(models.Model):
     _name = 'bb_estimate.estimate'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _description = 'Estimate'
     _rec_name = 'title'
+    
     
     @api.model
     def _read_group_state(self, stages, domain, order):
@@ -50,7 +53,7 @@ class Estimate(models.Model):
     #Estimate For Fields
     partner_id = fields.Many2one('res.partner', string='Customer', required=True)
     contact = fields.Many2one('res.partner', string='Contact')
-    project = fields.Many2one('project.project', string='Project')
+    project = fields.Many2one('project.project', string='Project',required=True)
     invoice_account = fields.Many2one('res.partner', string='Invoice Account')
     invoice_address = fields.Many2one('res.partner', string='Invoice Address')
     invoice_contact = fields.Many2one('res.partner', string='Invoice Contact')
@@ -59,9 +62,9 @@ class Estimate(models.Model):
     title = fields.Char('Title',required=True)
     product_type = fields.Many2one('product.product', string='Product Type',required=True)
     estimate_date = fields.Date('Estimate Date')
-    estimator = fields.Many2one('res.users','Estimator')
+    estimator = fields.Many2one('res.users','Estimator', default=lambda self: self.env.uid)
     office_copy = fields.Boolean('Office copy')
-    estimate_number = fields.Char('Estimate Number', compute='_computeEstimateNumber')        
+    estimate_number = fields.Char('Estimate Number', default=lambda self: self.env['ir.sequence'].next_by_code('bb_estimate.estimate'))        
     event_date = fields.Date('Event Date')
     target_dispatch_date = fields.Date('Target Dispatch Date')
     
@@ -73,7 +76,12 @@ class Estimate(models.Model):
                             , group_expand='_read_group_state'
                             , default=lambda self: self.env['bb_estimate.stage'].search([])[0])
     estimate_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Line')
-    #estimate_extra_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Extra Line')
+    
+    #Delievery Details
+    Delivery = fields.Many2one('res.partner',string="Delivery To",domain="[('type','=','delivery')]",required=True)
+    DeliveryContact = fields.Many2one('res.partner',string="Delivery Contact",required=True)
+    DeliveryMethod = fields.Many2one('delivery.carrier',string="Delivery Method",required=True)
+    DeliveryLabel = fields.Boolean('Plain Label')
     
     quantity_1 = fields.Integer('Quantity 1')    
     quantity_2 = fields.Integer('Quantity 2')
@@ -86,6 +94,12 @@ class Estimate(models.Model):
     total_price_3 = fields.Float('Total Price 3',store=True,compute="_get_estimate_line")
     total_price_4 = fields.Float('Total Price 4',store=True,compute="_get_estimate_line")
     total_price_run_on = fields.Float('Run On',store=True,compute="_get_estimate_line")
+    
+    total_price_extra_1 = fields.Float('Total Price 1',store=True,compute="_get_estimate_line")
+    total_price_extra_2 = fields.Float('Total Price 2',store=True,compute="_get_estimate_line")
+    total_price_extra_3 = fields.Float('Total Price 3',store=True,compute="_get_estimate_line")
+    total_price_extra_4 = fields.Float('Total Price 4',store=True,compute="_get_estimate_line")
+    total_price_extra_run_on = fields.Float('Run On',store=True,compute="_get_estimate_line")
     
     total_cost_1 = fields.Float('Total Cost 1',store=True,compute="_get_estimate_line")
     total_cost_2 = fields.Float('Total Cost 2',store=True,compute="_get_estimate_line")
@@ -129,16 +143,51 @@ class Estimate(models.Model):
     routings = fields.Many2one('mrp.routing','Generated Routing')
     bom = fields.Many2one('mrp.bom', 'Generated Bom')
     manufacturingOrder = fields.Many2one('mrp.production','Job Ticket')
+    salesOrder = fields.Many2one('sale.order','Sales Order')
     
     hasExtra = fields.Boolean('Has Extra',compute="getExtras")
+    estimateConditions = fields.Many2many('bb_estimate.conditions', string="Estimate Conditions")
+    isEnvelope = fields.Boolean('Is Envelope',related="product_type.isEnvelope")
+    showMo = fields.Boolean('Show Mo Button',related="state.isOrder")
+    EnquiryComments = fields.Text('Enquiry Comments')
+    SpecialInstuction = fields.Text('Special Instructions')
+    PackingInstruction = fields.Text('Packing Instructions')
     
+    #Fields For BOM and Invoice Computation
+    selectedQuantity = fields.Selection([('1','1'),('2','2'),('3','3'),('4','4')],string="Selected Quantity",default="1")
+    selectedRunOn = fields.Integer('Selected Run On',default=0)
+    selectedPrice = fields.Float('Total Price Selected',default=0)
+    selectedRatio = fields.Float('Ratio Selected',default=0)
     
-    def _get_estimate_summary(self):
-        raise Exception('test')
-
+    def GenerateEnvelopeDetails(self,estimate):
+        line = ''
+        if estimate.envelope_type:
+            line += '%s' % dict(ENVELOPE_TYPES)[estimate.envelope_type]
+        if estimate.flap_glue_type:
+            line += '\n%s' % dict(FLAP_GLUE_TYPES)[estimate.flap_glue_type]
+        if estimate.tissue_lined:
+            line += '\n%s' % dict(TISSUE_LINING_OPTIONS)[estimate.tissue_lined]
+        if estimate.embossed:
+            line += '\nBlind Embossed'
+        if estimate.windowed:
+            if estimate.standard_window_size:
+                line += '\nStandard'
+            else:
+                line += '\n%s mm  x  %s mm' % (estimate.windowHeight, estimate.windowWidth)
+                line += '\n%s mm FLHS,  %s mm Up' % (estimate.windowFlhs, estimate.windowUp)
+        return line
+    
+    @api.model
+    def create(self,val):
+        record = super(Estimate,self).create(val)
+        conditions = self.env['bb_estimate.conditions'].sudo().search([('isDefault','=',True)])
+        record.estimateConditions = conditions
+        return record
+    
     def _computeEstimateNumber(self):
         for record in self:
-            record.estimate_number = 'EST%d'%(record.id)
+            if not record.estimate_number :
+                record.estimate_number = self.env['ir.sequence'].next_by_code('bb_estimate.estimate') or 'EST%d'%(self.id)
     
     @api.depends('hasExtra')
     def getExtras(self):
@@ -155,6 +204,7 @@ class Estimate(models.Model):
             for qty in ['1','2','3','4','run_on']:
                 record['total_price_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line])
                 record['total_cost_'+qty] = sum([x['total_cost_'+qty] for x in record.estimate_line])
+                record['total_price_extra_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line if x.isExtra == True])
                 if qty != 'run_on':
                     record['unAllocated_'+qty] = record['quantity_'+qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
                 else:
@@ -223,9 +273,9 @@ class Estimate(models.Model):
                 'res_model' : 'bb_estimate.wizard_order_convert',
                 'type' : 'ir.actions.act_window',
                 'context' : "{'default_EstimateId' : active_id}",
-                'target' : 'new'
+                'target' : 'new',
             }
-        
+
     def AddLineItem(self):
         return {
                 'view_type' : 'form',
@@ -234,5 +284,5 @@ class Estimate(models.Model):
                 'res_model' : 'bb_estimate.estimate_line',
                 'type' : 'ir.actions.act_window',
                 'context' : "{'default_estimate_id' : active_id,'default_grammage' : %d}"%(self.grammage),
-                'target' : 'new'
+                'target' : 'new',
             }

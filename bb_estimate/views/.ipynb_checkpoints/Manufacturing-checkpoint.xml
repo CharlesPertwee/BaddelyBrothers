@@ -1,0 +1,24 @@
+<odoo>
+    <data>
+        <report 
+            id="report_job_ticket"
+            model="mrp.production"
+            string="Job Ticket"
+            report_type="qweb-html"
+            name="bb_estimate.job_ticket"
+            file="bb_estimate.job_ticket"
+            print_report_name="'Job Ticket - %s ' % object.name"
+        />
+        
+        <record id="mrp_production_form_view_bb" model="ir.ui.view">
+            <field name="name">mrp.production.form.bb</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="" postition="after">
+                    <field name="Estimate" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

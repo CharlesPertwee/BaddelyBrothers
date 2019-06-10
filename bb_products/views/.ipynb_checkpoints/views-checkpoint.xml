@@ -13,6 +13,8 @@
                 <field name="sheetSize" />
                 <field name="customerDescription"/>
                 <field name="jobTicketDescription"/>
+                <field name="productType" />
+                <field name="isEnvelope" />
             </xpath>
             
 		</field>

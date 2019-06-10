@@ -1,0 +1,29 @@
+<odoo>
+    <data>
+        <record id="mrp_production_workorder_form_view_inherit" model="ir.ui.view">
+          <field name="name">mrp.production.work.order.form</field>
+          <field name="model">mrp.workorder</field>
+          <field name="inherit_id" ref="mrp.mrp_production_workorder_form_view_inherit"/>
+          <field name="arch" type="xml">
+             <xpath expr="//notebook" position="inside">
+                  <page string="Estimate Details">
+                       <sheet>
+                           <group>
+                                <field name="ActualTime" widget="float_time" />
+                           </group>
+                           <field name="EstimateMaterials" attrs="{'readonly':[('state','in',['done','cancel'])]}">
+                               <tree editable="top">
+                                   <field name="EstimateLineId" invisible="1" />
+                                   <field name="name" readonly="1"/>
+                                   <field name="MaterialAllocated" readonly="1" />
+                                   <field name="MaterialUsed" />
+                                   <field name="WorkOrderId" invisible="1" />
+                                </tree>
+                           </field>
+                       </sheet>
+                  </page>
+              </xpath>
+          </field>
+        </record>
+    </data>
+</odoo>

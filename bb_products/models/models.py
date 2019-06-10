@@ -15,15 +15,18 @@ class ProductsTemplate(models.Model):
     thickness = fields.Float(string='Thickness(microns)')
     customerDescription = fields.Char('Standard customer Description')
     jobTicketDescription = fields.Char('Standard Job Ticket Text')
+    productType = fields.Selection([('Stock','Stock Material'),('Trade Counter','Trade Counter'),('Non-Stock','Non Stockable Product'),('Finished','Finished Product')],string="Material Type",default="Trade Counter")
+    isEnvelope = fields.Boolean('is Envelope?')
     
     def _compute_margin(self):
-        margin = 0
-        if self.standard_price == 0:
-            margin = 100
-        else:
-            margin = ((self.list_price - self.standard_price)/self.standard_price) * 100
+        for record in self:
+            margin = 0
+            if record.standard_price == 0:
+                margin = 100
+            else:
+                margin = ((record.list_price - record.standard_price)/record.standard_price) * 100
 
-        self.margin = margin
+            record.margin = margin
         
     @api.onchange('sheetSize')
     def calc_sheet_dimen(self):
