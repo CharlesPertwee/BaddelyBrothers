@@ -9,3 +9,5 @@ from . import Manufacturing
 from . import WorkOrders
 from . import Bom
 from . import Routing
+from . import SalesOrder
+from . import StockPicking

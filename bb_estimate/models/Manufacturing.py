@@ -11,6 +11,13 @@ class Manufacture(models.Model):
     _inherit = 'mrp.production'
     
     Estimate = fields.Many2one('bb_estimate.estimate','Originating Estimate')
+    NoOfCopiesRequired = fields.Char('No. File Copies Reqd', size=5)
+    NoOfCustomerCopies = fields.Char('Customer Files', size=5)
+    OversRequired = fields.Char('No. Overs Reqd', size=5)
+    ChargeOvers = fields.Boolean('Charge for Overs')
+    
+#     def button_mark_done(self):
+#         raise Exception('Test')
     
     def _workorders_create(self, bom, bom_data):
         """

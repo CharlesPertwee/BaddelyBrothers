@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="box_label">
+            <t t-call="web.basic_layout">
+                <t t-call="web.html_container">
+                    <t t-foreach="docs" t-as="mo">
+                        <div class="page">
+                            <div class="container" style="font-family:arial; font-size:9pt; padding:1px;">
+                                <p><b><span t-field="mo.name"/></b></p>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p><span t-field="mo.name"/></p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="pull-right">Cust Ref:</p>
+                                    </div>
+                                </div>
+                                <p><span t-field="mo.Estimate.finished_size.name" /> </p>
+                                
+                                <p>Type: <span t-field="mo.Estimate.envelope_type"/><br/>Flap: <span t-field="mo.Estimate.flap_glue_type"/><br/>Embossed: <span t-field="mo.Estimate.embossed"/><br/></p>
+                                
+                                <p>Material: <br/>
+                                    <t t-foreach="mo.Estimate.estimate_line" t-as="line">
+                                        <t t-if="line.option_type and line.option_type == 'material' and line.material.categ_id.name != 'Box'">
+                                            <span t-esc="line.GenerateMaterialDetails(line)" />
+                                        </t>
+                                    </t>
+                                </p>
+                                    
+                                <p>Qty: <span t-field="mo.product_qty"/></p>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+</odoo>

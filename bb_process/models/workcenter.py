@@ -61,7 +61,7 @@ class MrpWorkcenter(models.Model):
     misc_charge_per_cm2 = fields.Float('Misc. Material Charge per cm2', default=0.0)
     ink_mix_time = fields.Float('Ink Mix Time (hours)', default=0.28)
     
-    associatedBoxId = fields.Many2one('product.template',string="Packaging Product")
+    associatedBoxId = fields.Many2one('product.product',string="Packaging Product")
     sheetsPerBox = fields.Integer('Sheets Per Box')
     timePerBox = fields.Float('Time Per Box')
     paper_type = fields.Selection([('white','White'),('printed','Printed')],string="Paper Type")
@@ -72,3 +72,5 @@ class MrpWorkcenter(models.Model):
     gummingAvailable = fields.Boolean('Gumming Available')
     
     documentCatergory = fields.Selection(LINE_DOCUMENT_CATEGORIES,'Letter Category',default="Process")
+    jobTicketDescription = fields.Char('Standard Job Ticket Text')
+    notesForEstimator = fields.Char('Notes for Estimators')

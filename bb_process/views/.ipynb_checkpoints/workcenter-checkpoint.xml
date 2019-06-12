@@ -1,5 +1,16 @@
 <odoo>
 	<data>
+        <record id="view_workcenter_filter" model="ir.ui.view">
+            <field name="name">workcenter.filter.view</field>
+            <field name="model">mrp.workcenter</field>
+            <field name="inherit_id" ref="mrp.view_mrp_workcenter_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group" position="inside">
+                    <filter string="Process" name="process_type" context="{'group_by':'process_type'}"/>
+                </xpath>
+            </field>
+        </record>
+        
 		<record id="mrp_workcenter_view_bb" model="ir.ui.view">
 			<field name="name">mrp.workcenter.form.bb</field>
 			<field name="model">mrp.workcenter</field>
@@ -8,6 +19,12 @@
 				<xpath expr="//field[@name='name']" position="after">
 					<field name="process_type"/>
 				</xpath>
+                 <xpath expr="//field[@name='note']" position="after">
+                    <group>
+                        <field name="jobTicketDescription"/>
+                        <field name="notesForEstimator"/>
+                    </group>
+                </xpath>
 				<xpath expr="//notebook[1]/page[1]" position="after">
 					<page string="Quantity Breaks" name="QunatityBreaks" autofocus="autofocus" attrs="{'invisible':[('process_type','=',False)]}">
 						<field name="qty_break_params"/>

@@ -1,0 +1,30 @@
+<odoo>
+    <template id="die_label">
+            <t t-call="web.basic_layout">
+                <t t-call="web.html_container">
+                    <t t-foreach="docs" t-as="mo">
+                        <div class="page">
+                            <div class="container" style="font-family:arial; font-size:11pt; padding:1px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p><b><span t-field="mo.name"/></b></p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p><b>Qty: <span t-field="mo.product_qty"/></b></p>
+                                    </div>
+                                </div>
+                                
+                                <p>Prev Job: </p>                                
+                                <p>Customer: <b><span t-field="mo.Estimate.partner_id.name"/></b></p>
+                                <p>Job Title: <b><span t-field="mo.Estimate.title"/></b></p>
+                                <p>Date: <b><span t-field="mo.create_date"/></b></p>
+                                                              
+                                <p>Notes: </p>
+                                
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+</odoo>

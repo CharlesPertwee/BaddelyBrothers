@@ -9,6 +9,9 @@ class WorkOrder(models.Model):
     EstimateMaterials = fields.One2many('bb_estimate.work_material','WorkOrderId','Materials')
     ActualTime = fields.Float('Actual Time(hrs)')
     
+#     def action_open_manufacturing_order(self):
+#         raise Exception('Test')
+    
 class WorkOrderMaterial(models.Model):
     _name = 'bb_estimate.work_material'
     _description = 'Material usage for work orders'

@@ -3,7 +3,10 @@
     <template id="estimate_letter">
         <t t-call="web.basic_layout">
             <t t-foreach="docs" t-as="estimate">
-                <div class="page">
+                <div class="backgroundimage" style="position:absolute;z-index:-999;"> 
+                    <img class="img-responsive" src="/bb_estimate/static/src/img/Bb_invoice.jpg" width="900px" height="1335px"/>
+                </div> 
+                <div class="page" style="padding-top:16em; padding-left:2em; padding-right:2em;">
                     <div class="container">
                         <div class="row">
                             <div class="col-6">
@@ -32,10 +35,10 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <table>
+                                <table style="width:100%">
                                     <tbody>
                                         <tr>
-                                            <td>
+                                            <td style="width:30%">
                                                 Title:
                                             </td>
                                             <td>
@@ -43,7 +46,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
+                                            <td style="width:30%">
                                                 Size:
                                             </td>
                                             <td>
@@ -54,7 +57,7 @@
                                         <t t-foreach="estimate.estimate_line" t-as="line">
                                             <t t-if="line.customer_description and (line.option_type and line.option_type == 'material')">
                                                 <tr>
-                                                    <td>
+                                                    <td style="width:30%">
                                                         Material:
                                                     </td>
                                                     <td>
@@ -71,7 +74,7 @@
                                         <t t-foreach="estimate.estimate_line" t-as="line">
                                             <t t-if="line.customer_description and line.documentCatergory and (line.option_type and line.option_type == 'process')">
                                                 <tr>
-                                                    <td>
+                                                    <td style="width:30%">
                                                         <span t-field="line.documentCatergory"/>:
                                                     </td>
                                                     <td>
@@ -83,7 +86,7 @@
                                         <!-- end -->
                                         <!-- qty -->
                                         <tr>
-                                            <td>
+                                            <td style="width:30%">
                                                 Qty/Price:
                                             </td>
                                             <td>
@@ -91,7 +94,7 @@
                                             </td>
                                         </tr>
                                         <tr t-if="estimate.quantity_2 > 0">
-                                            <td>
+                                            <td style="width:30%">
                                                 
                                             </td>
                                             <td>
@@ -99,7 +102,7 @@
                                             </td>
                                         </tr>
                                         <tr t-if="estimate.quantity_3 > 0">
-                                            <td>
+                                            <td style="width:30%">
                                                 
                                             </td>
                                             <td>
@@ -107,7 +110,7 @@
                                             </td>
                                         </tr>
                                         <tr t-if="estimate.quantity_4 > 0">
-                                            <td>
+                                            <td style="width:30%">
                                                 
                                             </td>
                                             <td>
@@ -115,7 +118,7 @@
                                             </td>
                                         </tr>
                                         <tr t-if="estimate.run_on > 0">
-                                            <td>
+                                            <td style="width:30%">
                                                 
                                             </td>
                                             <td>
@@ -127,7 +130,7 @@
                                         <t t-foreach="estimate.estimate_line" t-as="line">
                                             <t t-if="line.isExtra and line.extraDescription">
                                                 <tr>
-                                                    <td>
+                                                    <td style="width:30%">
                                                         
                                                     </td>
                                                     <td>

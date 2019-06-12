@@ -42,8 +42,8 @@ class EstimateLine(models.Model):
     
     lineName = fields.Char(string='Process/Material',compute="_computeName")
     customer_description = fields.Char(string="Customer Description",required=True)
-    documentCatergory = fields.Selection(LINE_DOCUMENT_CATEGORIES,'Letter Category',related="workcenterId.documentCatergory")
-    JobTicketText = field.Char('Job Ticket Text',required=True)
+    documentCatergory = fields.Selection(LINE_DOCUMENT_CATEGORIES,'Letter Category')
+    JobTicketText = fields.Char('Job Ticket Text',required=True)
     StandardCustomerDescription = fields.Char('Standard Customer Description',required=True)
     StandardJobDescription = fields.Char('Standard Job Ticket Text',required=True)
     UseStadandardDescription = fields.Boolean('Use Standard Descriptions?',required=True)
@@ -320,6 +320,7 @@ class EstimateLine(models.Model):
                 
     def calc_material_fields(self):
         for record in self:
+            record.documentCatergory = 'Material'
             record.grammage = record.material.grammage
             record.SheetHeight = record.material.sheet_height
             record.SheetWidth = record.material.sheet_width
@@ -769,6 +770,11 @@ class EstimateLine(models.Model):
     def UpdateRequiredFields(self):
         for record in self:
             if record.workcenterId:
+                record.documentCatergory = record.workcenterId.documentCatergory
+                record.customer_description = record.workcenterId.note
+                record.JobTicketText = record.workcenterId.jobTicketDescription
+                record.EstimatorNotes = record.workcenterId.notesForEstimator
+                
                 model_fields = {x:False for x in record._fields if x.startswith('req_') }
                 fields = {x.name:True for x in record.workcenterId.process_type.requiredFields}
                 record.update(model_fields)
@@ -795,7 +801,29 @@ class EstimateLine(models.Model):
                         newLink['overs_only'] = True
                     
                     link.create(newLink)
+    
+    def CreateMaterialLink(self,process,work_twist):
+        link = self.env['bb_estimate.material_link'].sudo()
+        materials = process.estimate_id.estimate_line.search([('estimate_id','=',process.estimate_id.id),('option_type','=','material')])
+        added_working_sheets = False
+        for material in materials:
+            if process.workcenterId and process.workcenterId.process_type:
+                if process.work_twist:
+                    work_twist = True
+                if process.workcenterId.process_type.MapMaterials:
+                    newLink = {
+                        'materialLine' : material.id,
+                        'processLine' : process.id,
+                        'estimate': process.estimate_id.id,
+                    }
+                    if not added_working_sheets and process.workcenterId.process_type.OversOnly:
+                        newLink['overs_only'] = False
+                        added_working_sheets = True
+                    else:
+                        newLink['overs_only'] = True
                     
+                    link.create(newLink)
+            
     def RecalculatePrices(self,line,work_twist):
         if line.option_type and line.option_type == "material":
             estimate = line.estimate_id
@@ -851,6 +879,12 @@ class EstimateLine(models.Model):
         for lineId in records:
             if lineId:
                 if lineId.option_type == 'process':
+                    work_twist = False
+                    self.CreateMaterialLink(lineId,work_twist)
+                    for m in lineId.estimate_id.estimate_line:
+                        if m.option_type == 'material' and m.material.categ_id.name != 'Box':
+                            m.RecalculatePrices(m,work_twist)
+                            
                     if lineId.workcenterId.associatedBoxId:
                         data = {}
                         material = lineId.workcenterId.associatedBoxId
@@ -893,8 +927,14 @@ class EstimateLine(models.Model):
 
                         newRecord = {
                             'estimate_id' : lineId.estimate_id.id,
+                            'MaterialTypes': 'Stock',
                             'material': material.id,
                             'option_type':'material',
+                            'documentCatergory' : 'Packing',
+                            'customer_description': 'Packing as required',
+                            'StandardJobDescription': 'Packing',
+                            'StandardCustomerDescription' : 'Customer',
+                            'JobTicketText':'Text',
                             'lineName' : material.name
                         }
                         newRecord.update(data)

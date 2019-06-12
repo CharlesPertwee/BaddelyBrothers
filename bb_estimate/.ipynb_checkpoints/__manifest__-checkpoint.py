@@ -7,7 +7,6 @@
         """,
 
     'description': """    
-    
     """,
 
     'author': "Squadsoft Tech",
@@ -20,13 +19,21 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account'],
+    'depends': ['base','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        #'reports/views/EstimateLetter.xml',
-        'report/views/JobTicket.xml',
+        'data/Stages.xml',
+        'data/Estimate.xml',
+        'data/Manufacturing.xml',
+        'reports/views/EstimateLetter.xml',
+        'reports/views/JobTicket.xml',
+        'reports/views/BoxLabel.xml',
+        'reports/views/AsBeforeLetter.xml',
+        'reports/views/DieLabel.xml',
+        'reports/views/InvoiceReport.xml',
+        'reports/views/ProForma.xml',
         'views/EstimateLines.xml',
         'views/Estimate.xml',
         'views/EstimateStages.xml',
@@ -37,10 +44,9 @@
         'views/WorkOrders.xml',
         'views/Routing.xml',
         'views/Bom.xml',
-        #'reports/views/CostStructure.xml',
+        'views/SalesOrder.xml',
+        'views/Invoice.xml',
         'wizards/views/OrderConvert.xml',
-        'data/Stages.xml',
-        'data/Estimate.xml',
         
         
     ],

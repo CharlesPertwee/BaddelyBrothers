@@ -7,6 +7,7 @@
         report_type="qweb-pdf"
         name="bb_estimate.estimate_letter"
         file="mrp_account.mrp_cost_structure"
+        paperformat="bb_estimate.paperformat_invoice"
       />
           
     <record id="estimate_tree_view" model="ir.ui.view">

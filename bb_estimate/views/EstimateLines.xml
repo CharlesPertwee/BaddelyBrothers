@@ -91,16 +91,17 @@
                             <notebook colspan="4">
                                 <page string="Description">
                                     <group>
-                                        <field name="customer_description" />
-                                        <field name="JobTicketText" />
-                                        <field name="documentCatergory" />
+                                        <group>
+                                            <field name="customer_description" />
+                                            <field name="JobTicketText" />
+                                            <field name="documentCatergory" />
+                                        </group>
+                                        <group>
+                                            <field name="StandardCustomerDescription" />
+                                            <field name="StandardJobDescription" />
+                                            <field name="UseStadandardDescription" />
+                                        </group>
                                     </group>
-                                    <group>
-                                        <field name="StandardCustomerDescription" />
-                                        <field name="StandardJobDescription" />
-                                        <field name="UseStadandardDescription" />
-                                    </group>
-                                    
                                     <label for="Details" />
                                     <field name="Details" />
                                     

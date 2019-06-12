@@ -127,7 +127,6 @@ class OrderConvert(models.TransientModel):
             'Estimate' : self.EstimateId.id
             
         }
-        
         mo = order.create(newOrder)
         
         data = {
@@ -158,6 +157,7 @@ class OrderConvert(models.TransientModel):
             'partner_shipping_id': self.EstimateId.Delivery.id,
             'amount_untaxed': totalPrice,
             'carrier_id': self.EstimateId.DeliveryMethod.id,
+            'Estimate' : self.EstimateId.id,
             'order_line':[(0,0,salesProduct)]
         }
 
