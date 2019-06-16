@@ -126,37 +126,35 @@
                                     <group col="3" attrs="{'invisible':[('option_type','=','material')]}">
                                         <group>
                                             <field name="param_printed_material" attrs="{'invisible':[('req_param_printed_material','=',False)],'required':[('req_param_number_of_cuts','=',True)]}"/>
+                                            <field name="param_duplex_sheets" attrs="{'invisible':[('req_param_duplex_sheets','=',False)],'required':[('req_param_duplex_sheets','=',True)]}" />
                                             <field name="param_number_of_cuts" attrs="{'invisible':[('req_param_number_of_cuts','=',False)]}"/>
                                             <field name="param_sheets_per_pile" attrs="{'invisible':[('req_param_sheets_per_pile','=',False)],'required':[('req_param_sheets_per_pile','=',True)]}" />
+                                            <field name="param_number_of_sheets" attrs="{'invisible':[('req_param_number_of_sheets','=',False)],'required':[('req_param_number_of_sheets','=',True)]}" />
                                             <field name="param_time_per_pile" attrs="{'invisible':[('req_param_time_per_pile','=',False)],'required':[('req_param_time_per_pile','=',True)]}" />
+                                            <field name="param_additional_charge" attrs="{'invisible':[('req_param_additional_charge','=',False)],'required':[('req_param_additional_charge','=',True)]}" />
                                             <field name="param_number_out" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_number_out','=',False)],'required':[('req_param_number_out','=',True)]}" />
+                                            <field name="grammage" attrs="{'invisible':[('req_grammage','=',False)],'required':[('req_grammage','=',True)]}" />
                                             <field name="param_sheets_per_box" attrs="{'invisible':[('req_param_sheets_per_box','=',False)],'required':[('req_param_sheets_per_box','=',True)]}" />
                                             <field name="param_number_up" readonly="1" attrs="{'invisible':[('req_param_number_up','=',False)],'required':[('req_param_number_up','=',True)]}" />
-                                            <field name="work_twist" attrs="{'invisible':[('req_work_twist','=',False)]}" />
                                         </group>
                                         
                                         <group>
                                             <field name="param_number_of_colors" attrs="{'invisible':[('req_param_number_of_colors','=',False)],'required':[('req_param_number_of_colors','=',True)]}" />
-                                            <field name="grammage" attrs="{'invisible':[('req_grammage','=',False)],'required':[('req_grammage','=',True)]}" />
-                                            <field name="param_duplex_sheets" attrs="{'invisible':[('req_param_duplex_sheets','=',False)],'required':[('req_param_duplex_sheets','=',True)]}" />
-                                            <field name="param_number_of_sheets" attrs="{'invisible':[('req_param_number_of_sheets','=',False)],'required':[('req_param_number_of_sheets','=',True)]}" />
-                                            <field name="param_additional_charge" attrs="{'invisible':[('req_param_additional_charge','=',False)],'required':[('req_param_additional_charge','=',True)]}" />
+                                            <field name="work_twist" attrs="{'invisible':[('req_work_twist','=',False)]}" />
                                             <field name="param_material_line_id" options="{'no_create_edit': True}" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)],'required':[('req_param_material_line_id','=',True)]}" />
                                         </group>
-                                        
+                                        <group>
+                                            <field name="param_number_of_colors_rev" attrs="{'invisible':[('req_param_number_of_colors_rev','=',False)],'required':[('req_param_number_of_colors_rev','=',True)]}" />
+                                            <field name="param_no_of_ink_mixes" attrs="{'invisible':[('req_param_no_of_ink_mixes','=',False)],'required':[('req_param_no_of_ink_mixes','=',True)]}" />
+                                            <field name="param_die_size" attrs="{'invisible':[('req_param_die_size','=',False)],'required':[('req_param_number_of_colors','=',True)]}" />
+                                        </group>
                                         <group>
                                             <field name="param_env_windowpatching" attrs="{'invisible':[('req_param_env_windowpatching','=',False)],'required':[('req_param_env_windowpatching','=',True)]}" />
                                             <field name="param_env_peelandstick" attrs="{'invisible':[('req_param_env_peelandstick','=',False)]}" />
                                             <field name="param_env_inlineemboss" attrs="{'invisible':[('req_param_env_inlineemboss','=',False)]}" />
                                             <field name="param_env_gumming" attrs="{'invisible':[('req_param_env_gumming','=',False)]}" />
                                         </group>
-
-                                        <group>
-                                            <field name="param_number_of_colors_rev" attrs="{'invisible':[('req_param_number_of_colors_rev','=',False)],'required':[('req_param_number_of_colors_rev','=',True)]}" />
-                                            <field name="param_no_of_ink_mixes" attrs="{'invisible':[('req_param_no_of_ink_mixes','=',False)],'required':[('req_param_no_of_ink_mixes','=',True)]}" />
-                                            <field name="param_die_size" attrs="{'invisible':[('req_param_die_size','=',False)],'required':[('req_param_number_of_colors','=',True)]}" />
-                                        </group>
-                                    </group>
+             </group>
                                     
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Stock')]}">
                                         <group>
