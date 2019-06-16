@@ -10,10 +10,13 @@
         </template>
         
         <template id="product_price_bb" inherit_id="website_sale.product_price">
-              <xpath expr="//div[hasclass('mt16')]/h4[1]/span[1]" position="before">
-                  <span>Unit Price</span>
-                  <input type="hidden" name="roundOff" id="roundOff" class="roundOff" value="100"/>
-              </xpath>
+            <xpath expr="//h4[hasclass('decimal_precision')]" position="replace">
+                
+            </xpath>
+            <xpath expr="//div[hasclass('mt16')]/h4[1]/span[1]" position="before">
+                <span>Unit Price</span>
+                <input type="hidden" name="roundOff" id="roundOff" class="roundOff" value="100"/>
+            </xpath>
               
         </template>
        

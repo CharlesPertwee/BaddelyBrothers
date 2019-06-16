@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-
 class ProductsTemplate(models.Model):
     _inherit = 'product.template'
     _name = 'product.template'
-
+    
+    productType = fields.Selection([('Stock','Stock Material'),('Trade Counter','Trade Counter'),('Non-Stock','Non Stockable Product'),('Finished','Finished Product'),('Package','Package'),('Delivery','Delivery')],string="Material Type",default="Trade Counter")
+    isEnvelope = fields.Boolean('Is Envelope?')
+    customerDescription = fields.Char('Standard customer Description')
+    jobTicketDescription = fields.Char('Standard Job Ticket Text')
     estimateAvailable = fields.Boolean(string='Available in Estimating?')
     grammage = fields.Char(string='Grammage (G.S.M)')
     sheetSize = fields.Many2one('bb_products.material_size', string='Sheet Size')
@@ -13,10 +16,7 @@ class ProductsTemplate(models.Model):
     sheet_width = fields.Integer(string='Sheet Width(mm)')
     sheet_height = fields.Integer(string='Sheet Height(mm)')
     thickness = fields.Float(string='Thickness(microns)')
-    customerDescription = fields.Char('Standard customer Description')
-    jobTicketDescription = fields.Char('Standard Job Ticket Text')
-    productType = fields.Selection([('Stock','Stock Material'),('Trade Counter','Trade Counter'),('Non-Stock','Non Stockable Product'),('Finished','Finished Product')],string="Material Type",default="Trade Counter")
-    isEnvelope = fields.Boolean('is Envelope?')
+    staticPrice = fields.Boolean('Static Price')
     
     def _compute_margin(self):
         for record in self:
@@ -34,7 +34,3 @@ class ProductsTemplate(models.Model):
             if record.sheetSize:
                 record.sheet_width = record.sheetSize.width
                 record.sheet_height = record.sheetSize.height
-    
-
-
-    

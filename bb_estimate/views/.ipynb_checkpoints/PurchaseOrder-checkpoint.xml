@@ -1,0 +1,27 @@
+<odoo>
+    <data>
+        <report
+            id="purchase_order_report"
+            model="purchase.order"
+            string="Purchase Order"
+            report_type="qweb-pdf"
+            name="bb_estimate.custom_purchase_order"
+            file="bb_estimate.custom_purchase_order"
+            print_report_name="
+                (object.state in ('draft', 'sent') and 'Request for Quotation - %s' % (object.name) or
+                'Purchase Order - %s' % (object.name))"
+            paperformat="bb_estimate.paperformat_invoice"
+        />
+        
+        <report
+            id="request_for_quotation"
+            model="purchase.order"
+            string="R.F.Q"
+            report_type="qweb-pdf"
+            name="bb_estimate.request_for_quote_custom"
+            file="bb_estimate.request_for_quote_custom"
+            print_report_name="'Request for Quotation - %s' % (object.name)"
+            paperformat="bb_estimate.paperformat_invoice"
+        />
+    </data>
+</odoo>

@@ -7,8 +7,7 @@
         """,
 
     'description': """
-       
-       """,
+     """,
 
     'author': "SquadsoftTech",
     'website': "http://www.squadsoft.com",
@@ -27,6 +26,7 @@
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
+        'data/Product.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

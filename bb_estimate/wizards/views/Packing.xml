@@ -1,0 +1,43 @@
+<odoo>
+    <data>
+        <record id="wizard_packing" model="ir.ui.view">
+            <field name="name">Create Packings</field>
+            <field name="model">bb_estimate.picking</field>
+            <field name="arch" type="xml">
+                <form string="Packings">
+                    <sheet>
+                        <field name="Pick" invisible="1"/>
+                        <group>
+                            <field name="Quantity" />
+                            <field name="QuantityPerBox" />
+                        </group>
+                        <h5>Packages</h5>
+                        <hr/>
+                        <group>
+                            <group>
+                                <field name="NoOfBox1" string="Boxes of"/>
+                                <field name="NoOfBox2" string="Boxes of"/>
+                            </group>
+                            <group>
+                                <field name="CapacityBox1" string="Per Box"/>
+                                <field name="CapacityBox2" string="Per Box"/>
+                            </group>
+                        </group>
+<!--                         <field name="Packages">
+                            <tree editable="top">
+                                <field name="PickId" invisible="1"/>
+                                <field name="NoOfBoxes" />
+                                <field name="QuantityPerBox" />
+                            </tree>
+                        </field> -->
+                        <footer>
+                            <button name="Confirm" string="Confirm" class="oe_right oe_highlight" type="object"/>
+                            <button string="Cancel" class="oe_right" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

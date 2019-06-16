@@ -45,10 +45,13 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
+                <xpath expr="//header" postion="inside">
+                    <button name="ConfirmOrder" attrs="{'invisible':[('state','not in',['planned'])]}" string="Complete Order" class="btn btn-primary o_form_button_edit" type="object"/>
+                </xpath>
                 <xpath expr="//field[@name='origin']" postition="after">
                     <field name="Estimate" readonly="1"/>
                 </xpath>
-                <xpath expr="//notebook" postition="after">
+                <xpath expr="//field[@name='location_dest_id']" postition="after">
                     <group>
                         <group col="4">
                             <field name="NoOfCopiesRequired"/>

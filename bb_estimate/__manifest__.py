@@ -34,6 +34,12 @@
         'reports/views/DieLabel.xml',
         'reports/views/InvoiceReport.xml',
         'reports/views/ProForma.xml',
+        'reports/views/CreditNote.xml',
+        'reports/views/CreditNoteHeaded.xml',
+        'reports/views/PurchaseOrder.xml',
+        'reports/views/RequestQuote.xml',
+        'reports/views/ProFormaHeaded.xml',
+        'reports/views/InvoiceHeaded.xml',
         'views/EstimateLines.xml',
         'views/Estimate.xml',
         'views/EstimateStages.xml',
@@ -46,8 +52,10 @@
         'views/Bom.xml',
         'views/SalesOrder.xml',
         'views/Invoice.xml',
+        'views/PurchaseOrder.xml',
         'wizards/views/OrderConvert.xml',
-        
+        'wizards/views/MoConfirmation.xml',
+        'wizards/views/Packing.xml',
         
     ],
     # only loaded in demonstration mode

@@ -6,8 +6,8 @@ class MaterialLink(models.Model):
     _name = 'bb_estimate.material_link'
     _description = 'Estimate Material Link'
     
-    materialLine = fields.Many2one('bb_estimate.estimate_line',string="Material",domain="[('option_type','=','material')]", required=True)
-    processLine = fields.Many2one('bb_estimate.estimate_line',string="Process",domain="[('option_type','=','process')]", required=True)
+    materialLine = fields.Many2one('bb_estimate.estimate_line',ondelete='cascade', string="Material",domain="[('option_type','=','material')]", required=True)
+    processLine = fields.Many2one('bb_estimate.estimate_line',ondelete='cascade', string="Process",domain="[('option_type','=','process')]", required=True)
     estimate = fields.Many2one('bb_estimate.estimate')
     
     overs_only = fields.Boolean('Overs Only?')

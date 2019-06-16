@@ -8,6 +8,7 @@
               <xpath expr="//field[@name='partner_id']" position="after">
                   <field name="partnerOnHold"/>
                   <field name="Estimate" readonly="1"/>
+                  <field name="JobTicket" readonly="1"/>
               </xpath>
               <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
                   <attribute name="attrs">{'invisible':['|',('partnerOnHold','=',True),('state', 'not in', ['sent'])]}</attribute>

@@ -145,8 +145,8 @@ class MrpCostStructure(models.AbstractModel):
     
     @api.multi
     def get_lines(self, productions):
-        non_estimates = productions.filtered(lambda r: r.origin != 'Estimate Workflow')
-        estimates = productions.filtered(lambda r: r.origin == 'Estimate Workflow')
+        non_estimates = productions.filtered(lambda r: r.Estimate == False)
+        estimates = productions.filtered(lambda r: r.Estimate != None)
         res = []
         for estimate in estimates:
             res.append(self.get_lines_computed(estimate))

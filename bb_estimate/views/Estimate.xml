@@ -33,15 +33,17 @@
             <form string="Estimate">
                 <field name="isEnvelope" invisible="1" />
                 <field name="showMo" invisible="1" />
+                <field name="isLocked" invisible="1" />
                 <header>
+                    <button name="AddDelivery" string="Set Delivery" type="object" />
                     <field name="state" widget="statusbar" clickable="True" />
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                      <button class="oe_stat_button" icon="fa-database" type="object" name="AddLineItem" attrs="{'invisible':['|',('id','=',False),('manufacturingOrder','!=',False)]}">
+                      <button class="oe_stat_button" icon="fa-database" type="object" name="AddLineItem" attrs="{'invisible':['|',('id','=',False),('isLocked','!=',False)]}">
                           <span>Add Line</span>
                       </button>
-                      <button class="oe_stat_button" icon="fa-database" type="object" name="CreateManufacturingOrder" attrs="{'invisible':['|',('showMo','=',False),('manufacturingOrder','!=',False)]}">
+                      <button class="oe_stat_button" icon="fa-database" type="object" name="CreateManufacturingOrder" attrs="{'invisible':['|',('showMo','=',False),('isLocked','!=',False)]}">
                           <span>Create MO</span>
                       </button>
                     </div>
@@ -51,19 +53,19 @@
                     </h1>
                     <group>
                         <group>
-                            <field name="partner_id" domain="[('is_company','=',True)]" />
-                            <field name="contact" domain="[('parent_id','=',partner_id)]" />
-                            <field name="project" />
-                            <field name="invoice_account" required="1"/>
-                            <field name="invoice_address" domain="[('type','=','invoice')]" required="1"/>
-                            <field name="invoice_contact" domain="[('parent_id','=',partner_id)]" required="1"/>
+                            <field name="partner_id"  options="{'no_create_edit': True}" domain="[('is_company','=',True)]" />
+                            <field name="contact"  options="{'no_create_edit': True}" domain="[('parent_id','=',partner_id)]" />
+                            <field name="project" options="{'no_create_edit': True}" domain="[('partner_id','=',partner_id)]"/>
+                            <field name="invoice_account" options="{'no_create_edit': True}" required="1"/>
+                            <field name="invoice_address" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account),('type','=','invoice')]" required="1"/>
+                            <field name="invoice_contact" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account)]" required="1"/>
                         </group>
                         <group>
-                            <field name="product_type" domain="[('productType','=','Finished')]" required="1"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
+                            <field name="product_type" options="{'no_create_edit': True}" domain="[('productType','=','Finished')]" required="1"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
                             <field name="estimate_date" required="1"/>
-                            <field name="estimator" required="1"/>
+                            <field name="estimator" options="{'no_create_edit': True}" required="1"/>
                             <field name="office_copy" />
-                            <field name="estimate_number" required="1"/>
+                            <field name="estimate_number" readonly="1"/>
                             <field name="event_date" />
                             <field name="target_dispatch_date" required="1"/>
                         </group>
@@ -256,13 +258,11 @@
                                    </div>
                                </div>
                                <div class="o_kanban_record_body">
+                                   <strong class="o_kanban_record_title"><field name="estimator"/></strong><br/>
+                                   <small class="o_kanban_record_subtitle text-muted">
+                                       <span t-attf-class="#{red || ''}"><i><field name="estimate_number"/></i></span>
+                                   </small>
                                </div>
-                               <div class="o_kanban_record_bottom">
-                                    <div class="oe_kanban_bottom_left">
-                                    </div>
-                                    <div class="oe_kanban_bottom_right">
-                                    </div>
-                                </div>
                            </div>
                        </div>
                    </t>

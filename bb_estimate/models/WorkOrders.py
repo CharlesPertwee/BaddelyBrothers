@@ -7,7 +7,7 @@ class WorkOrder(models.Model):
     _inherit = 'mrp.workorder'
     
     EstimateMaterials = fields.One2many('bb_estimate.work_material','WorkOrderId','Materials')
-    ActualTime = fields.Float('Actual Time(hrs)')
+    ActualTime = fields.Float('Actual Time (hrs)')
     
 #     def action_open_manufacturing_order(self):
 #         raise Exception('Test')

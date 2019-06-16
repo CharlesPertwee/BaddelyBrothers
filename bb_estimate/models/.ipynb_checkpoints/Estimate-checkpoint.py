@@ -64,7 +64,7 @@ class Estimate(models.Model):
     estimate_date = fields.Date('Estimate Date')
     estimator = fields.Many2one('res.users','Estimator', default=lambda self: self.env.uid)
     office_copy = fields.Boolean('Office copy')
-    estimate_number = fields.Char('Estimate Number', default=lambda self: self.env['ir.sequence'].next_by_code('bb_estimate.estimate'))        
+    estimate_number = fields.Char('Estimate Number')        
     event_date = fields.Date('Event Date')
     target_dispatch_date = fields.Date('Target Dispatch Date')
     
@@ -80,7 +80,7 @@ class Estimate(models.Model):
     #Delievery Details
     Delivery = fields.Many2one('res.partner',string="Delivery To",domain="[('type','=','delivery')]",required=True)
     DeliveryContact = fields.Many2one('res.partner',string="Delivery Contact",required=True)
-    DeliveryMethod = fields.Many2one('delivery.carrier',string="Delivery Method",required=True)
+    DeliveryMethod = fields.Many2one('product.product',string="Delivery Method",required=True) #delivery.carrier
     DeliveryLabel = fields.Boolean('Plain Label')
     
     quantity_1 = fields.Integer('Quantity 1')    
@@ -119,7 +119,7 @@ class Estimate(models.Model):
     nett_value_4 = fields.Float('Nett Value 4')
 
     number_up = fields.Integer('Number up', default=1 ,required=True )
-    grammage = fields.Integer('Grammage(g.s.m)', required=True)
+    grammage = fields.Integer('Grammage (G.S.M)', required=True)
     finished_size = fields.Many2one('bb_products.material_size','Finished Size', required=True)
     finished_width = fields.Integer('Finished Width', required=True)
     finished_height = fields.Integer('Finished Height', required=True)
@@ -135,8 +135,8 @@ class Estimate(models.Model):
     embossed = fields.Boolean('Embossed')
     windowed = fields.Boolean('Windowed')
     standardWindowSize = fields.Boolean('Standard Window Size')
-    windowHeight = fields.Float('Window Size: Height(mm)')
-    windowWidth = fields.Float('Window Size:Widht(mm)')
+    windowHeight = fields.Float('Window Size: Height (mm)')
+    windowWidth = fields.Float('Window Size:Widht (mm)')
     windowFlhs = fields.Float('Window Pos: FLHS')
     windowUp = fields.Float('Window Pos: Up')
     
@@ -152,6 +152,7 @@ class Estimate(models.Model):
     EnquiryComments = fields.Text('Enquiry Comments')
     SpecialInstuction = fields.Text('Special Instructions')
     PackingInstruction = fields.Text('Packing Instructions')
+    isLocked = fields.Boolean('Locked')
     
     #Fields For BOM and Invoice Computation
     selectedQuantity = fields.Selection([('1','1'),('2','2'),('3','3'),('4','4')],string="Selected Quantity",default="1")
@@ -179,15 +180,11 @@ class Estimate(models.Model):
     
     @api.model
     def create(self,val):
+        val['estimate_number'] = self.env['ir.sequence'].next_by_code('bb_estimate.estimate')
         record = super(Estimate,self).create(val)
         conditions = self.env['bb_estimate.conditions'].sudo().search([('isDefault','=',True)])
         record.estimateConditions = conditions
         return record
-    
-    def _computeEstimateNumber(self):
-        for record in self:
-            if not record.estimate_number :
-                record.estimate_number = self.env['ir.sequence'].next_by_code('bb_estimate.estimate') or 'EST%d'%(self.id)
     
     @api.depends('hasExtra')
     def getExtras(self):
@@ -237,34 +234,38 @@ class Estimate(models.Model):
     def PartnerUpdate(self):
         for record in self:
             record.invoice_account = record.partner_id
+            customerDeliveryContact = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','contact')])
+            if customerDeliveryContact:
+                record.DeliveryContact = customerDeliveryContact[0]
+            else:
+                record.DeliveryContact = record.partner_id
+            
+            customerDeliveryAddress = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','delivery')])
+            if customerDeliveryAddress:
+                record.Delivery = customerDeliveryAddress[0]
+            
             customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','invoice')])
-            if(len(customer_account_addresses)>0):
-                for address in customer_account_addresses:
-                    record.invoice_address = address
-                    break
+            if customer_account_addresses and not record.invoice_address:
+                record.invoice_address = customer_account_addresses[0]
+           
             customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',record.partner_id.id),('type','=','contact'),('employeeStatus','=','current')])
-            if (len(customer_contacts)):
-                for contacts in customer_contacts:
-                    record.contact = contacts
-                    record.invoice_contact = contacts
-                    break
+            if customer_contacts and not (record.invoice_contact or record.invoice_contact):
+                record.invoice_contact = customer_contacts[0]
+                
+                
     
     @api.onchange('invoice_account')
     def InvoiceAccount(self):
         for records in self:
-            customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',records.partner_id.id),('type','=','invoice')])
-            if(len(customer_account_addresses)>0):
-                for address in customer_account_addresses:
-                    records.invoice_address = address
-                    break
-
-            customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',records.partner_id.id),('type','=','contact'),('employeeStatus','=','current')])
-            if (len(customer_contacts)):
-                for contacts in customer_contacts:
-                    records.contact = contacts
-                    records.invoice_contact = contacts
-                    break
-    
+            customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',records.invoice_account.id),('type','=','invoice')])
+            if customer_account_addresses:
+                records.invoice_address = customer_account_addresses[0]
+            
+            customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',records.invoice_account.id),('type','=','contact'),('employeeStatus','=','current')])
+            if customer_contacts:
+                records.invoice_contact = customer_contacts[0]
+                
+            
     def CreateManufacturingOrder(self):
         return {
                 'view_type' : 'form',

@@ -1,0 +1,42 @@
+<odoo>
+    <data>
+        <record id="wizard_confirm_mo" model="ir.ui.view">
+            <field name="name">Confirm Manufaturing Order</field>
+            <field name="model">bb_estimate.confirm_mo</field>
+            <field name="arch" type="xml">
+                <form string="Confirm">
+                    <sheet>
+                        <field name="ProductionId" invisible="1"/>
+                        <h5>Process</h5>
+                        <hr/>
+                        <field name="WorkOrders">
+                            <tree editable="top">
+                                <field name="WorkOrder" invisible="1"/>
+                                <field name="name" readonly="1" />
+                                <field name="Confirmation" invisible="1"/>
+                                <field name="EstimatedTime" readonly="1" widget="float_time"/>
+                                <field name="ActualTime" widget="float_time"/>
+                            </tree>
+                        </field>
+                        <h5>Materials</h5>
+                        <hr/>
+                        <field name="MaterialLines">
+                            <tree editable="top">
+                                <field name="Material" invisible="1"/>
+                                <field name="name" readonly="1" />
+                                <field name="Confirmation" invisible="1"/>
+                                <field name="EstimateMaterial" readonly="1"/>
+                                <field name="ActualMaterial" />
+                            </tree>
+                        </field>
+                        <footer>
+                            <button name="Confirm" string="Confirm" class="oe_right oe_highlight" type="object"/>
+                            <button string="Cancel" class="oe_right" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

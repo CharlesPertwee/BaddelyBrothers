@@ -114,10 +114,10 @@ class OrderConvert(models.TransientModel):
                 if material.material.uom_id:
                     newMaterial['product_uom_id'] = material.material.uom_id.id
                 components.create(newMaterial)
-        
+
         newOrder = {
-            'name' : self.EstimateId.estimate_number,
-            'origin' : 'Estimate Workflow',
+            'name' : self.env['ir.sequence'].next_by_code('bb_estimate.jobticket'),
+            'origin' : self.EstimateId.estimate_number,#'Estimate Workflow',
             'bom_id' : bomId.id,
             'routing_id': routeId.id,
             'product_qty' : self.TotalQuantity,
@@ -125,8 +125,8 @@ class OrderConvert(models.TransientModel):
             'product_id' : self.EstimateId.product_type.id,
             'product_uom_id':  self.EstimateId.product_type.uom_id.id,
             'Estimate' : self.EstimateId.id
-            
         }
+        
         mo = order.create(newOrder)
         
         data = {
@@ -138,6 +138,7 @@ class OrderConvert(models.TransientModel):
         
         if mo:
             data['manufacturingOrder'] = mo.id
+            data['isLocked'] = True
         if routeId:
             data['routings'] = routeId.id
         if bomId:
@@ -156,13 +157,16 @@ class OrderConvert(models.TransientModel):
             'partner_invoice_id': self.EstimateId.invoice_account.id,
             'partner_shipping_id': self.EstimateId.Delivery.id,
             'amount_untaxed': totalPrice,
-            'carrier_id': self.EstimateId.DeliveryMethod.id,
+            #'carrier_id': self.EstimateId.DeliveryMethod.id,
             'Estimate' : self.EstimateId.id,
+            'JobTicket': mo.id,
+            'user_id': self.EstimateId.estimator.id,
             'order_line':[(0,0,salesProduct)]
         }
 
         salesId = sales.create(newSales)
         if salesId:
+            salesId.action_confirm()
             data['salesOrder'] = salesId.id
             
         self.EstimateId.write(data)

@@ -41,12 +41,12 @@ class EstimateLine(models.Model):
     extraDescription = fields.Char('Extra Description')
     
     lineName = fields.Char(string='Process/Material',compute="_computeName")
-    customer_description = fields.Char(string="Customer Description",required=True)
+    customer_description = fields.Char(string="Customer Description")
     documentCatergory = fields.Selection(LINE_DOCUMENT_CATEGORIES,'Letter Category')
-    JobTicketText = fields.Char('Job Ticket Text',required=True)
-    StandardCustomerDescription = fields.Char('Standard Customer Description',required=True)
-    StandardJobDescription = fields.Char('Standard Job Ticket Text',required=True)
-    UseStadandardDescription = fields.Boolean('Use Standard Descriptions?',required=True)
+    JobTicketText = fields.Char('Job Ticket Text')
+    StandardCustomerDescription = fields.Char('Standard Customer Description')
+    StandardJobDescription = fields.Char('Standard Job Ticket Text')
+    UseStadandardDescription = fields.Boolean('Use Standard Descriptions?')
     Details = fields.Text('Details and Notes')
     EstimatorNotes = fields.Text('Notes for Estimator')
     
@@ -199,7 +199,7 @@ class EstimateLine(models.Model):
     #Material Fields
     MaterialTypes = fields.Selection([('Stock','Stock'),('Trade Counter','Trade Counter'),('Non-Stockable','Non-Stockable')],string="Material Type")
     SheetHeight = fields.Float('Sheet Height (mm)')
-    SheetWidth = fields.Float('Sheet Width(mm)')
+    SheetWidth = fields.Float('Sheet Width (mm)')
     WhiteCutting = fields.Many2one('mrp.workcenter',string="White Cutting", domain="[('paper_type','=','white')]")
     PrintedCutting = fields.Many2one('mrp.workcenter',string="Printed Cutting", domain="[('paper_type','=','printed')]")
     NoWhiteCuts = fields.Integer('Number of White Cuts')
@@ -214,6 +214,7 @@ class EstimateLine(models.Model):
     Margin = fields.Float('Margin')
     
     Sequence = fields.Integer('Sequence', default=1, help='Gives the sequence order when displaying a product list')
+    staticPrice = fields.Boolean('Static Price', related="estimate_id.product_type.staticPrice")
     
     #General Parameters
     param_number_up = fields.Integer('Number Up', compute="getEstimateParams")
@@ -225,8 +226,8 @@ class EstimateLine(models.Model):
     param_number_of_colors = fields.Integer('Number of Colors')
     req_param_number_of_colors = fields.Boolean('Number of Colors')
     
-    param_number_of_colors_rev = fields.Integer('Number of Colors(Reverse)')
-    req_param_number_of_colors_rev = fields.Boolean('Number of Colors(Reverse)')
+    param_number_of_colors_rev = fields.Integer('Number of Colors (Reverse)')
+    req_param_number_of_colors_rev = fields.Boolean('Number of Colors (Reverse)')
     
     work_twist = fields.Boolean('Work and Twist')
     req_work_twist = fields.Boolean('Work and Twist')
@@ -237,8 +238,8 @@ class EstimateLine(models.Model):
     param_no_of_ink_mixes = fields.Integer('No of Ink mixes')
     req_param_no_of_ink_mixes = fields.Boolean('No of Ink mixes')
     
-    param_additional_charge = fields.Float('Misc. Material Charge(per 1000)')
-    req_param_additional_charge = fields.Boolean('Misc. Material Charge(per 1000)')
+    param_additional_charge = fields.Float('Misc. Material Charge (per 1000)')
+    req_param_additional_charge = fields.Boolean('Misc. Material Charge (per 1000)')
     
     param_misc_charge_per_cm2 = fields.Float('Misc. Material Charge (Per cm2)')
     req_param_misc_charge_per_cm2 = fields.Boolean('Misc. Material Charge (Per cm2)')
@@ -259,7 +260,7 @@ class EstimateLine(models.Model):
     req_param_sheets_per_box = fields.Boolean('Req. Sheets per Box')
     
     param_time_per_box = fields.Float('Time per Box(Hours)')
-    req_param_time_per_box =fields.Boolean('Req. Time per Box(Hours)')
+    req_param_time_per_box =fields.Boolean('Req. Time per Box (Hours)')
     
     param_number_of_cuts = fields.Integer('Number of cuts')
     req_param_number_of_cuts = fields.Boolean('Number of cuts')
@@ -321,6 +322,16 @@ class EstimateLine(models.Model):
     def calc_material_fields(self):
         for record in self:
             record.documentCatergory = 'Material'
+            if record.material.productType in ['Package','Delivery']:
+                record.documentCatergory = record.material.productType
+                if record.documentCategory == 'Delivery':
+                    record.documentCategory = 'Despatch'
+            
+            record.customer_description = record.material.customerDescription
+            record.JobTicketText = record.material.jobTicketDescription
+            record.StandardCustomerDescription = record.material.customerDescription
+            record.StandardJobDescription = record.material.jobTicketDescription
+            
             record.grammage = record.material.grammage
             record.SheetHeight = record.material.sheet_height
             record.SheetWidth = record.material.sheet_width
@@ -445,6 +456,10 @@ class EstimateLine(models.Model):
     def calc_gen_param_change(self):
         self.onChangeEventTrigger('param_die_size')
         
+    @api.onchange('cost_per_unit_1','cost_per_unit_2','cost_per_unit_3','cost_per_unit_4')
+    def calc_cost_per_unit_change(self):
+        self.onChangeEventTrigger('cost_per_unit')
+        
     #Material Methods
     def get_default_field_values(self,material):
         qty_params = {
@@ -539,6 +554,38 @@ class EstimateLine(models.Model):
                 cost_params['margin'] = (((cost_params['price_per_unit']/cost_params['cost_per_unit'])-1)*100)
             elif cost_params['margin']:
                 cost_params['price_per_unit'] = ((cost_params['margin']/100)+1)*cost_params['cost_per_unit']
+            if qty=='1' and qty_params['static_price']:
+                cost_params['price_per_unit'] = cost_params['cost_per_unit'] * 2
+                cost_params['margin'] = (((cost_params['price_per_unit'] / cost_params['cost_per_unit']) - 1) * 100) if cost_params['cost_per_unit'] else 0
+                if qty_params['quantity_2'] > 0:
+                    qty_params['quantity_required_2'] = cost_params['quantity_required']
+                    qty_params['cost_per_unit_2'] = cost_params['cost_per_unit']
+                    qty_params['price_per_unit_2'] = cost_params['cost_per_unit'] * 2
+                    qty_params['margin_2'] = (((cost_params['price_per_unit'] / cost_params['cost_per_unit']) - 1) * 100) if cost_params['cost_per_unit'] else 0
+                    qty_params['total_cost_2'] = cost_params['cost_per_unit'] * cost_params['quantity_required']
+                    qty_params['total_price_2'] = (cost_params['price_per_unit'] * cost_params['quantity_required']) + ((cost_params['finished_quantity'] / 1000.0) * extra_price_per_1000)
+                    qty_params['total_price_per_1000_2'] = ((qty_params['total_price_2'] / cost_params['finished_quantity']) * 1000.0) if cost_params['finished_quantity'] else 0
+                if qty_params['quantity_3'] > 0:
+                    qty_params['quantity_required_3'] = cost_params['quantity_required']
+                    qty_params['cost_per_unit_3'] = cost_params['cost_per_unit']
+                    qty_params['price_per_unit_3'] = cost_params['cost_per_unit'] * 2
+                    qty_params['margin_3'] = (((cost_params['price_per_unit'] / cost_params['cost_per_unit']) - 1) * 100) if cost_params['cost_per_unit'] else 0  
+                    qty_params['total_cost_3'] = cost_params['cost_per_unit'] * cost_params['quantity_required']
+                    qty_params['total_price_3'] = (cost_params['price_per_unit'] * cost_params['quantity_required']) + ((cost_params['finished_quantity'] / 1000.0) * extra_price_per_1000)
+                    qty_params['total_price_per_1000_3'] = ((qty_params['total_price_3'] / cost_params['finished_quantity']) * 1000.0) if cost_params['finished_quantity'] else 0 
+                if qty_params['quantity_4'] > 0:
+                    qty_params['quantity_required_4'] = cost_params['quantity_required']
+                    qty_params['cost_per_unit_4'] = cost_params['cost_per_unit']
+                    qty_params['price_per_unit_4'] = cost_params['cost_per_unit'] * 2
+                    qty_params['margin_4'] = (((cost_params['price_per_unit'] / cost_params['cost_per_unit']) - 1) * 100) if cost_params['cost_per_unit'] else 0
+                    qty_params['total_cost_4'] = cost_params['cost_per_unit'] * cost_params['quantity_required']
+                    qty_params['total_price_4'] = (cost_params['price_per_unit'] * cost_params['quantity_required']) + ((cost_params['finished_quantity'] / 1000.0) * extra_price_per_1000)
+                    qty_params['total_price_per_1000_4'] = ((qty_params['total_price_4'] / cost_params['finished_quantity']) * 1000.0) if cost_params['finished_quantity'] else 0
+                qty_params['quantity_required_run_on'] = 0.0
+                qty_params['cost_per_unit_run_on'] = 0.0
+                qty_params['price_per_unit_run_on'] = 0.0
+                qty_params['margin_run_on'] = 0.0
+                
         elif fieldUpdated == 'price_per_unit':
             if cost_params['price_per_unit'] and cost_params['cost_per_unit']:
                 cost_params['margin'] = (((cost_params['price_per_unit']/cost_params['cost_per_unit'])-1)*100)
@@ -637,23 +684,22 @@ class EstimateLine(models.Model):
                         record.req_param_env_gumming,
                         record.param_sheets_per_box,
                         record.param_time_per_box,
+                        record.staticPrice,
                         field)
                 
     
     
-    def calc_qty_params(self,workcenterId,material,finished_quantity,param_make_ready_time,param_machine_speed,param_running_time,param_wash_up_time,param_make_ready_overs,param_running_overs_percent,param_finished_quantity,quantity_required,cost_per_unit,price_per_unit,margin,total_price,total_price_per_1000,qty,param_additional_charge,param_number_up,param_number_of_colors,param_number_of_colors_rev,param_grammage,param_die_size,param_misc_charge_per_cm2,param_no_of_ink_mixes,quantity_1,quantity_2,quantity_3,quantity_4,run_on,param_number_out,param_working_width,param_working_height,param_printed_material,param_duplex_sheets,param_number_of_sheets,param_material_line_id,param_number_of_cuts,param_sheets_per_pile,param_time_per_pile,param_env_windowpatching,param_env_peelandstick,param_env_inlineemboss,param_env_gumming,req_param_env_windowpatching,req_param_env_peelandstick,req_param_env_inlineemboss,req_param_env_gumming,param_sheets_per_box,param_time_per_box,fieldUpdated):
+    def calc_qty_params(self,workcenterId,material,finished_quantity,param_make_ready_time,param_machine_speed,param_running_time,param_wash_up_time,param_make_ready_overs,param_running_overs_percent,param_finished_quantity,quantity_required,cost_per_unit,price_per_unit,margin,total_price,total_price_per_1000,qty,param_additional_charge,param_number_up,param_number_of_colors,param_number_of_colors_rev,param_grammage,param_die_size,param_misc_charge_per_cm2,param_no_of_ink_mixes,quantity_1,quantity_2,quantity_3,quantity_4,run_on,param_number_out,param_working_width,param_working_height,param_printed_material,param_duplex_sheets,param_number_of_sheets,param_material_line_id,param_number_of_cuts,param_sheets_per_pile,param_time_per_pile,param_env_windowpatching,param_env_peelandstick,param_env_inlineemboss,param_env_gumming,req_param_env_windowpatching,req_param_env_peelandstick,req_param_env_inlineemboss,req_param_env_gumming,param_sheets_per_box,param_time_per_box,static_price,fieldUpdated):
         #Variables required for calculations        
         return_values = {}
         process_type = workcenterId.process_type
-
-        return_values['customer_description'] = workcenterId.standard_description
-
         #data dictionaries which would ne updated with values in Workcenter
         
         qty_params = {
             'workcenterId':workcenterId,
             'param_number_out':param_number_out,
             'material':material,   
+            'static_price':static_price,
             'param_env_windowpatching':param_env_windowpatching,
             'req_param_env_windowpatching':req_param_env_windowpatching,
             'param_sheets_per_box':param_sheets_per_box,
@@ -720,6 +766,13 @@ class EstimateLine(models.Model):
                 
             elif self.option_type == 'material':
                 self.update_field_values(material,qty_params,cost_params,fieldUpdated,qty)
+                if not self.isEnvelope:
+                    whiteCuttings = self.env['mrp.workcenter'].sudo().search([('paper_type','=','white')])
+                    if whiteCuttings:
+                        self.WhiteCutting = whiteCuttings[0]
+                    printedCuttings = self.env['mrp.workcenter'].sudo().search([('paper_type','=','printed')])
+                    if printedCuttings:
+                        self.PrintedCutting = printedCuttings[0]
                 
             elif fieldUpdated == 'workcenterId':
                 cost_params['cost_per_unit'] = workcenterId.standard_price
@@ -733,11 +786,10 @@ class EstimateLine(models.Model):
                     
             self._calc_prices(qty_params, cost_params, fieldUpdated, qty)
             return_values.update(cost_params)
-            self.update_values(qty_params,return_values,qty)  
+            self.update_values(qty_params,return_values,qty,fieldUpdated)  
     
-    def update_values(self,qty_params,return_values,qty):    
+    def update_values(self,qty_params,return_values,qty,fieldUpdated):
         for record in self:
-            record['customer_description'] = return_values['customer_description'] if 'customer_description' in return_values else ''
             record['param_make_ready_time_'+qty] = return_values['param_make_ready_time'] if qty != 'run_on' else None
             record['param_machine_speed_'+qty] = return_values['param_machine_speed'] if 'param_machine_speed' in return_values else ''
             record['param_running_time_'+qty] = return_values['param_running_time'] if 'param_running_time' in return_values else ''
@@ -773,6 +825,8 @@ class EstimateLine(models.Model):
                 record.documentCatergory = record.workcenterId.documentCatergory
                 record.customer_description = record.workcenterId.note
                 record.JobTicketText = record.workcenterId.jobTicketDescription
+                record.StandardCustomerDescription = record.workcenterId.note
+                record.StandardJobDescription = record.workcenterId.jobTicketDescription
                 record.EstimatorNotes = record.workcenterId.notesForEstimator
                 
                 model_fields = {x:False for x in record._fields if x.startswith('req_') }
@@ -804,7 +858,7 @@ class EstimateLine(models.Model):
     
     def CreateMaterialLink(self,process,work_twist):
         link = self.env['bb_estimate.material_link'].sudo()
-        materials = process.estimate_id.estimate_line.search([('estimate_id','=',process.estimate_id.id),('option_type','=','material')])
+        materials = process.estimate_id.estimate_line.search([('estimate_id','=',process.estimate_id.id),('option_type','=','material'),('documentCatergory','=','Material')])
         added_working_sheets = False
         for material in materials:
             if process.workcenterId and process.workcenterId.process_type:
@@ -882,7 +936,7 @@ class EstimateLine(models.Model):
                     work_twist = False
                     self.CreateMaterialLink(lineId,work_twist)
                     for m in lineId.estimate_id.estimate_line:
-                        if m.option_type == 'material' and m.material.categ_id.name != 'Box':
+                        if m.option_type == 'material' and m.material.productType != 'Package':
                             m.RecalculatePrices(m,work_twist)
                             
                     if lineId.workcenterId.associatedBoxId:
@@ -931,7 +985,7 @@ class EstimateLine(models.Model):
                             'material': material.id,
                             'option_type':'material',
                             'documentCatergory' : 'Packing',
-                            'customer_description': 'Packing as required',
+                            'customer_description': 'Packing in suitable boxes',
                             'StandardJobDescription': 'Packing',
                             'StandardCustomerDescription' : 'Customer',
                             'JobTicketText':'Text',

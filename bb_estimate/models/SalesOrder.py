@@ -6,6 +6,7 @@ class Sales(models.Model):
     _inherit = "sale.order"
     
     Estimate = fields.Many2one('bb_estimate.estimate',string='Originating Estimate')
+    JobTicket = fields.Many2one('mrp.production',string="Job Ticket")
     partnerOnHold = fields.Boolean('Account on Hold')
     
     @api.onchange('partner_id')

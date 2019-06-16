@@ -1,13 +1,13 @@
 <odoo>
   <data>
       
-    <record id="product_template_only_form_view_bb" model="ir.ui.view">
-		<field name="name">product.template.product.form.bb</field>
+    
+     <record id="product_template_form_view_bb" model="ir.ui.view">
+		<field name="name">product.template.common.form.bb</field>
 		<field name="model">product.template</field>
-		<field name="inherit_id" ref="product.product_template_only_form_view"/>
+		<field name="inherit_id" ref="product.product_template_form_view"/>
 		<field name="arch" type="xml">
-            
-            <xpath expr="//field[@name='barcode']" position="after">
+            <xpath expr="//field[@name='categ_id']" position="after">
                 <field name="estimateAvailable" />
                 <field name="grammage" />
                 <field name="sheetSize" />
@@ -16,15 +16,9 @@
                 <field name="productType" />
                 <field name="isEnvelope" />
             </xpath>
-            
-		</field>
-	 </record>
-      
-     <record id="product_template_form_view_bb" model="ir.ui.view">
-		<field name="name">product.template.common.form.bb</field>
-		<field name="model">product.template</field>
-		<field name="inherit_id" ref="product.product_template_form_view"/>
-		<field name="arch" type="xml">
+            <!--field name="categ_id" postition="after">
+                
+            </field-->
             
             <xpath expr="//field[@name='list_price']" position="after">
                 <field name="margin" />
@@ -34,9 +28,11 @@
                 <field name="sheet_width"/>
                 <field name="sheet_height"/>
                 <field name="thickness"/>
+                <field name="staticPrice"/>
             </xpath>
      	</field>
 	 </record>
+      
       
   </data>
 </odoo>

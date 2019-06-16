@@ -25,6 +25,7 @@
                 <form string="Estimate Line">
                     <sheet>
                         <field name="estimate_id" invisible="1"/>
+                        <field name="staticPrice" invisible="1"/>
                         <field name="req_param_number_up" invisible="1" />
                         <field name="req_param_number_out" invisible="1" />
                         <field name="req_param_number_of_colors" invisible="1" />
@@ -78,7 +79,7 @@
                                 <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','process')]}">
                                     <div class="form-group">
                                         <label for="workcenterId" class="col-md-4" />
-                                        <field name="workcenterId" class="col-md-7" domain="[('process_type','!=',False)]"/>
+                                        <field name="workcenterId" options="{'no_create_edit': True}" class="col-md-7" domain="[('process_type','!=',False)]"/>
                                     </div>
                                 </div>
                                 <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','material')]}">
@@ -109,57 +110,57 @@
                                     <field name="EstimatorNotes" />
                                 </page>
 
-                                <page string="Materials" attrs="{'invisible':['|',('option_type','=','process'),('option_type','=',False)]}">
+                                <page string="Link" attrs="{'invisible':['|',('option_type','=','process'),('option_type','=',False)]}">
                                     <sheet>
-                                        <field name="material_ids" />
+                                        <field name="material_ids" options="{'no_create_edit': True}"/>
                                     </sheet>
                                 </page>
 
-                                <page string="Process" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
+                                <page string="Link" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
                                     <sheet>
-                                        <field name="process_ids" />
+                                        <field name="process_ids" options="{'no_create_edit': True}" />
                                     </sheet>
                                 </page>
 
                                 <page string="Parameters &amp; Costing" autofocus="autofocus" attrs="{'invisible':['&amp;',('workcenterId','=',False),('MaterialTypes','=',False)]}">
                                     <group col="3" attrs="{'invisible':[('option_type','=','material')]}">
                                         <group>
-                                            <field name="param_printed_material" attrs="{'invisible':[('req_param_printed_material','=',False)]}"/>
+                                            <field name="param_printed_material" attrs="{'invisible':[('req_param_printed_material','=',False)],'required':[('req_param_number_of_cuts','=',True)]}"/>
                                             <field name="param_number_of_cuts" attrs="{'invisible':[('req_param_number_of_cuts','=',False)]}"/>
-                                            <field name="param_sheets_per_pile" attrs="{'invisible':[('req_param_sheets_per_pile','=',False)]}" />
-                                            <field name="param_time_per_pile" attrs="{'invisible':[('req_param_time_per_pile','=',False)]}" />
-                                            <field name="param_number_out" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_number_out','=',False)]}" />
-                                            <field name="param_sheets_per_box" attrs="{'invisible':[('req_param_sheets_per_box','=',False)]}" />
-                                            <field name="param_number_up" readonly="1" attrs="{'invisible':[('req_param_sheets_per_box','=',False)]}" />
+                                            <field name="param_sheets_per_pile" attrs="{'invisible':[('req_param_sheets_per_pile','=',False)],'required':[('req_param_sheets_per_pile','=',True)]}" />
+                                            <field name="param_time_per_pile" attrs="{'invisible':[('req_param_time_per_pile','=',False)],'required':[('req_param_time_per_pile','=',True)]}" />
+                                            <field name="param_number_out" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_number_out','=',False)],'required':[('req_param_number_out','=',True)]}" />
+                                            <field name="param_sheets_per_box" attrs="{'invisible':[('req_param_sheets_per_box','=',False)],'required':[('req_param_sheets_per_box','=',True)]}" />
+                                            <field name="param_number_up" readonly="1" attrs="{'invisible':[('req_param_number_up','=',False)],'required':[('req_param_number_up','=',True)]}" />
                                             <field name="work_twist" attrs="{'invisible':[('req_work_twist','=',False)]}" />
                                         </group>
                                         
                                         <group>
-                                            <field name="param_number_of_colors" attrs="{'invisible':[('req_param_number_of_colors','=',False)]}" />
-                                            <field name="grammage" attrs="{'invisible':[('req_grammage','=',False)]}" />
-                                            <field name="param_duplex_sheets" attrs="{'invisible':[('req_param_duplex_sheets','=',False)]}" />
-                                            <field name="param_number_of_sheets" attrs="{'invisible':[('req_param_number_of_sheets','=',False)]}" />
-                                            <field name="param_additional_charge" attrs="{'invisible':[('req_param_additional_charge','=',False)]}" />
-                                            <field name="param_material_line_id" create_edit="false" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)]}" />
+                                            <field name="param_number_of_colors" attrs="{'invisible':[('req_param_number_of_colors','=',False)],'required':[('req_param_number_of_colors','=',True)]}" />
+                                            <field name="grammage" attrs="{'invisible':[('req_grammage','=',False)],'required':[('req_grammage','=',True)]}" />
+                                            <field name="param_duplex_sheets" attrs="{'invisible':[('req_param_duplex_sheets','=',False)],'required':[('req_param_duplex_sheets','=',True)]}" />
+                                            <field name="param_number_of_sheets" attrs="{'invisible':[('req_param_number_of_sheets','=',False)],'required':[('req_param_number_of_sheets','=',True)]}" />
+                                            <field name="param_additional_charge" attrs="{'invisible':[('req_param_additional_charge','=',False)],'required':[('req_param_additional_charge','=',True)]}" />
+                                            <field name="param_material_line_id" options="{'no_create_edit': True}" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)],'required':[('req_param_material_line_id','=',True)]}" />
                                         </group>
                                         
                                         <group>
-                                            <field name="param_env_windowpatching" attrs="{'invisible':[('req_param_env_windowpatching','=',False)]}" />
+                                            <field name="param_env_windowpatching" attrs="{'invisible':[('req_param_env_windowpatching','=',False)],'required':[('req_param_env_windowpatching','=',True)]}" />
                                             <field name="param_env_peelandstick" attrs="{'invisible':[('req_param_env_peelandstick','=',False)]}" />
                                             <field name="param_env_inlineemboss" attrs="{'invisible':[('req_param_env_inlineemboss','=',False)]}" />
                                             <field name="param_env_gumming" attrs="{'invisible':[('req_param_env_gumming','=',False)]}" />
                                         </group>
 
                                         <group>
-                                            <field name="param_number_of_colors_rev" attrs="{'invisible':[('req_param_number_of_colors_rev','=',False)]}" />
-                                            <field name="param_no_of_ink_mixes" attrs="{'invisible':[('req_param_no_of_ink_mixes','=',False)]}" />
-                                            <field name="param_die_size" attrs="{'invisible':[('req_param_die_size','=',False)]}" />
+                                            <field name="param_number_of_colors_rev" attrs="{'invisible':[('req_param_number_of_colors_rev','=',False)],'required':[('req_param_number_of_colors_rev','=',True)]}" />
+                                            <field name="param_no_of_ink_mixes" attrs="{'invisible':[('req_param_no_of_ink_mixes','=',False)],'required':[('req_param_no_of_ink_mixes','=',True)]}" />
+                                            <field name="param_die_size" attrs="{'invisible':[('req_param_die_size','=',False)],'required':[('req_param_number_of_colors','=',True)]}" />
                                         </group>
                                     </group>
                                     
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Stock')]}">
                                         <group>
-                                            <field name="material" domain="['&amp;',('productType','=','Stock'),('productType','!=',False)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/>
+                                            <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Stock'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/>
                                         </group>
                                         <group string="Stock Material Properties">
                                             <group>
@@ -177,8 +178,8 @@
                                             </group>
                                             <group>
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                    <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                    <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
@@ -190,7 +191,7 @@
                                     </group>
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Trade Counter')]}">
                                         <group>
-                                            <field name="material" domain="['&amp;',('productType','=','Trade Counter'),('productType','!=',False)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Trade Counter')]}"/>
+                                            <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Trade Counter'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Trade Counter')]}"/>
                                         </group>
                                         <group string="Material Parameters" col="1">
                                             <group>
@@ -198,8 +199,8 @@
                                             </group>
                                             <group >
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                    <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                    <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
@@ -229,7 +230,7 @@
                                                     <field name="SheetHeight" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
                                                     <field name="SheetWidth" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
                                                     <field name="CharegeRate" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
-                                                    <field name="Supplier" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
+                                                    <field name="Supplier" options="{'no_create_edit': True}" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
@@ -251,8 +252,8 @@
                                         <group string="Material Parameters" attrs="{'invisible':[('NonStockMaterialType','=','process')]}">
                                             <field name="param_number_out" />
                                             <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                <field name="WhiteCutting" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                <field name="PrintedCutting" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                             </group>
 
                                             <group attrs="{'invisible':[('isEnvelope','=',True)]}">

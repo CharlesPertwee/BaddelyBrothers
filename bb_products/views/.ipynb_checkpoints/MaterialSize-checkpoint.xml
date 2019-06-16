@@ -24,19 +24,24 @@
                         <h1>
                            <field name="name" placeholder="Size Title" />
                         </h1>
-                        <group>
+                        <group string="Material Size Details">
                             <group>
                                 <field name="width"/>
                                 <field name="height"/>
-                                <field name="isPrintSize"/>
-                                <field name="isEnquirySize"/>
+                                
                             </group>
                             <group>
+                                <field name="isPrintSize"/>
+                                <field name="isEnquirySize"/>
                                 <field name="isEnvelopeEstimate"/>
-                                <field name="flatWidth" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}"/>
-                                <field name="flatHeight" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}"/>
-                                <field name="knifeNumber" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}"/>
+                                
                             </group>
+                        </group>
+                        <hr/>
+                        <group  string="Cutting Information" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}">
+                            <field name="flatWidth" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}"/>
+                            <field name="flatHeight" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}"/>
+                            <field name="knifeNumber" attrs="{'invisible':[('isEnvelopeEstimate','=',False)]}"/>
                         </group>
                     </sheet>
               </form>

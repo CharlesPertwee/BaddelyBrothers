@@ -11,3 +11,5 @@ from . import Bom
 from . import Routing
 from . import SalesOrder
 from . import StockPicking
+from . import Invoice
+

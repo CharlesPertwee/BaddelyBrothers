@@ -18,6 +18,17 @@ class Manufacture(models.Model):
     
 #     def button_mark_done(self):
 #         raise Exception('Test')
+
+    def ConfirmOrder(self):
+        return {
+                'view_type' : 'form',
+                'view_mode' : 'form',
+                'name': 'Confirm',
+                'res_model' : 'bb_estimate.confirm_mo',
+                'type' : 'ir.actions.act_window',
+                'context' : "{'default_ProductionId' : active_id}",
+                'target' : 'new',
+            }
     
     def _workorders_create(self, bom, bom_data):
         """
@@ -39,13 +50,15 @@ class Manufacture(models.Model):
             quantity = quantity if (quantity > 0) else 0
         
         computedOperations = []
-        estimate_materials = estimate.estimate_line.search([('estimate_id','=',estimate.id),('option_type','=','material')])
         materials = []
-        for x in estimate_materials:
-            materials.append((0,0,{
-                'EstimateLineId': x.id,
-                'MaterialAllocated' : x['quantity_required_'+estimate.selectedQuantity] + (x.quantity_required_run_on * estimate.selectedRatio)
-            }))
+            
+        if estimate:
+            estimate_materials = estimate.estimate_line.search([('estimate_id','=',estimate.id),('option_type','=','material')])
+            for x in estimate_materials:
+                materials.append((0,0,{
+                    'EstimateLineId': x.id,
+                    'MaterialAllocated' : x['quantity_required_'+estimate.selectedQuantity] + (x.quantity_required_run_on * estimate.selectedRatio)
+                }))
         for operation in bom.routing_id.operation_ids:
             # create workorder
             cycle_number = float_round(bom_qty / operation.workcenter_id.capacity, precision_digits=0, rounding_method='UP')
