@@ -244,6 +244,9 @@ class EstimateLine(models.Model):
     param_misc_charge_per_cm2 = fields.Float('Misc. Material Charge (Per cm2)')
     req_param_misc_charge_per_cm2 = fields.Boolean('Misc. Material Charge (Per cm2)')
     
+    param_misc_charge_per_cm2_area = fields.Float('Misc. Mat. Charge Area (cm2)')
+    req_param_misc_charge_per_cm2_area = fields.Boolean('Misc. Material Charge Area (Per cm2)')
+    
     param_die_size = fields.Selection(DIE_SIZES,string="Size of Die")
     req_param_die_size = fields.Boolean('Size of Die')
     
@@ -386,6 +389,14 @@ class EstimateLine(models.Model):
     def calc_param_additional_charge(self):
         self.onChangeEventTrigger('param_additional_charge')
         
+    @api.onchange('param_misc_charge_per_cm2')
+    def calc_param_misc_charge_per_cm2_area(self):
+        self.onChangeEventTrigger('param_misc_charge_per_cm2')
+        
+    @api.onchange('param_misc_charge_per_cm2_area')
+    def calc_param_misc_charge_per_cm2_area(self):
+        self.onChangeEventTrigger('param_misc_charge_per_cm2_area')
+        
     @api.onchange('param_sheets_per_box')
     def calc_param_sheets_per_box(self):
         self.onChangeEventTrigger('param_sheets_per_box')
@@ -441,6 +452,7 @@ class EstimateLine(models.Model):
     @api.onchange('workcenterId')  
     def calc_workcenterId_change(self):
         self.UpdateRequiredFields()
+        self.getEstimateParams()
         self.onChangeEventTrigger('workcenterId')
         
     @api.onchange('material')  
@@ -623,7 +635,8 @@ class EstimateLine(models.Model):
                 record.quantity_3 = record.estimate_id.quantity_3
                 record.quantity_4 = record.estimate_id.quantity_4
                 record.run_on = record.estimate_id.run_on
-                record.param_number_up = record.estimate_id.number_up
+                record.param_number_up = record.estimate_id.number_up                             
+                record.grammage = record.estimate_id.grammage
 
     
     def onChangeEventTrigger(self,field):

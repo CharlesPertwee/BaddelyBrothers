@@ -35,6 +35,7 @@
                         <field name="req_param_no_of_ink_mixes" invisible="1" />
                         <field name="req_param_additional_charge" invisible="1" />
                         <field name="req_param_misc_charge_per_cm2" invisible="1" />
+                        <field name="req_param_misc_charge_per_cm2_area" invisible="1"/>
                         <field name="req_param_die_size" invisible="1" />
                         <field name="req_param_printed_material" invisible="1"/>
                         <field name="req_param_duplex_sheets" invisible="1" />
@@ -141,6 +142,8 @@
                                         <group>
                                             <field name="param_number_of_colors" attrs="{'invisible':[('req_param_number_of_colors','=',False)],'required':[('req_param_number_of_colors','=',True)]}" />
                                             <field name="work_twist" attrs="{'invisible':[('req_work_twist','=',False)]}" />
+                                            <field name="param_misc_charge_per_cm2" attrs="{'invisible':[('req_param_misc_charge_per_cm2','=',False)]}"/>
+                                            <field name="param_misc_charge_per_cm2_area" attrs="{'invisible':[('req_param_misc_charge_per_cm2_area','=',False)]}"/>
                                             <field name="param_material_line_id" options="{'no_create_edit': True}" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)],'required':[('req_param_material_line_id','=',True)]}" />
                                         </group>
                                         <group>

@@ -252,6 +252,10 @@ class Estimate(models.Model):
             if customer_contacts and not (record.invoice_contact or record.invoice_contact):
                 record.invoice_contact = customer_contacts[0]
                 
+            record.contact = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','contact'),('employeeStatus','=','current')],limit=1)
+                
+                
+                
                 
     
     @api.onchange('invoice_account')
