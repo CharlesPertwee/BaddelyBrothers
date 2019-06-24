@@ -1,84 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="estimate_letter">
+        <t t-foreach="docs" t-as="o">
         <t t-call="web.basic_layout">
-            <t t-foreach="docs" t-as="estimate">
                 <div class="backgroundimage" style="position:absolute;z-index:-999;"> 
                     <img class="img-responsive" src="/bb_estimate/static/src/img/Bb_invoice.jpg" width="900px" height="1335px"/>
                 </div> 
                 <div class="page" style="padding-top:16em; padding-left:2em; padding-right:2em;">
                     <div class="container">
-                        <div class="row">
+                        <div class="row" style="font-family: Georgia;">
                             <div class="col-6">
-                                <h5><span t-field="estimate.partner_id.name"/></h5>
-                                <h5><span t-field="estimate.invoice_address.street"/></h5>
-                                <h5><span t-field="estimate.invoice_address.street2"/></h5>
-                                <h5><span t-field="estimate.invoice_address.city"/></h5>
-                                <h5>Attn: <span t-field="estimate.invoice_contact.zip"/></h5>
+                                <h5 style="font-family: Georgia;"><span t-field="o.partner_id.name"/></h5>
+                                <h5><span t-field="o.invoice_address.street"/></h5>
+                                <h5><span t-field="o.invoice_address.street2"/></h5>
+                                <h5><span t-field="o.invoice_address.city"/></h5>
+                                <h5><span t-field="o.invoice_contact.zip"/></h5>
+                                <h5>Attn: <span t-field="o.partner_id.name"/></h5>
+                            </div>
+                            <div>
+                                
                             </div>
                             <div class="col-6">
-                                <h5 class="text-right">Date: <span t-field="estimate.estimate_date"/></h5>
+                                <h5 class="text-right">Date: <span t-field="o.estimate_date"/></h5>
                                 <br/>
                                 <br/>
                                 <br/>
-                                <h5 class="text-right">Estimate no. <span t-field="estimate.estimate_number"/></h5>
+                                <br/>
+                                <h5 class="text-right">Estimate no. <span t-field="o.estimate_number"/></h5>
                             </div>
                         </div>
                         <br/>
                         <br/>
                         <br/>
-                        <div class="row">
+                        <div class="row" style="font-family: Georgia;">
                             <div class="col-12">
-                            Dear ,<br/>
-                            Thank you for your enquiry, we have pleasure in submitting our estimate as follows:
+                            <t t-set="name" t-value="o.contact.name.split()"/>
+                            <h5>Dear <t t-esc="name[0]"/>,<br/>
+                            Thank you for your enquiry, we have pleasure in submitting our estimate as follows:</h5>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" style="font-family: Georgia;">
                             <div class="col-12">
                                 <table style="width:100%">
                                     <tbody>
                                         <tr>
                                             <td style="width:30%">
-                                                Title:
+                                                <h5>Title:</h5>
                                             </td>
                                             <td>
-                                                <span t-field="estimate.title"/>
+                                                <h5><span t-field="o.title"/></h5>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td style="width:30%">
-                                                Size:
+                                                <h5>Size:</h5>
                                             </td>
                                             <td>
-                                                <span t-field="estimate.finished_height"/> X <span t-field="estimate.finished_width"/>
+                                                <h5><span t-field="o.finished_height"/> X <span t-field="o.finished_width"/></h5>
                                             </td>
                                         </tr>
                                         <!-- material -->
-                                        <t t-foreach="estimate.estimate_line" t-as="line">
+                                        <t t-foreach="o.estimate_line" t-as="line">
                                             <t t-if="line.customer_description and (line.option_type and line.option_type == 'material')">
                                                 <tr>
                                                     <td style="width:30%">
-                                                        Material:
+                                                        <h5>Material:</h5>
                                                     </td>
                                                     <td>
-                                                        <span t-field="line.customer_description"/>
+                                                        <h5><span t-field="line.customer_description"/></h5>
                                                     </td>
                                                 </tr>
                                             </t>
                                         </t>
                                         <!-- end -->
                                         <!-- envolope -->
-                                        <span t-esc="estimate.GenerateEnvelopeDetails(estimate)" />
+                                        <h5><span t-esc="o.GenerateEnvelopeDetails(o)" /></h5>
                                         <!-- end -->
                                         <!-- process -->
-                                        <t t-foreach="estimate.estimate_line" t-as="line">
+                                        <t t-foreach="o.estimate_line" t-as="line">
                                             <t t-if="line.customer_description and line.documentCatergory and (line.option_type and line.option_type == 'process')">
                                                 <tr>
                                                     <td style="width:30%">
-                                                        <span t-field="line.documentCatergory"/>:
+                                                        <h5><span t-field="line.documentCatergory"/>:</h5>
                                                     </td>
                                                     <td>
-                                                        <span t-field="line.customer_description"/>
+                                                        <h5><span t-field="line.customer_description"/></h5>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -87,59 +93,59 @@
                                         <!-- qty -->
                                         <tr>
                                             <td style="width:30%">
-                                                Qty/Price:
+                                                <h5>Qty/Price:</h5>
                                             </td>
                                             <td>
-                                                <span t-field="estimate.quantity_1"/> @ £<span t-esc="estimate.total_price_1 - estimate.total_price_extra_1" />
+                                                <h5><span t-field="o.quantity_1"/> @ £<span t-esc="o.total_price_1 - o.total_price_extra_1" /></h5>
                                             </td>
                                         </tr>
-                                        <tr t-if="estimate.quantity_2 > 0">
+                                        <tr t-if="o.quantity_2 > 0">
                                             <td style="width:30%">
                                                 
                                             </td>
                                             <td>
-                                                <span t-field="estimate.quantity_2"/> @ £<span t-esc="estimate.total_price_2 - estimate.total_price_extra_2" />
+                                                <h5><span t-field="o.quantity_2"/> @ £<span t-esc="o.total_price_2 - o.total_price_extra_2" /></h5>
                                             </td>
                                         </tr>
-                                        <tr t-if="estimate.quantity_3 > 0">
+                                        <tr t-if="o.quantity_3 > 0">
                                             <td style="width:30%">
                                                 
                                             </td>
                                             <td>
-                                                <span t-field="estimate.quantity_3"/> @ £<span t-esc="estimate.total_price_3 - estimate.total_price_extra_3" />
+                                                <h5><span t-field="o.quantity_3"/> @ £<span t-esc="o.total_price_3 - o.total_price_extra_3" /></h5>
                                             </td>
                                         </tr>
-                                        <tr t-if="estimate.quantity_4 > 0">
+                                        <tr t-if="o.quantity_4 > 0">
                                             <td style="width:30%">
                                                 
                                             </td>
                                             <td>
-                                                <span t-field="estimate.quantity_4"/> @ £<span t-esc="estimate.total_price_4 - estimate.total_price_extra_4" />
+                                                <h5><span t-field="o.quantity_4"/> @ £<span t-esc="o.total_price_4 - o.total_price_extra_4" /></h5>
                                             </td>
                                         </tr>
-                                        <tr t-if="estimate.run_on > 0">
+                                        <tr t-if="o.run_on > 0">
                                             <td style="width:30%">
                                                 
                                             </td>
                                             <td>
-                                                Run on: £<span t-esc="estimate.total_price_run_on - estimate.total_price_extra_run_on" /> per <span t-field="estimate.run_on"/>
+                                                <h5>Run on: £<span t-esc="o.total_price_run_on - o.total_price_extra_run_on" /> per <span t-field="o.run_on"/></h5>
                                             </td>
                                         </tr>
                                         <!-- end -->
                                         <!-- extras -->
-                                        <t t-foreach="estimate.estimate_line" t-as="line">
+                                        <t t-foreach="o.estimate_line" t-as="line">
                                             <t t-if="line.isExtra and line.extraDescription">
                                                 <tr>
                                                     <td style="width:30%">
                                                         
                                                     </td>
                                                     <td>
-                                                        <span t-field="line.extraDescription"/>
-                                                        <span t-if="estimate.quantity_1 > 0" t-esc="line.total_price_1"/>
-                                                        <span t-if="estimate.quantity_2 > 0" t-esc="line.total_price_2"/>
-                                                        <span t-if="estimate.quantity_3 > 0" t-esc="line.total_price_3"/>
-                                                        <span t-if="estimate.quantity_4 > 0" t-esc="line.total_price_4"/>
-                                                        <span t-if="estimate.run_on > 0" t-esc="line.total_price_run_on"/>
+                                                        <h5><span t-field="line.extraDescription"/></h5>
+                                                        <h5><span t-if="o.quantity_1 > 0" t-esc="line.total_price_1"/></h5>
+                                                        <h5><span t-if="o.quantity_2 > 0" t-esc="line.total_price_2"/></h5>
+                                                        <h5><span t-if="o.quantity_3 > 0" t-esc="line.total_price_3"/></h5>
+                                                        <h5><span t-if="o.quantity_4 > 0" t-esc="line.total_price_4"/></h5>
+                                                        <h5><span t-if="o.run_on > 0" t-esc="line.total_price_run_on"/></h5>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -149,17 +155,17 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row"  style="font-family: Georgia;">
                             <div class="col-12">
-                                <t t-foreach="estimate.estimateConditions" t-as="line">
-                                    <span t-field="line.description" />
+                                <t t-foreach="o.estimateConditions" t-as="line">
+                                    <span t-field="line.description" /><br/>
                                 </t>
-                                <br/><br/><br/>
-                                <span>Should you require any more information or wish to discuss your detailed requirements further, please contact us on 020 8986 2666.</span>
+                                <br/><br/>
+                                <h5><span>Should you require any more information or wish to discuss your detailed requirements further, please contact us on 020 8986 2666.</span></h5>
                                 <br/>
                                 <br/>
-                                <span>Yours faithfully,</span><br/>
-                                <span t-field="estimate.estimator.name" />
+                                <h5><span>Yours faithfully,</span><br/></h5>
+                                <h5><span t-field="o.estimator.name" /></h5>
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, SUPERUSER_ID, _
-from datetime import datetime
+from odoo.exceptions import UserError
+import datetime
+from odoo.addons import decimal_precision as dp
+from odoo.tools.safe_eval import safe_eval
 
 DIE_SIZES = [
     ('standard','No Die (No Charge)'),
@@ -61,12 +64,12 @@ class Estimate(models.Model):
     #Estimate Summary
     title = fields.Char('Title',required=True)
     product_type = fields.Many2one('product.product', string='Product Type',required=True)
-    estimate_date = fields.Date('Estimate Date')
+    estimate_date = fields.Date('Estimate Date', default= lambda a: datetime.datetime.now().strftime('%Y-%m-%d'))
     estimator = fields.Many2one('res.users','Estimator', default=lambda self: self.env.uid)
     office_copy = fields.Boolean('Office copy')
     estimate_number = fields.Char('Estimate Number')        
     event_date = fields.Date('Event Date')
-    target_dispatch_date = fields.Date('Target Dispatch Date')
+    target_dispatch_date = fields.Date('Target Dispatch Date', default=lambda self: (datetime.datetime.now() + datetime.timedelta(days=14)).strftime('%Y-%m-%d'))
     
     #Estimate Detailed Screen
     state = fields.Many2one('bb_estimate.stage','State'
@@ -80,7 +83,7 @@ class Estimate(models.Model):
     #Delievery Details
     Delivery = fields.Many2one('res.partner',string="Delivery To",domain="[('type','=','delivery')]",required=True)
     DeliveryContact = fields.Many2one('res.partner',string="Delivery Contact",required=True)
-    DeliveryMethod = fields.Many2one('product.product',string="Delivery Method",required=True) #delivery.carrier
+    DeliveryMethod = fields.Many2one('delivery.carrier',string="Delivery Method",required=True) #delivery.carrier
     DeliveryLabel = fields.Boolean('Plain Label')
     
     quantity_1 = fields.Integer('Quantity 1')    
@@ -89,17 +92,23 @@ class Estimate(models.Model):
     quantity_4 = fields.Integer('Quantity 4')
     run_on =  fields.Integer('Run on')
     
-    total_price_1 = fields.Float('Total Price 1',store=True,compute="_get_estimate_line")
-    total_price_2 = fields.Float('Total Price 2',store=True,compute="_get_estimate_line")
-    total_price_3 = fields.Float('Total Price 3',store=True,compute="_get_estimate_line")
-    total_price_4 = fields.Float('Total Price 4',store=True,compute="_get_estimate_line")
-    total_price_run_on = fields.Float('Run On',store=True,compute="_get_estimate_line")
+    total_price_1 = fields.Float('Total Price 1',store=True)
+    total_price_2 = fields.Float('Total Price 2',store=True)
+    total_price_3 = fields.Float('Total Price 3',store=True)
+    total_price_4 = fields.Float('Total Price 4',store=True)
+    total_price_run_on = fields.Float('Run On',store=True)
     
     total_price_extra_1 = fields.Float('Total Price 1',store=True,compute="_get_estimate_line")
     total_price_extra_2 = fields.Float('Total Price 2',store=True,compute="_get_estimate_line")
     total_price_extra_3 = fields.Float('Total Price 3',store=True,compute="_get_estimate_line")
     total_price_extra_4 = fields.Float('Total Price 4',store=True,compute="_get_estimate_line")
     total_price_extra_run_on = fields.Float('Run On',store=True,compute="_get_estimate_line")
+    
+    total_price_1000_1 = fields.Float('Total Price 1000 1',store=True)
+    total_price_1000_2 = fields.Float('Total Price 1000 2',store=True)
+    total_price_1000_3 = fields.Float('Total Price 1000 3',store=True)
+    total_price_1000_4 = fields.Float('Total Price 1000 4 ',store=True)
+    total_price_1000_run_on = fields.Float('Total Price 1000 Run On',store=True)
     
     total_cost_1 = fields.Float('Total Cost 1',store=True,compute="_get_estimate_line")
     total_cost_2 = fields.Float('Total Cost 2',store=True,compute="_get_estimate_line")
@@ -141,7 +150,7 @@ class Estimate(models.Model):
     windowUp = fields.Float('Window Pos: Up')
     
     routings = fields.Many2one('mrp.routing','Generated Routing')
-    bom = fields.Many2one('mrp.bom', 'Generated Bom')
+    bom = fields.Many2one('mrp.bom', 'Generated BOM')
     manufacturingOrder = fields.Many2one('mrp.production','Job Ticket')
     salesOrder = fields.Many2one('sale.order','Sales Order')
     
@@ -171,7 +180,7 @@ class Estimate(models.Model):
         if estimate.embossed:
             line += '\nBlind Embossed'
         if estimate.windowed:
-            if estimate.standard_window_size:
+            if estimate.standardWindowSize:
                 line += '\nStandard'
             else:
                 line += '\n%s mm  x  %s mm' % (estimate.windowHeight, estimate.windowWidth)
@@ -202,69 +211,90 @@ class Estimate(models.Model):
                 record['total_price_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line])
                 record['total_cost_'+qty] = sum([x['total_cost_'+qty] for x in record.estimate_line])
                 record['total_price_extra_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line if x.isExtra == True])
+                record['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in record.estimate_line])
+                
                 if qty != 'run_on':
                     record['unAllocated_'+qty] = record['quantity_'+qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
                 else:
                     record['unAllocated_'+qty] = record[qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
                     
+            record.compute_calc_total_price_1()
+    
+    def compute_calc_total_price_1(self):
+        for record in self:
+            record.total_price_1 = 123
+            #totals
+            for qty in ['1','2','3','4','run_on']:
+                record['total_price_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line])
+        
+    
     @api.onchange('finished_size')
     def finished_size_change(self):
         for record in self:
-            record.finished_width = record.finished_size.width
-            record.finished_height = record.finished_size.height
+            if record.finished_size.width:
+                record.finished_width = record.finished_size.width
+            if record.finished_size.height:
+                record.finished_height = record.finished_size.height
             if record.finished_size.isEnvelopeEstimate:
-                record.working_size = record.finished_size.id
-                record.working_width = record.finished_size.flatWidth
-                record.working_height = record.finished_size.flatHeight
                 record.knife_number = record.finished_size.knifeNumber
                 
     @api.onchange('working_size')
     def working_size_change(self):
         for record in self:
             if record.working_size.isEnvelopeEstimate:
-                record.working_width = record.working_size.flatWidth
-                record.working_height = record.working_size.flatHeight
+                if record.working_size.flatWidth:
+                    record.working_width = record.working_size.flatWidth
+                if record.working_size.flatHeight:
+                    record.working_height = record.working_size.flatHeight
                 record.knife_number = record.working_size.knifeNumber
             else:
-                record.working_width = record.working_size.width
-                record.working_height = record.working_size.height
+                if record.working_size.width:
+                    record.working_width = record.working_size.width
+                if record.working_size.height:
+                    record.working_height = record.working_size.height
     
     
     @api.onchange('partner_id')
     def PartnerUpdate(self):
         for record in self:
-            record.invoice_account = record.partner_id
-            customerDeliveryContact = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','contact')])
-            if customerDeliveryContact:
-                record.DeliveryContact = customerDeliveryContact[0]
-            else:
-                record.DeliveryContact = record.partner_id
+            if record.partner_id:
+                record.invoice_account = record.partner_id
+                customerDeliveryContact = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','contact')],limit=1)
+                if customerDeliveryContact:
+                    record.DeliveryContact = customerDeliveryContact[0]
+                else:
+                    record.DeliveryContact = record.partner_id
             
-            customerDeliveryAddress = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','delivery')])
-            if customerDeliveryAddress:
-                record.Delivery = customerDeliveryAddress[0]
-            
-            customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','invoice')])
-            if customer_account_addresses and not record.invoice_address:
-                record.invoice_address = customer_account_addresses[0]
-           
-            customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',record.partner_id.id),('type','=','contact'),('employeeStatus','=','current')])
-            if customer_contacts and not (record.invoice_contact or record.invoice_contact):
-                record.invoice_contact = customer_contacts[0]
+                customerDeliveryAddress = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','delivery')])
+                if customerDeliveryAddress:
+                    record.Delivery = customerDeliveryAddress[0]
+
+                customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','invoice')])
+                if customer_account_addresses and not record.invoice_address:
+                    record.invoice_address = customer_account_addresses[0]
+
+                customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',record.partner_id.id),('type','=','contact'),('employeeStatus','=','current')])
+                if customer_contacts and not (record.invoice_contact or record.invoice_contact):
+                    record.invoice_contact = customer_contacts[0]
+
+                record.contact = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','contact'),('employeeStatus','=','current')],limit=1)
+
+                
                 
                 
     
     @api.onchange('invoice_account')
     def InvoiceAccount(self):
-        for records in self:
-            customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',records.invoice_account.id),('type','=','invoice')])
-            if customer_account_addresses:
-                records.invoice_address = customer_account_addresses[0]
-            
-            customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',records.invoice_account.id),('type','=','contact'),('employeeStatus','=','current')])
-            if customer_contacts:
-                records.invoice_contact = customer_contacts[0]
-                
+        for record in self:
+            if record.invoice_account:
+                customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.invoice_account.id),('type','=','invoice')])
+                if customer_account_addresses:
+                    record.invoice_address = customer_account_addresses[0]
+
+                customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',record.invoice_account.id),('type','=','contact'),('employeeStatus','=','current')])
+                if customer_contacts:
+                    record.invoice_contact = customer_contacts[0]
+
             
     def CreateManufacturingOrder(self):
         return {
@@ -287,3 +317,135 @@ class Estimate(models.Model):
                 'context' : "{'default_estimate_id' : active_id,'default_grammage' : %d}"%(self.grammage),
                 'target' : 'new',
             }
+    
+    def AdjustPrice(self):
+        return {
+                'view_type' : 'form',
+                'view_mode' : 'form',
+                'name': 'Adjust Price',
+                'res_model' : 'bb_estimate.adjust_price',
+                'type' : 'ir.actions.act_window',
+                'context' : "{'default_Estimate' : active_id}",
+                'target' : 'new',
+            }
+    
+    def _match_address(self,carrier, partner):
+        self.ensure_one()
+        if carrier.country_ids and partner.country_id not in carrier.country_ids:
+            return False
+        if carrier.state_ids and partner.state_id not in carrier.state_ids:
+            return False
+        if carrier.zip_from and (partner.zip or '').upper() < carrier.zip_from.upper():
+            return False
+        if carrier.zip_to and (partner.zip or '').upper() > carrier.zip_to.upper():
+            return False
+        return True
+    
+    def _get_price_from_picking(self,carrier, total, weight, volume, quantity):
+        price = 0.0
+        criteria_found = False
+        price_dict = {'price': total, 'volume': volume, 'weight': weight, 'wv': volume * weight, 'quantity': quantity}
+        for line in carrier.price_rule_ids:
+            test = safe_eval(line.variable + line.operator + str(line.max_value), price_dict)
+            if test:
+                price = line.list_base_price + line.list_price * price_dict[line.variable_factor]
+                criteria_found = True
+                break
+        if not criteria_found:
+            raise UserError(_("No price rule matching this order; delivery cost cannot be computed."))
+
+        return price
+    
+    def _get_price_available(self,carrier,qty):
+        self.ensure_one()
+        total = weight = volume = quantity = 0
+        total_delivery = 0.0
+        for line in self.estimate_line:
+            total_delivery += line['total_price_'+qty]
+            lineQuantity = line['quantity_required_'+qty]
+            weight += self.LineWeight(line,qty)
+            volume += (line.material.volume or 0.0) * lineQuantity
+            quantity += lineQuantity
+        total = total_delivery
+
+        return self._get_price_from_picking(carrier,total, weight, volume, quantity)
+    
+    def AddDelivery(self):
+        prices = {}
+        for qty in ['1','2','3','4','run_on']:
+            quantity = 0
+            if qty == 'run_on':
+                quantity = self.run_on
+            else:
+                quantity = self['quantity_'+qty]
+            if quantity > 0:
+                carrier = self._match_address(self.DeliveryMethod,self.Delivery)
+                if carrier:
+                    price_unit = self._get_price_available(self.DeliveryMethod,qty)
+                    prices['qty_'+qty] = price_unit
+                else:
+                    prices['qty_'+qty] = 0.0
+                    raise UserError(_('Shipping address not valid for selected delivery method.'))
+            else:
+                prices['qty_'+qty] = 0.0
+        newLine = self.env['bb_estimate.estimate_line'].create(
+            {
+                'material': self.DeliveryMethod.product_id.id,
+                'estimate_id': self.id,
+                'lineName': self.DeliveryMethod.product_id.name,
+                'option_type':'material',
+                'MaterialTypes':'Stock',
+                'customer_description': self.DeliveryMethod.product_id.customerDescription,
+                'documentCatergory': 'Despatch',
+                'JobTicketText': self.DeliveryMethod.product_id.jobTicketDescription,
+                'StandardCustomerDescription': self.DeliveryMethod.product_id.customerDescription,
+                'StandardJobDescription': self.DeliveryMethod.product_id.jobTicketDescription,
+                'quantity_required_1': 1 if self.quantity_1 > 0 else 0,
+                'quantity_required_2': 1 if self.quantity_2 > 0 else 0,
+                'quantity_required_3': 1 if self.quantity_3 > 0 else 0,
+                'quantity_required_4': 1 if self.quantity_4 > 0 else 0,
+                'quantity_required_run_on': 1 if self.run_on > 0 else 0,
+                'cost_per_unit_1':prices['qty_1'],
+                'cost_per_unit_2':prices['qty_2'],
+                'cost_per_unit_3':prices['qty_3'],
+                'cost_per_unit_4':prices['qty_4'],
+                'cost_per_unit_run_on':prices['qty_run_on'],
+                'price_per_unit_1':prices['qty_1'],
+                'price_per_unit_2':prices['qty_2'],
+                'price_per_unit_3':prices['qty_3'],
+                'price_per_unit_4':prices['qty_4'],
+                'price_per_unit_run_on':prices['qty_run_on'],
+                'margin_1':self.DeliveryMethod.margin,
+                'margin_2':self.DeliveryMethod.margin,
+                'margin_3':self.DeliveryMethod.margin,
+                'margin_4':self.DeliveryMethod.margin,
+                'margin_run_on':self.DeliveryMethod.margin,
+                'total_cost_1':prices['qty_1'],
+                'total_cost_2':prices['qty_2'],
+                'total_cost_3':prices['qty_3'],
+                'total_cost_4':prices['qty_4'],
+                'total_cost_run_on':prices['qty_run_on'],
+                'total_price_1':prices['qty_1'],
+                'total_price_2':prices['qty_2'],
+                'total_price_3':prices['qty_3'],
+                'total_price_4':prices['qty_4'],
+                'total_price_run_on':prices['qty_run_on'],
+                
+            })
+        self.message_post(body="Delivery Added %s"%(self.DeliveryMethod.name))
+
+    def LineWeight(self,line, qty):
+        # return the weight of the specified estimate line for the specified quantity
+        if line.material.productType in ['Stock','Trade Counter']:
+            if line['quantity_required_'+qty] and line.material.sheet_width and line.material.sheetSize and line.material.grammage:
+                kg_per_sheet =  (float(line.material.sheet_width) / 1000.0) * (float(line.material.sheet_height) / 1000.0) * (float(line.material.grammage) / 1000.0)
+                total_weight = float(line['quantity_required_'+qty]) * kg_per_sheet
+                return total_weight
+            else:
+                return 0.0
+        elif line.material.productType in ['Package']:
+            return line.material.weight or 0.0
+        else:
+            return 0.0
+    
+    

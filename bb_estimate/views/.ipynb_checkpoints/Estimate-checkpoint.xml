@@ -8,6 +8,8 @@
         name="bb_estimate.estimate_letter"
         file="mrp_account.mrp_cost_structure"
         paperformat="bb_estimate.paperformat_invoice"
+        attachment="((object.estimate_number or '').replace('/','')+'.pdf')"
+        print_report_name="(object.estimate_number or '')"
       />
           
     <record id="estimate_tree_view" model="ir.ui.view">
@@ -35,7 +37,8 @@
                 <field name="showMo" invisible="1" />
                 <field name="isLocked" invisible="1" />
                 <header>
-                    <button name="AddDelivery" string="Set Delivery" type="object" />
+                    <button name="AddDelivery" string="Set Delivery" type="object" attrs="{'invisible':['|',('id','=',False),('isLocked','!=',False)]}"/>
+                    <button name="AdjustPrice" string="Adjust Prices" type="object" attrs="{'invisible':['|',('id','=',False),('isLocked','!=',False)]}"/>
                     <field name="state" widget="statusbar" clickable="True" />
                 </header>
                 <sheet>
@@ -44,7 +47,7 @@
                           <span>Add Line</span>
                       </button>
                       <button class="oe_stat_button" icon="fa-database" type="object" name="CreateManufacturingOrder" attrs="{'invisible':['|',('showMo','=',False),('isLocked','!=',False)]}">
-                          <span>Create MO</span>
+                          <span>Create Job</span>
                       </button>
                     </div>
                     
@@ -184,6 +187,11 @@
                                         <field name="total_price_3" readonly="1"/>
                                         <field name="total_price_4" readonly="1"/>
                                         <field name="total_price_run_on" readonly="1"/>
+                                        <field name="total_price_1000_1" readonly="1"/>
+                                        <field name="total_price_1000_2" readonly="1"/>
+                                        <field name="total_price_1000_3" readonly="1"/>
+                                        <field name="total_price_1000_4" readonly="1"/>
+                                        <field name="total_price_1000_run_on" readonly="1"/>
                                         <field name="total_cost_1" readonly="1"/>
                                         <field name="total_cost_2" readonly="1"/>
                                         <field name="total_cost_3" readonly="1"/>
@@ -223,7 +231,7 @@
                         </group>
                         
                         <group>
-                            <field name="DeliveryMethod" />
+                            <field name="DeliveryMethod" domain="[('delivery_type','=','base_on_rule')]"/>
                             <field name="DeliveryLabel" />
                         </group>
                     </group>

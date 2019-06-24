@@ -347,13 +347,16 @@ class EstimateLine(models.Model):
     
     @api.onchange('param_finished_quantity_1')
     def _onChangeQuantities1(self):
-        self.unallocated_finished_quantity_1 = self.estimate_id.unAllocated_1
         if float(self.unallocated_finished_quantity_1) != 0.0:
             ratio = self.param_finished_quantity_1 / float(self.unallocated_finished_quantity_1)
+            self.unallocated_finished_quantity_1 = self.estimate_id.unAllocated_1
+            
             self.param_finished_quantity_2 = self.estimate_id.unAllocated_2 * ratio
             self.param_finished_quantity_3 = self.estimate_id.unAllocated_3 * ratio
             self.param_finished_quantity_4 = self.estimate_id.unAllocated_4 * ratio
             self.param_finished_quantity_run_on = self.estimate_id.unAllocated_run_on * ratio
+        else:
+            self.unallocated_finished_quantity_1 = self.estimate_id.unAllocated_1
             
     
     @api.onchange('param_finished_quantity_2')
@@ -468,9 +471,39 @@ class EstimateLine(models.Model):
     def calc_gen_param_change(self):
         self.onChangeEventTrigger('param_die_size')
         
-    @api.onchange('cost_per_unit_1','cost_per_unit_2','cost_per_unit_3','cost_per_unit_4')
-    def calc_cost_per_unit_change(self):
+    #--------#
+    @api.onchange('cost_per_unit_1')
+    def calc_cost_per_unit_1(self):
         self.onChangeEventTrigger('cost_per_unit')
+        
+    @api.onchange('cost_per_unit_2')
+    def calc_cost_per_unit_2(self):
+        self.onChangeEventTrigger('cost_per_unit')  
+        
+    @api.onchange('cost_per_unit_3')
+    def calc_cost_per_unit_3(self):
+        self.onChangeEventTrigger('cost_per_unit')
+        
+    @api.onchange('cost_per_unit_4')
+    def calc_cost_per_unit_4(self):
+        self.onChangeEventTrigger('cost_per_unit')  
+        
+    @api.onchange('param_make_ready_time_1')
+    def calc_param_make_ready_time_1(self):
+        self.onChangeEventTrigger('param_make_ready_time')  
+        
+    @api.onchange('param_make_ready_time_2')
+    def calc_param_make_ready_time_2(self):
+        self.onChangeEventTrigger('param_make_ready_time') 
+        
+    @api.onchange('param_make_ready_time_3')
+    def calc_param_make_ready_time_3(self):
+        self.onChangeEventTrigger('param_make_ready_time') 
+        
+    @api.onchange('param_make_ready_time_4')
+    def calc_param_make_ready_time_4(self):
+        self.onChangeEventTrigger('param_make_ready_time') 
+    #--------#
         
     #Material Methods
     def get_default_field_values(self,material):
@@ -939,7 +972,26 @@ class EstimateLine(models.Model):
                 })
             
             line.write(write_vals)
-            
+    @api.multi
+    def unlink(self):
+        estimate = self.estimate_id
+        optionType = self.option_type
+        work_twist = False
+                    
+        rec = super(EstimateLine, self).unlink()
+        
+        if optionType == 'process':
+            for m in estimate.estimate_line:
+                if m.option_type == 'material' and m.documentCatergory not in ['Packing','Despatch']:
+                    m.RecalculatePrices(m,work_twist)
+                    
+        estimateData = {}
+        for qty in ['1','2','3','4','run_on']:
+            estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in estimate.estimate_line])
+            estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in estimate.estimate_line])
+        estimate.write(estimateData)
+        return rec
+        
     @api.model
     def create(self,values):
         records = super(EstimateLine,self).create(values)
@@ -949,7 +1001,8 @@ class EstimateLine(models.Model):
                     work_twist = False
                     self.CreateMaterialLink(lineId,work_twist)
                     for m in lineId.estimate_id.estimate_line:
-                        if m.option_type == 'material' and m.material.productType != 'Package':
+                        #m.material.productType != 'Package':
+                        if m.option_type == 'material' and m.documentCatergory not in ['Packing','Despatch']:
                             m.RecalculatePrices(m,work_twist)
                             
                     if lineId.workcenterId.associatedBoxId:
@@ -998,10 +1051,10 @@ class EstimateLine(models.Model):
                             'material': material.id,
                             'option_type':'material',
                             'documentCatergory' : 'Packing',
-                            'customer_description': 'Packing in suitable boxes',
-                            'StandardJobDescription': 'Packing',
-                            'StandardCustomerDescription' : 'Customer',
-                            'JobTicketText':'Text',
+                            'customer_description': material.customerDescription,
+                            'StandardJobDescription': material.jobTicketDescription,
+                            'StandardCustomerDescription' : material.customerDescription,
+                            'JobTicketText':material.jobTicketDescription,
                             'lineName' : material.name
                         }
                         newRecord.update(data)
@@ -1050,14 +1103,19 @@ class EstimateLine(models.Model):
                             lineId.write({'material':productId.id})    
                             lineId.calc_material_change()
                             dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}
-                            lineId.write(dictLine)      
-                        
-                        
+                            lineId.write(dictLine)
+                    
+                    if lineId.documentCatergory not in ['Packing','Despatch']:   
+                        work_twist = False
+                        self.CreateLink(lineId,work_twist)
+                        self.RecalculatePrices(lineId,work_twist)
+                    
                     if lineId.WhiteCutting:
                         newProcess = {
                             'option_type' : 'process',
                             'workcenterId' : lineId.WhiteCutting.id,
                             'param_material_line_id' : lineId.id,
+                            'estimate_id' : lineId.estimate_id.id,
                             #'param_number_of_cuts' : lineId.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
                         }
                         process = self.create(newProcess)
@@ -1070,13 +1128,15 @@ class EstimateLine(models.Model):
                             'option_type' : 'process',
                             'workcenterId' : lineId.PrintedCutting.id,
                             'param_material_line_id' : lineId.id,
+                            'estimate_id' : lineId.estimate_id.id,
                         }
                         process = self.create(newProcess)
                         process.calc_workcenterId_change()
                         dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
                         process.write(dictProcess)
-
-                    work_twist = False
-                    self.CreateLink(lineId,work_twist)
-                    self.RecalculatePrices(lineId,work_twist)
+        estimateData = {}
+        for qty in ['1','2','3','4','run_on']:
+            estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in lineId.estimate_id.estimate_line])
+            estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in lineId.estimate_id.estimate_line])
+        lineId.estimate_id.write(estimateData)
         return records    

@@ -1,35 +1,35 @@
 <odoo>
     <template id="job_ticket">
         <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
             <t t-call="web.basic_layout">
-                <t t-foreach="docs" t-as="estimate">
-                    <div class="page" t-if="estimate.Estimate">
+                    <div class="page" t-if="o.Estimate">
                         <div class="table-responsive">
                             <table style="border: 1px black solid;" class="table">
                                 <tbody>
                                     <tr>
                                         <td style="width:20%;border: 1px black solid;">
                                           <span>Date Required:</span><br/>
-                                          <span><b><span t-field="estimate.Estimate.target_dispatch_date" /></b></span><br/>
+                                          <span><b><span t-field="o.Estimate.target_dispatch_date" /></b></span><br/>
                                           <span>Office Contact:</span><br/>
-                                          <span><b><span t-field="estimate.Estimate.estimator.name" /></b></span><br/>
+                                          <span><b><span t-field="o.Estimate.estimator.name" /></b></span><br/>
                                           <span>Office Copy:</span><br/>
-                                          <span><b><span t-field="estimate.Estimate.office_copy" /></b></span><br/>
+                                          <span><b><span t-field="o.Estimate.office_copy" /></b></span><br/>
                                         </td>
                                         <td style="width:30%;border: 1px black solid;">
-                                            <center><span t-field="estimate.name"/></center>
+                                            <center><span t-field="o.name"/></center>
                                             <center>
-                                                <img alt="Barcode" t-if="len(estimate.name) == 13" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', estimate.name, 600, 150)" style="width:100%;height:30%;"/>
-                                                <img alt="Barcode" t-elif="len(estimate.name) == 8" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN8', estimate.name, 600, 150)" style="width:100%;height:30%;"/>
-                                                <img alt="Barcode" t-else="" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', estimate.name, 600, 150)" style="width:100%;height:30%;"/>
+                                                <img alt="Barcode" t-if="len(o.name) == 13" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', o.name, 600, 150)" style="width:100%;height:30%;"/>
+                                                <img alt="Barcode" t-elif="len(o.name) == 8" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN8', o.name, 600, 150)" style="width:100%;height:30%;"/>
+                                                <img alt="Barcode" t-else="" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', o.name, 600, 150)" style="width:100%;height:30%;"/>
                                             </center>
                                             <center>
-                                                <span t-field="estimate.name"/>
+                                                <span t-field="o.name"/>
                                             </center>
                                         </td>
                                         <td style="width:20%;border: 1px black solid;">
-                                          Date: <span t-field="estimate.create_date" /><br/>
-                                          Estimate no. <span t-field="estimate.Estimate.estimate_number" /><br/>
+                                          Date: <span t-field="o.create_date" /><br/>
+                                          Estimate no. <span t-field="o.Estimate.estimate_number" /><br/>
                                         </td>
                                         <td style="width:20%;border: 1px black solid;">
                                           Invoice No: <br/>
@@ -43,10 +43,10 @@
                                     </tr>
                                   <tr>
                                     <td colspan="3" style="border: 1px black solid;">
-                                      Customer: <span t-field="estimate.Estimate.partner_id.name"/> Project:<span class="text-right" t-field="estimate.Estimate.project.name"></span>
+                                      Customer: <span t-field="o.Estimate.partner_id.name"/> Project:<span class="text-right" t-field="o.Estimate.project.name"></span>
                                     </td>
                                     <td colspan="3" style="border: 1px black solid;">
-                                      Customer O/No: <span t-field="estimate.name"/>
+                                      Customer O/No: <span t-field="o.name"/>
                                     </td>
                                   </tr>
                                   <tr>
@@ -55,7 +55,7 @@
                                         <tbody>
                                           <tr>
                                             <td style="border: 1px black solid; width:40%" >
-                                              Job Title: <b><span t-field="estimate.Estimate.title" /></b>
+                                              Job Title: <b><span t-field="o.Estimate.title" /></b>
                                             </td>
                                             <td>
                                               <u>Process</u>
@@ -74,14 +74,14 @@
                                               <td style="border: 1px black solid; width:40%">
                                                   Job Type: <span /><br/>
                                                   Spec: <span /><br/>
-                                                  Quantity: <span t-esc="estimate.Estimate['quantity_'+estimate.Estimate.selectedQuantity] + estimate.Estimate.selectedRunOn"/><br/>
-                                                  Finished Size: <span t-field="estimate.Estimate.finished_height" /> X <span t-field="estimate.Estimate.finished_width" /><br/><br/>
-                                                  <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                  Quantity: <span t-esc="o.Estimate['quantity_'+o.Estimate.selectedQuantity] + o.Estimate.selectedRunOn"/><br/>
+                                                  Finished Size: <span t-field="o.Estimate.finished_height" /> X <span t-field="o.Estimate.finished_width" /><br/><br/>
+                                                  <t t-foreach="o.Estimate.estimate_line" t-as="line">
                                                       <t t-if="line.option_type and line.option_type == 'material' and line.material.categ_id.name != 'Box'">
                                                           <span t-esc="line.GenerateMaterialDetails(line)" /><br/>
                                                       </t>
                                                   </t>
-                                                  <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                  <t t-foreach="o.Estimate.estimate_line" t-as="line">
                                                       <t t-if="line.option_type and line.option_type == 'process' and line.JobTicketText">
                                                           <span t-field="line.JobTicketText" /><br/>
                                                       </t>
@@ -89,23 +89,23 @@
                                               </td>
                                               <td>
                                                   <!-- material -->
-                                                  <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                  <t t-foreach="o.Estimate.estimate_line" t-as="line">
                                                       <t t-if="line.option_type and line.option_type == 'material' and line.material.categ_id.name != 'Box' and (not (line.NonStockMaterialType and line.NonStockMaterialType == 'Customer Supplied Material'))">
                                                           <span t-esc="line.GenerateMaterialDetails(line)" /><br/>
                                                       </t>
                                                   </t>
                                                   <!-- end -->
                                                   <!-- process -->
-                                                   <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                   <t t-foreach="o.Estimate.estimate_line" t-as="line">
                                                       <t t-if="line.option_type and line.option_type == 'process'">
                                                           <span t-esc="line.lineName" /><br/>
                                                       </t>
                                                   </t>
                                                   <!-- end -->
-                                                  <span t-esc="estimate.Estimate.GenerateEnvelopeDetails(estimate.Estimate)" />
+                                                  <span t-esc="o.Estimate.GenerateEnvelopeDetails(o.Estimate)" />
                                               </td>
                                               <td>
-                                                  <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                                  <t t-foreach="o.Estimate.estimate_line" t-as="line">
                                                       <t t-if="line.Supplier">
                                                           <span t-esc="line.Supplier.name" /><br/>
                                                       </t>
@@ -124,10 +124,10 @@
                                           </tr>
                                            <tr>
                                                <td style="border: 1px black solid; width:40%">
-                                                   Special Instructions: <span t-field="estimate.Estimate.SpecialInstuction" />
+                                                   Special Instructions: <span t-field="o.Estimate.SpecialInstuction" />
                                                </td>
                                                <td colspan="5" style="border: 1px black solid;">
-                                                    Packing Instructions: <span t-field="estimate.Estimate.PackingInstruction" />
+                                                    Packing Instructions: <span t-field="o.Estimate.PackingInstruction" />
                                                 </td>
                                               </tr>
                                             </tbody>
@@ -136,10 +136,10 @@
                                     </tr>
                                     <tr>
                                         <td colspan="6">
-                                            Stock Description / Cutting Instructions: <span t-esc="'Knife Number: '+ estimate.Estimate.knife_number if estimate.Estimate.knife_number else ''" />
+                                            Stock Description / Cutting Instructions: <span t-esc="'Knife Number: '+ o.Estimate.knife_number if o.Estimate.knife_number else ''" />
                                         </td>
                                     </tr>
-                                    <t t-foreach="estimate.Estimate.estimate_line" t-as="line">
+                                    <t t-foreach="o.Estimate.estimate_line" t-as="line">
                                         <t t-if="line.option_type and line.option_type == 'material' and line.material.categ_id.name == 'Box' and line.GenerateMaterialDetails(line)">
                                             <tr style="border: 0px">
                                                 <td colspan="3">
@@ -147,7 +147,7 @@
                                                 </td>
 
                                                 <td>
-                                                    <span t-esc="line['quantity_required_'+estimate.Estimate.selectedQuantity] + (line.quantity_required_run_on * estimate.Estimate.selectedRatio)" /> <span t-field="line.material.uom_id.name" />
+                                                    <span t-esc="line['quantity_required_'+o.Estimate.selectedQuantity] + (line.quantity_required_run_on * o.Estimate.selectedRatio)" /> <span t-field="line.material.uom_id.name" />
                                                 </td>
 
                                                 <td>
@@ -162,20 +162,20 @@
                                     </t>
                                     <tr>
                                         <td style="border: 1px black solid;">
-                                            No of File Copies Req'd: <span t-field="estimate.NoOfCopiesRequired" /><br/>
-                                            Client File Copies Req'd: <span t-field="estimate.NoOfCustomerCopies" />
+                                            No of File Copies Req'd: <span t-field="o.NoOfCopiesRequired" /><br/>
+                                            Client File Copies Req'd: <span t-field="o.NoOfCustomerCopies" />
                                         </td>
                                         <td style="border: 1px black solid;">
-                                            No Of Overs Req'd: <span t-field="estimate.OversRequired" />
+                                            No Of Overs Req'd: <span t-field="o.OversRequired" />
                                         </td>
                                         <td style="border: 1px black solid;">
-                                            Charge for Overs: <t t-if="estimate.ChargeOvers">Y</t>
+                                            Charge for Overs: <t t-if="o.ChargeOvers">Y</t>
                                         </td>
                                         <td style="border: 1px black solid;">
                                             Return Die / Block to:
                                         </td>
                                         <td style="border: 1px black solid;">
-                                            Despatch Method: <span t-field="estimate.Estimate.DeliveryMethod.name" />
+                                            Despatch Method: <span t-field="o.Estimate.DeliveryMethod.name" />
                                         </td>
                                         <td rowspan="2" style="border: 1px black solid;">
                                             Despatch Date:
@@ -183,10 +183,10 @@
                                     </tr>
                                     <tr>
                                         <td colspan="6" style="border: 1px black solid;">
-                                            Delivery Address: <span t-field="estimate.Estimate.Delivery.street" />
-                                            <span t-field="estimate.Estimate.Delivery.street2" />
-                                            <span t-field="estimate.Estimate.Delivery.city" />
-                                            <span t-field="estimate.Estimate.Delivery.zip" />
+                                            Delivery Address: <span t-field="o.Estimate.Delivery.street" />
+                                            <span t-field="o.Estimate.Delivery.street2" />
+                                            <span t-field="o.Estimate.Delivery.city" />
+                                            <span t-field="o.Estimate.Delivery.zip" />
                                         </td>
                                         
                                     </tr>

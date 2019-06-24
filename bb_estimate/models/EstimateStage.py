@@ -7,5 +7,5 @@ class EstimageStage(models.Model):
     _description = 'Estimate Stage'
     
     name = fields.Char('Name', required=True)
-    isOrder = fields.Boolean('Show MO button')
-    
+    isOrder = fields.Boolean('Conversion Stage')
+    ConvertedStage = fields.Boolean('Converted Stage')

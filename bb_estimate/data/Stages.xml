@@ -11,14 +11,12 @@
 
         <record id="provided" model="bb_estimate.stage">
             <field name="name">Estimate Provided</field>
-        </record>
-
-        <record id="accepted" model="bb_estimate.stage">
-            <field name="name">Estimate Accepted</field>
+            <field name="isOrder" eval="True"/>
         </record>
 
         <record id="converted" model="bb_estimate.stage">
             <field name="name">Estimate Converted</field>
+            <field name="ConvertedStage" eval="True"></field>
         </record>
 
         <record id="declined" model="bb_estimate.stage">

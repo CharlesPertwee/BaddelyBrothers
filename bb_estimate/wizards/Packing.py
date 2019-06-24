@@ -25,6 +25,10 @@ class Packing(models.TransientModel):
     Pick = fields.Many2one('stock.picking','Pick')
     Quantity = fields.Float('Quantity Done')#,related="Pick.quantity_done")
     QuantityPerBox = fields.Integer('Quantity Per Box')
+    PrimaryPacking = fields.Many2one('product.product','Primary Packing',domain=[('productType','=','Package')])
+    SecondaryPacking = fields.Many2one('product.product','Primary Packing',domain=[('productType','=','Package')])
+    SecondaryBoxes = fields.Integer('Boxes')
+    
     #Packages = fields.One2many('bb_estimate.picking_line','PickId')
     
     NoOfBox1 = fields.Integer('Quantity')
@@ -59,6 +63,10 @@ class Packing(models.TransientModel):
                 
             
     def Confirm(self):
+#         if self.SecondaryPacking and self.SecondaryBoxes:
+#             raise UserError(_('Secondary Packing is required'))
+#         if self.PrimaryPacking:
+#             raise UserError(_('Primary Packing is required'))
         move_line_ids = self.Pick.move_line_ids.filtered(lambda o: o.qty_done > 0 and not o.result_package_id)
         pick = self.Pick
         if move_line_ids:
@@ -66,20 +74,22 @@ class Packing(models.TransientModel):
             move_lines_to_pack = self.env['stock.move.line']
             
             rec = [(self.NoOfBox1,self.CapacityBox1),(self.NoOfBox2,self.CapacityBox2)]
+            t = []
             for line in rec:
                 for pack in range(line[0]):
                     package = self.env['stock.quant.package'].create({})
                     
-                    if float_compare(ml.qty_done, ml.product_uom_qty, precision_rounding=ml.product_uom_id.rounding) >= 0:
-                        move_lines_to_pack = ml
-                    else:
-                        quantity_left_todo = float_round(ml.product_uom_qty - line[1], precision_rounding=ml.product_uom_id.rounding, rounding_method='UP')
-                        done_to_keep = line[1]
-                        new_move_line = ml.copy(default={'product_uom_qty': 0, 'qty_done': line[1]})
-                        ml.write({'product_uom_qty': quantity_left_todo, 'qty_done': 0.0})
-                        new_move_line.write({'product_uom_qty': done_to_keep})
-                        move_lines_to_pack = new_move_line
-                    
+#                     if float_compare(line[1], ml.product_uom_qty, precision_rounding=ml.product_uom_id.rounding) >= 0:
+#                         raise Exception(line[1], ml.product_uom_qty,)
+#                         move_lines_to_pack = ml
+#                     else:
+                    quantity_left_todo = float_round(ml.product_uom_qty - line[1], precision_rounding=ml.product_uom_id.rounding, rounding_method='UP')
+                    done_to_keep = line[1]
+                    new_move_line = ml.copy(default={'product_uom_qty': 0, 'qty_done': line[1]})
+                    ml.write({'product_uom_qty': quantity_left_todo, 'qty_done': 0.0})
+                    new_move_line.write({'product_uom_qty': done_to_keep})
+                    move_lines_to_pack = new_move_line
+                        
                     package_level = self.env['stock.package_level'].create({
                         'package_id': package.id,
                         'picking_id': pick.id,
@@ -90,6 +100,48 @@ class Packing(models.TransientModel):
                     move_lines_to_pack.write({
                         'result_package_id': package.id,
                     })
+                    t.append(move_lines_to_pack)
+            #raise Exception(t)
+            movement_line = self.env['stock.move.line']
+            move = self.env['stock.move']
+            if self.SecondaryPacking and self.SecondaryBoxes:
+                new_move = ml.move_id.copy(default=
+                    {
+                        'name':'Package Movement',
+                        'product_id': self.SecondaryPacking.id,
+                        'product_uom_qty': self.SecondaryBoxes, 
+                        'product_uom': self.SecondaryPacking.uom_id.id,
+                        'state': 'done',
+                        'procure_method':'make_to_stock',
+                    })
+                new_move_line = ml.copy(default={
+                        'product_id':self.SecondaryPacking.id,
+                        'product_uom_id':self.SecondaryPacking.uom_id.id,
+                        'product_uom_qty': 0, 
+                        'qty_done': self.SecondaryBoxes,
+                        'move_id': new_move.id,
+                })
+            if self.PrimaryPacking:
+                total = self.NoOfBox1 + self.NoOfBox2
+                new_move = ml.move_id.copy(default=
+                    {
+                        'name':'Package Movement',
+                        'product_id': self.PrimaryPacking.id,
+                        'product_uom_qty': total, 
+                        'product_uom': self.PrimaryPacking.uom_id.id,
+                        'state': 'done',
+                        'procure_method':'make_to_stock',
+                    })
+                
+                
+                new_move_line = ml.copy(default={
+                        'product_id':self.PrimaryPacking.id,
+                        'product_uom_id':self.PrimaryPacking.uom_id.id,
+                        'product_uom_qty': 0, 
+                        'qty_done': total,
+                        'move_id': new_move.id,
+                })
+                
         else:
             raise UserError(_('You must first set the quantity you will put in the pack.'))
             

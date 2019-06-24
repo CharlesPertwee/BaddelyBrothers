@@ -10,15 +10,29 @@ from odoo.tools import float_compare, float_round
 class Manufacture(models.Model):
     _inherit = 'mrp.production'
     
+    def GetOptions(self,key):
+        values = [(x.value,x.value) for x in self.env['bb_estimate.specification'].search([('name','=',key)])]
+        return values
+    
+    def GetSpecs(self):
+        return self.GetOptions('Specification')
+    def GetJob(self):
+        return self.GetOptions('JobType')
+    def GetDie(self):
+        return self.GetOptions('Die')
+    
+    
     Estimate = fields.Many2one('bb_estimate.estimate','Originating Estimate')
     NoOfCopiesRequired = fields.Char('No. File Copies Reqd', size=5)
     NoOfCustomerCopies = fields.Char('Customer Files', size=5)
     OversRequired = fields.Char('No. Overs Reqd', size=5)
     ChargeOvers = fields.Boolean('Charge for Overs')
     
-#     def button_mark_done(self):
-#         raise Exception('Test')
-
+    SpecifcationType = fields.Selection(GetSpecs,string="Spec Type")
+    JobType = fields.Selection(GetJob,string="Job Type")
+    DieType = fields.Selection(GetDie,string="Return Die / Block To :")
+    
+    
     def ConfirmOrder(self):
         return {
                 'view_type' : 'form',

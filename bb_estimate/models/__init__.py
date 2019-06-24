@@ -12,4 +12,5 @@ from . import Routing
 from . import SalesOrder
 from . import StockPicking
 from . import Invoice
-
+from . import Specification
+from . import Delivery

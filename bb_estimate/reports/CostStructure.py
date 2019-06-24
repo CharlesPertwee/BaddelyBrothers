@@ -105,22 +105,21 @@ class MrpCostStructure(models.AbstractModel):
                 estimate_line = estimate.estimate_line.search([('quantity_required_'+estimate.selectedQuantity,'>',0),('estimate_id','=',estimate.id),('option_type','=','material'),('material','=',product.product_id.id),('id','not in',materialComputed)])
                 if estimate_line:
                     estimate_line = estimate_line[0]
-                materialComputed.append(estimate_line.id)   
+                    materialComputed.append(estimate_line.id)   
 
-                m_qty = 0
-                for x in production.workorder_ids:
-                    m_qty += sum([y.MaterialUsed for y in x.EstimateMaterials if y.EstimateLineId.id == estimate_line.id])
+                    m_qty = 0
+                    for x in production.workorder_ids:
+                        m_qty += sum([y.MaterialUsed for y in x.EstimateMaterials if y.EstimateLineId.id == estimate_line.id])
+                    unitPrice = (estimate_line['total_price_'+estimate.selectedQuantity] + (estimate_line.total_price_run_on * estimate.selectedRatio)) / (estimate_line['quantity_required_'+estimate.selectedQuantity] + (estimate_line.quantity_required_run_on *estimate.selectedRatio))
+                    total_cost += (m_qty * unitPrice)
+                    bom_line_id = production.bom_id.search([('id','=',production.bom_id.id),('product_id','=',product.product_id.id)])
+                    raw_material_moves.append({
+                            'qty': m_qty,
+                            'cost': m_qty * unitPrice,
+                            'product_id': product.product_id,
+                            'bom_line_id': bom_line_id
+                        })
 
-                unitPrice = (estimate_line['total_price_'+estimate.selectedQuantity] + (estimate_line.total_price_run_on * estimate.selectedRatio)) / (estimate_line['quantity_required_'+estimate.selectedQuantity] + (estimate_line.quantity_required_run_on *estimate.selectedRatio))
-                total_cost += (m_qty * unitPrice)
-                bom_line_id = production.bom_id.search([('id','=',production.bom_id.id),('product_id','=',product.product_id.id)])
-                raw_material_moves.append({
-                        'qty': m_qty,
-                        'cost': m_qty * unitPrice,
-                        'product_id': product.product_id,
-                        'bom_line_id': bom_line_id
-                    })
-        
         if estimate:
             product = production.mapped('product_id')
             uom = product.uom_id

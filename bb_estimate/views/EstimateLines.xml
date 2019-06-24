@@ -142,6 +142,7 @@
                                         <group>
                                             <field name="param_number_of_colors" attrs="{'invisible':[('req_param_number_of_colors','=',False)],'required':[('req_param_number_of_colors','=',True)]}" />
                                             <field name="work_twist" attrs="{'invisible':[('req_work_twist','=',False)]}" />
+                                            <field name="param_time_per_box" attrs="{'invisible':[('req_param_time_per_box','=',False)],'required':[('req_param_time_per_box','=',True)]}"/>
                                             <field name="param_misc_charge_per_cm2" attrs="{'invisible':[('req_param_misc_charge_per_cm2','=',False)]}"/>
                                             <field name="param_misc_charge_per_cm2_area" attrs="{'invisible':[('req_param_misc_charge_per_cm2_area','=',False)]}"/>
                                             <field name="param_material_line_id" options="{'no_create_edit': True}" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)],'required':[('req_param_material_line_id','=',True)]}" />
@@ -157,7 +158,7 @@
                                             <field name="param_env_inlineemboss" attrs="{'invisible':[('req_param_env_inlineemboss','=',False)]}" />
                                             <field name="param_env_gumming" attrs="{'invisible':[('req_param_env_gumming','=',False)]}" />
                                         </group>
-             </group>
+                                     </group>
                                     
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Stock')]}">
                                         <group>
@@ -485,22 +486,22 @@
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_unallocated_finished_quantity','=',False)]}">
                                                 <div class="col-md-2 form-group">
-                                                    <span class="o_field_char o_field_widget o_readonly_modifier">Unallocated Quantity in this Material</span>
+                                                    <span class="o_field_char o_field_widget o_readonly_modifier">Quantity Not Tagged</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="unallocated_finished_quantity_1" />
+                                                    <field name="unallocated_finished_quantity_1" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="unallocated_finished_quantity_2" />
+                                                    <field name="unallocated_finished_quantity_2" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="unallocated_finished_quantity_3" />
+                                                    <field name="unallocated_finished_quantity_3" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="unallocated_finished_quantity_4" />
+                                                    <field name="unallocated_finished_quantity_4" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="unallocated_finished_quantity_run_on" />
+                                                    <field name="unallocated_finished_quantity_run_on" readonly="1"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_finished_quantity','=',False)]}">

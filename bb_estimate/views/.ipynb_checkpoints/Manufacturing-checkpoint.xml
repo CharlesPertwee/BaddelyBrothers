@@ -7,6 +7,7 @@
             report_type="qweb-html"
             name="bb_estimate.job_ticket"
             file="bb_estimate.job_ticket"
+            attachment="((object.name or '').replace('/','')+'.pdf')"
             print_report_name="'Job Ticket - %s ' % object.name"
         />
         
@@ -17,6 +18,8 @@
                 report_type="qweb-pdf" 
                 name="bb_estimate.box_label" 
                 file="bb_estimate.box_label" 
+                attachment="('Box Label-'+(object.name or '').replace('/','')+'.pdf')"
+                print_report_name="'Box Label - %s ' % object.name"
                 paperformat="bb_estimate.box_label_paper_format"
         />      
         
@@ -26,7 +29,9 @@
                 model="mrp.production" 
                 report_type="qweb-pdf" 
                 name="bb_estimate.as_before_label" 
-                file="bb_estimate.as_before_label" 
+                file="bb_estimate.as_before_label"
+                attachment="('As Before Label-'+(object.name or '').replace('/','')+'.pdf')"
+                print_report_name="'As Before Label - %s ' % object.name"
                 paperformat="bb_estimate.box_label_paper_format"
         />
         
@@ -36,7 +41,9 @@
                 model="mrp.production" 
                 report_type="qweb-pdf" 
                 name="bb_estimate.die_label" 
-                file="bb_estimate.die_label" 
+                file="bb_estimate.die_label"
+                attachment="('Die Label-'+(object.name or '').replace('/','')+'.pdf')"
+                print_report_name="'Die Label - %s ' % object.name" 
                 paperformat="bb_estimate.box_label_paper_format"
         />
         
@@ -45,21 +52,20 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//header" postion="inside">
+                <xpath expr="//header" position="inside">
                     <button name="ConfirmOrder" attrs="{'invisible':[('state','not in',['planned'])]}" string="Complete Order" class="btn btn-primary o_form_button_edit" type="object"/>
                 </xpath>
-                <xpath expr="//field[@name='origin']" postition="after">
+                <xpath expr="//field[@name='origin']" position="after">
                     <field name="Estimate" readonly="1"/>
+                    <field name="SpecifcationType" />
+                    <field name="JobType" />
                 </xpath>
-                <xpath expr="//field[@name='location_dest_id']" postition="after">
-                    <group>
-                        <group col="4">
-                            <field name="NoOfCopiesRequired"/>
-                            <field name="NoOfCustomerCopies"/>
-                            <field name="OversRequired"/>
-                            <field name="ChargeOvers"/>
-                        </group>
-                    </group>
+                <xpath expr="//field[@name='availability']" position="after">
+                    <field name="NoOfCopiesRequired"/>
+                    <field name="NoOfCustomerCopies"/>
+                    <field name="OversRequired"/>
+                    <field name="ChargeOvers"/>
+                    <field name="DieType" />
                 </xpath>
             </field>
         </record>

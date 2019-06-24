@@ -17,3 +17,14 @@ class Sales(models.Model):
                     record.partnerOnHold = True
                 else:
                     record.partnerOnHold = False
+    
+    def AdjustPrice(self):
+        return {
+                'view_type' : 'form',
+                'view_mode' : 'form',
+                'name': 'Adjust Price',
+                'res_model' : 'bb_estimate.adjust_price_so',
+                'type' : 'ir.actions.act_window',
+                'context' : "{'default_SalesOrder' : active_id}",
+                'target' : 'new',
+            }

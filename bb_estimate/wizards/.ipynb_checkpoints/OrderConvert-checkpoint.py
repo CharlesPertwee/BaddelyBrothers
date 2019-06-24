@@ -168,5 +168,8 @@ class OrderConvert(models.TransientModel):
         if salesId:
             salesId.action_confirm()
             data['salesOrder'] = salesId.id
-            
+        
+        stage = self.env['bb_estimate.stage'].sudo().search([('ConvertedStage','=','True')],limit=1)
+        if stage:
+            data['state'] = stage.id
         self.EstimateId.write(data)

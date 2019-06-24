@@ -10,6 +10,7 @@
                         <group>
                             <field name="Quantity" />
                             <field name="QuantityPerBox" />
+                            <field name="PrimaryPacking" options="{'no_create_edit': True}" />
                         </group>
                         <h5>Packages</h5>
                         <hr/>
@@ -17,10 +18,12 @@
                             <group>
                                 <field name="NoOfBox1" string="Boxes of"/>
                                 <field name="NoOfBox2" string="Boxes of"/>
+                                <field name="SecondaryBoxes"  string="Boxes of"/>
                             </group>
                             <group>
                                 <field name="CapacityBox1" string="Per Box"/>
                                 <field name="CapacityBox2" string="Per Box"/>
+                                <field name="SecondaryPacking" options="{'no_create_edit': True}" string="Packaging Type"/>
                             </group>
                         </group>
 <!--                         <field name="Packages">

@@ -6,7 +6,7 @@
         This module creates the estimate and job tickets.
         """,
 
-    'description': """    
+    'description': """      
     """,
 
     'author': "Squadsoft Tech",
@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account'],
+    'depends': ['base','web','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock'],
 
     # always loaded
     'data': [
@@ -40,6 +40,7 @@
         'reports/views/RequestQuote.xml',
         'reports/views/ProFormaHeaded.xml',
         'reports/views/InvoiceHeaded.xml',
+        #'reports/views/DeliveryNote.xml',
         'views/EstimateLines.xml',
         'views/Estimate.xml',
         'views/EstimateStages.xml',
@@ -53,10 +54,12 @@
         'views/SalesOrder.xml',
         'views/Invoice.xml',
         'views/PurchaseOrder.xml',
+        'views/Specification.xml',
         'wizards/views/OrderConvert.xml',
         'wizards/views/MoConfirmation.xml',
         'wizards/views/Packing.xml',
-        
+        'wizards/views/PriceAdjustment.xml',
+        'wizards/views/SalesAdjustment.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -1,0 +1,28 @@
+<odoo>
+    <data>
+        
+        <record id="wizard_adjustment_so" model="ir.ui.view">
+            <field name="name">Adjust Prices</field>
+            <field name="model">bb_estimate.adjust_price_so</field>
+            <field name="arch" type="xml">
+                <form string="Adjustments">
+                    <sheet>
+                        <field name="SalesOrder" invisible="1"/>
+                        <group>
+                            <field name="Quantity" readonly="1"/>
+                            <field name="Price" readonly="1"/>
+                            <field name="AdjustedPrice" />
+                            <field name="AdjustPricePercent" />
+                            <field name="PriceDelta" readonly="1"/>
+                        </group>
+                        <footer>
+                            <button name="Confirm" string="Confirm" class="oe_right oe_highlight" type="object"/>
+                            <button string="Cancel" class="oe_right" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>
