@@ -447,5 +447,14 @@ class Estimate(models.Model):
             return line.material.weight or 0.0
         else:
             return 0.0
+        
+    def EstimateLetter(self):
+        return { 
+                'type': 'ir.actions.act_url',
+                'url': '/bb_estimate/bb_estimate/estimateLetter/%s' % self.id,
+                'target': 'self',
+                'res_id': self.id,
+               }
+        
     
     

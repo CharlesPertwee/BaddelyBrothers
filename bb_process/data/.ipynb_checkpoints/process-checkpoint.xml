@@ -4,12 +4,10 @@
     <record id="prepress" model="bb_process.process">
         <field name="name">Prepress</field>
         <field name="estimate">
+	
 cost_params = estimate.cost_params
 qty_params = estimate.qty_params
 qty = estimate.qty
-
-#defaults
-qty_params['param_number_up'] = 1
 
 if estimate.fieldUpdated in ['workcenterId']:
     qty_break = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)])
@@ -114,6 +112,7 @@ estimate.update(qty_params,cost_params,qty)
     <record id="print_emboss" model="bb_process.process">
         <field name="name">Print/Emboss</field>
         <field name="estimate">
+	
 def calculate_working_sheets_needed(qty_params, cost_params, qty):
     running_sheets = int(cost_params['finished_quantity']) / qty_params['param_number_up'] if qty_params['param_number_up'] > 0 else int(cost_params['finished_quantity'])
     return running_sheets
@@ -266,9 +265,6 @@ cost_params = estimate.cost_params
 qty_params = estimate.qty_params
 qty = estimate.qty
 
-#default
-qty_params['param_number_up'] = 1
-
 qty_params['param_minimum_price'] = process = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)]).minimum_price
 
 if qty_params['param_material_line_id']:
@@ -336,6 +332,9 @@ if estimate.fieldUpdated in ['workcenterId']:
 cost_params['params_working_sheets_needed'] = 0
 qty_params['params_working_sheets_needed'] = 0
 qty_params['params_overs_needed'] = 0
+
+#defaults
+qty_params['param_number_up'] = 1
 
 estimate.update(qty_params,cost_params,qty)
         </field>
@@ -531,6 +530,7 @@ estimate.update(qty_params,cost_params,qty)
     <record id="duplex" model="bb_process.process">
         <field name="name">Duplex</field>
         <field name="estimate">
+	
 def load_qty_break_params(workcenter, qty_params, cost_params, qty):
     # Set default general parameters
     qty_params['param_additional_charge'] = workcenter.additional_charge
@@ -689,6 +689,7 @@ total_hours = cost_params['param_make_ready_time'] + cost_params['param_running_
 
 cost_params['quantity_required'] = round(total_hours, 2)
 estimate.update(qty_params,cost_params,qty)
+        
         </field>
     </record>
     
@@ -744,11 +745,14 @@ qty = estimate.qty
 if estimate.fieldUpdated in ['workcenterId']:
     qty_params['param_sheets_per_box'] = workcenter.sheetsPerBox
     qty_params['param_time_per_box'] = workcenter.timePerBox
-    qty_params['cost_per_unit'] = workcenter.standard_price
-    qty_params['price_per_unit'] = workcenter.list_price
-    qty_params['margin'] = workcenter.margin_percent
+    cost_params ['cost_per_unit'] = workcenter.standard_price
+    cost_params ['price_per_unit'] = workcenter.list_price
+    cost_params ['margin'] = workcenter.margin_percent
 
 sheets_to_process = int(cost_params['finished_quantity'])
+
+#defaults
+qty_params['param_number_up'] = 1
 
 cost_params['params_working_sheets_needed'] = 0
 qty_params['params_working_sheets_needed'] = 0

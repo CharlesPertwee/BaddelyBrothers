@@ -4,7 +4,7 @@
         id="report_estimate"
         model="bb_estimate.estimate"
         string="Estimate Letter"
-        report_type="qweb-html"
+        report_type="qweb-pdf"
         name="bb_estimate.estimate_letter"
         file="mrp_account.mrp_cost_structure"
         paperformat="bb_estimate.paperformat_invoice"
@@ -37,12 +37,15 @@
                 <field name="showMo" invisible="1" />
                 <field name="isLocked" invisible="1" />
                 <header>
-                    <button name="AddDelivery" string="Set Delivery" type="object" attrs="{'invisible':['|',('id','=',False),('isLocked','!=',False)]}"/>
+                    <button class="oe_stat_button" icon="fa-database" type="object" name="EstimateLetter" string="Print Letter" />
                     <button name="AdjustPrice" string="Adjust Prices" type="object" attrs="{'invisible':['|',('id','=',False),('isLocked','!=',False)]}"/>
                     <field name="state" widget="statusbar" clickable="True" />
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                      <button name="AddDelivery" type="object" attrs="{'invisible':['|',('id','=',False),('isLocked','!=',False)]}">
+                          <span>Set Delivery</span>
+                      </button>
                       <button class="oe_stat_button" icon="fa-database" type="object" name="AddLineItem" attrs="{'invisible':['|',('id','=',False),('isLocked','!=',False)]}">
                           <span>Add Line</span>
                       </button>
