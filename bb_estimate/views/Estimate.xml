@@ -4,7 +4,7 @@
         id="report_estimate"
         model="bb_estimate.estimate"
         string="Estimate Letter"
-        report_type="qweb-pdf"
+        report_type="qweb-html"
         name="bb_estimate.estimate_letter"
         file="mrp_account.mrp_cost_structure"
         paperformat="bb_estimate.paperformat_invoice"

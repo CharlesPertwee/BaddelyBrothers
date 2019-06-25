@@ -16,7 +16,6 @@ class WorkOrder(models.Model):
     def record_production(self):
         if not self:
             return True
-
         self.ensure_one()
         if self.qty_producing <= 0:
             raise UserError(_('Please set the quantity you are currently producing. It should be different from zero.'))
@@ -33,20 +32,19 @@ class WorkOrder(models.Model):
             if move.has_tracking == 'none' and (move.state not in ('done', 'cancel')) and move.bom_line_id\
                         and move.unit_factor and not move.move_line_ids.filtered(lambda ml: not ml.done_wo):
                 rounding = move.product_uom.rounding
-                material = self.EstimateMaterials.sudo().search([('name','=',move.product_id.name),('MaterialAllocated','=',move.product_uom_qty),('WorkOrderId','=',self.id),('id','not in',computedMaterial)],limit=1)
+                materials = self.env['bb_estimate.work_material'].sudo().search([('production_id','=',self.production_id.id),('product_id','=',move.product_id.id),('EstimateLineId','not in',computedMaterial)]) 
                 usedQty = 0
-                if material:
-                    usedQty = material.MaterialUsed
-                    computedMaterial.append(material.id)
-                    
+                if materials:
+                    usedQty = sum([x.MaterialUsed for x in materials])
+                    computedMaterial.append(materials[0].EstimateLineId.id)
                 if self.product_id.tracking != 'none':
                     qty_to_add = float_round(self.qty_producing * move.unit_factor, precision_rounding=rounding) if usedQty <= 0 else usedQty
                     move._generate_consumed_move_line(qty_to_add, self.final_lot_id)
                 elif len(move._get_move_lines()) < 2:
                     move.quantity_done += float_round(self.qty_producing * move.unit_factor, precision_rounding=rounding) if usedQty <= 0 else usedQty
                 else:
-                    move._set_quantity_done(move.quantity_done + float_round(self.qty_producing * move.unit_factor, precision_rounding=rounding)) if usedQty <= 0 else usedQty
-                
+                    move._set_quantity_done((move.quantity_done + float_round(self.qty_producing * move.unit_factor, precision_rounding=rounding)) if usedQty <= 0 else usedQty)
+        
         # Transfer quantities from temporary to final move lots or make them final
         for move_line in self.active_move_line_ids:
             # Check if move_line already exists
@@ -143,6 +141,8 @@ class WorkOrderMaterial(models.Model):
     _description = 'Material usage for work orders'
     
     EstimateLineId = fields.Many2one('bb_estimate.estimate_line','Estimate Line',domain="[('option_type','=','material')]")
+    product_id = fields.Many2one('product.product',string="Product",related="EstimateLineId.material")
+    production_id = fields.Many2one('mrp.production',string="Manufacturing Order",related="WorkOrderId.production_id")
     name = fields.Char('Material Name',related="EstimateLineId.lineName")
     
     MaterialAllocated = fields.Integer('Estimate Material')

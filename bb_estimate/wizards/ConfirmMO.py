@@ -57,11 +57,11 @@ class ConfirmMo(models.TransientModel):
         
     def Confirm(self):
         if self.ProductionId.workorder_ids:
-            process = self.ProductionId.workorder_ids[0]
+            process = self.ProductionId.workorder_ids.filtered(lambda x: len(x.move_raw_ids) > 0)[0]
             computed = []
             for mat in self.MaterialLines:
                 if mat.Material:
-                    record = process.EstimateMaterials.search([('WorkOrderId','=',process.id),('name','=',mat.Material.product_id.name),('id','not in',computed)],limit=1)
+                    record = process.EstimateMaterials.search([('WorkOrderId','=',process.id),('product_id','=',mat.Material.product_id.id),('id','not in',computed)],limit=1)
                     record.write({'MaterialUsed': mat.ActualMaterial})
                     computed.append(record.id)
         

@@ -7,6 +7,7 @@
         """,
 
     'description': """      
+    
     """,
 
     'author': "Squadsoft Tech",
@@ -40,7 +41,7 @@
         'reports/views/RequestQuote.xml',
         'reports/views/ProFormaHeaded.xml',
         'reports/views/InvoiceHeaded.xml',
-        #'reports/views/DeliveryNote.xml',
+        'reports/views/DeliveryNote.xml',
         'views/EstimateLines.xml',
         'views/Estimate.xml',
         'views/EstimateStages.xml',

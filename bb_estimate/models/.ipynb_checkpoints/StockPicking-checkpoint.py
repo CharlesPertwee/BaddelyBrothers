@@ -42,3 +42,9 @@ class PickingType(models.Model):
             return self._estimate_pack(sale)
         else:
             return self._put_in_pack()
+    
+    @api.model
+    def getEstimateData(self):
+        for record in self:
+            return self.env['bb_estimate.estimate'].sudo().search([('salesOrder','=',record.origin)])
+        

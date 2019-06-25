@@ -72,8 +72,8 @@
                                           </tr>
                                           <tr>
                                               <td style="border: 1px black solid; width:40%">
-                                                  Job Type: <span /><br/>
-                                                  Spec: <span /><br/>
+                                                  Job Type: <span t-field="o.JobType"/><br/>
+                                                  Spec: <span t-field="o.SpecifcationType"/><br/>
                                                   Quantity: <span t-esc="o.Estimate['quantity_'+o.Estimate.selectedQuantity] + o.Estimate.selectedRunOn"/><br/>
                                                   Finished Size: <span t-field="o.Estimate.finished_height" /> X <span t-field="o.Estimate.finished_width" /><br/><br/>
                                                   <t t-foreach="o.Estimate.estimate_line" t-as="line">
@@ -172,7 +172,7 @@
                                             Charge for Overs: <t t-if="o.ChargeOvers">Y</t>
                                         </td>
                                         <td style="border: 1px black solid;">
-                                            Return Die / Block to:
+                                            Return Die / Block to: <span t-field="o.DieType"/>
                                         </td>
                                         <td style="border: 1px black solid;">
                                             Despatch Method: <span t-field="o.Estimate.DeliveryMethod.name" />
