@@ -6,7 +6,7 @@
         This module creates the estimate and job tickets.
         """,
 
-    'description': """      
+    'description': """ 
     
     """,
 
@@ -56,6 +56,7 @@
         'views/Invoice.xml',
         'views/PurchaseOrder.xml',
         'views/Specification.xml',
+        'views/Projects.xml',
         'wizards/views/OrderConvert.xml',
         'wizards/views/MoConfirmation.xml',
         'wizards/views/Packing.xml',

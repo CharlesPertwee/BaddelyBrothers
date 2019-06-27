@@ -7,6 +7,8 @@
             report_type="qweb-pdf"
             name="bb_estimate.custom_purchase_order"
             file="bb_estimate.custom_purchase_order"
+            attachment="(object.state in ('draft', 'sent') and 'Request for Quotation - %s' % (object.name) or
+                'Purchase Order - %s' % (object.name))"
             print_report_name="
                 (object.state in ('draft', 'sent') and 'Request for Quotation - %s' % (object.name) or
                 'Purchase Order - %s' % (object.name))"
@@ -20,6 +22,7 @@
             report_type="qweb-pdf"
             name="bb_estimate.request_for_quote_custom"
             file="bb_estimate.request_for_quote_custom"
+            attachment="'Request for Quotation - %s' % (object.name)"
             print_report_name="'Request for Quotation - %s' % (object.name)"
             paperformat="bb_estimate.paperformat_invoice"
         />

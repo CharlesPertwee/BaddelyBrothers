@@ -78,13 +78,11 @@ class MrpCostStructure(models.AbstractModel):
         ProductProduct = self.env['product.product']
         StockMove = self.env['stock.move']
         
-        estimate = False
+        estimate = production.Estimate
         #operations
         operations = []
         for workorder in production.workorder_ids:
-            if workorder.operation_id.EstimateLineId.estimate_id:
-                if not estimate:
-                    estimate = workorder.operation_id.EstimateLineId.estimate_id
+            if estimate:
                 
                 estimate_line = workorder.operation_id.EstimateLineId
                 

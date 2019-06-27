@@ -115,6 +115,22 @@ class PriceAdjustment(models.TransientModel):
                 
     def Confirm(self):
         if self.Estimate:
+            self.env['bb_estimate.price_history'].create(
+                {
+                    'CurrentPrice1':self.Estimate.total_price_1,
+                    'CurrentPrice2':self.Estimate.total_price_2,
+                    'CurrentPrice3':self.Estimate.total_price_3,
+                    'CurrentPrice4':self.Estimate.total_price_4,
+                    'CurrentPriceRunOn':self.Estimate.total_price_run_on,
+                    'ChangedPrice1':self.AdjustedPrice1,
+                    'ChangedPrice2':self.AdjustedPrice2,
+                    'ChangedPrice3':self.AdjustedPrice3,
+                    'ChangedPrice4':self.AdjustedPrice4,
+                    'ChangedPriceRunOn':self.AdjustedPriceRunOn,
+                    'Estimate':self.Estimate.id
+                    
+                }
+            )
             self.Estimate.write(
                 {
                     'total_price_1':self.AdjustedPrice1,
@@ -129,4 +145,5 @@ class PriceAdjustment(models.TransientModel):
                     'total_price_1000_run_on':self.PricePer1000_RunOn,
                 }
             )
+            
             self.Estimate.message_post(body="Adjusted Price for estimate")

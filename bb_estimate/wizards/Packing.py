@@ -138,32 +138,41 @@ class Packing(models.TransientModel):
                         'state': 'done',
                         'procure_method':'make_to_stock',
                     })
-                packs = []
-                secondary = self.SecondaryBoxes
-                for x in range(secondary):
-                    current = math.ceil(total/secondary)
-                    packs.append(current)
-                    total -= current
-                    secondary -= 1
-                
-                for current in packs:
-                    package = self.env['stock.quant.package'].create({})
+                if self.SecondaryPacking and (self.SecondaryBoxes > 0):
+                    packs = []
+                    secondary = self.SecondaryBoxes
+                    for x in range(secondary):
+                        current = math.ceil(total/secondary)
+                        packs.append(current)
+                        total -= current
+                        secondary -= 1
+
+                    for current in packs:
+                        package = self.env['stock.quant.package'].create({})
+                        new_move_line = ml.copy(default={
+                            'product_id':self.PrimaryPacking.id,
+                            'product_uom_id':self.PrimaryPacking.uom_id.id,
+                            'product_uom_qty': 0, 
+                            'qty_done': current,
+                            'move_id': new_move.id,
+                        })
+                        package_level = self.env['stock.package_level'].create({
+                        'package_id': package.id,
+                        'picking_id': pick.id,
+                        'location_id': False,
+                        'location_dest_id': move_line_ids.mapped('location_dest_id').id,
+                        'move_line_ids': [(6, 0, new_move_line.ids)]
+                        })
+                        new_move_line.write({
+                            'result_package_id': package.id,
+                        })
+                else:
                     new_move_line = ml.copy(default={
                         'product_id':self.PrimaryPacking.id,
                         'product_uom_id':self.PrimaryPacking.uom_id.id,
                         'product_uom_qty': 0, 
-                        'qty_done': current,
+                        'qty_done': total,
                         'move_id': new_move.id,
-                    })
-                    package_level = self.env['stock.package_level'].create({
-                    'package_id': package.id,
-                    'picking_id': pick.id,
-                    'location_id': False,
-                    'location_dest_id': move_line_ids.mapped('location_dest_id').id,
-                    'move_line_ids': [(6, 0, new_move_line.ids)]
-                    })
-                    new_move_line.write({
-                        'result_package_id': package.id,
                     })
                     
                 

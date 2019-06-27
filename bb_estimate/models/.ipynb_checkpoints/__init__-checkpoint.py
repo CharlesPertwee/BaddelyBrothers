@@ -14,3 +14,5 @@ from . import StockPicking
 from . import Invoice
 from . import Specification
 from . import Delivery
+from . import PriceHistory
+from . import Project

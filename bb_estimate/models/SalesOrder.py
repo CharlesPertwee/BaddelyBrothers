@@ -8,6 +8,7 @@ class Sales(models.Model):
     Estimate = fields.Many2one('bb_estimate.estimate',string='Originating Estimate')
     JobTicket = fields.Many2one('mrp.production',string="Job Ticket")
     partnerOnHold = fields.Boolean('Account on Hold')
+    priceHistory = fields.One2many('bb_estimate.price_history','SalesOrder','Price Adjustments')
     
     @api.onchange('partner_id')
     def check_hold(self):

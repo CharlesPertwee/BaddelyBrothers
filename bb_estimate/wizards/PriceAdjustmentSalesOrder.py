@@ -37,9 +37,21 @@ class PriceAdjustment(models.TransientModel):
     def Confirm(self):
         if self.SalesOrder.order_line:
             record = self.SalesOrder.order_line[0]
+            otherSum = sum([x.price_subtotal for x in self.SalesOrder.order_line if x.id != record.id])
+            price = (self.AdjustedPrice - otherSum)
+            current = self.SalesOrder.amount_untaxed 
+            
             record.write(
                 {
-                    'price_unit': (self.AdjustedPrice / self.Quantity)
+                    'price_unit': (price / self.Quantity)
+                }
+            )
+            self.env['bb_estimate.price_history'].create(
+                {
+                    'CurrentPrice1':current,
+                    'ChangedPrice1':self.SalesOrder.amount_untaxed,
+                    'SalesOrder':self.SalesOrder.id
+                    
                 }
             )
             self.SalesOrder.message_post(body="Adjusted Price for Sales Order")

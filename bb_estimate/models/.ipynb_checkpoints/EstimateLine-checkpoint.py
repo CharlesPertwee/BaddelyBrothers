@@ -977,7 +977,15 @@ class EstimateLine(models.Model):
         estimate = self.estimate_id
         optionType = self.option_type
         work_twist = False
-                    
+        
+        estimateData = {x : estimate[x] for x in estimate._fields if 'total_price_' in x}
+        for qty in ['1','2','3','4','run_on']:
+            estimateData['total_price_'+qty] -= self['total_price_'+qty]
+            estimateData['total_price_1000_'+qty] -= self['total_price_per_1000_'+qty]
+            #estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in estimate.estimate_line])
+            #estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in estimate.estimate_line])
+        estimate.write(estimateData)
+        
         rec = super(EstimateLine, self).unlink()
         
         if optionType == 'process':
@@ -985,13 +993,28 @@ class EstimateLine(models.Model):
                 if m.option_type == 'material' and m.documentCatergory not in ['Packing','Despatch']:
                     m.RecalculatePrices(m,work_twist)
                     
-        estimateData = {}
-        for qty in ['1','2','3','4','run_on']:
-            estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in estimate.estimate_line])
-            estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in estimate.estimate_line])
-        estimate.write(estimateData)
         return rec
+    
+    @api.multi
+    def write(self,vals):
+        estimateData = {x : self.estimate_id[x] for x in self.estimate_id._fields if 'total_price_' in x}
+        for qty in ['1','2','3','4','run_on']:
+            if 'total_price_'+qty in vals.keys():
+                estimateData['total_price_'+qty] -= self['total_price_'+qty]
+            if 'total_price_per_1000_'+qty in vals.keys():
+                estimateData['total_price_1000_'+qty] -= self['total_price_per_1000_'+qty]
+            #estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in estimate.estimate_line])
+            #estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in estimate.estimate_line])
+        for qty in ['1','2','3','4','run_on']:
+            if 'total_price_'+qty in vals.keys():
+                estimateData['total_price_'+qty] += vals['total_price_'+qty]
+            if 'total_price_per_1000_'+qty in vals.keys():
+                estimateData['total_price_1000_'+qty] += vals['total_price_per_1000_'+qty]
+       
+        self.estimate_id.write(estimateData)
+        return super(EstimateLine, self).write(vals)
         
+    
     @api.model
     def create(self,values):
         records = super(EstimateLine,self).create(values)
@@ -1134,9 +1157,13 @@ class EstimateLine(models.Model):
                         process.calc_workcenterId_change()
                         dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
                         process.write(dictProcess)
-        estimateData = {}
+        estimateData = {x:lineId.estimate_id[x] for x in lineId.estimate_id._fields if 'total_price_' in x}
+        
         for qty in ['1','2','3','4','run_on']:
-            estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in lineId.estimate_id.estimate_line])
-            estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in lineId.estimate_id.estimate_line])
+            estimateData['total_price_'+qty] += lineId['total_price_'+qty]
+            estimateData['total_price_1000_'+qty] += lineId['total_price_per_1000_'+qty]
+            #estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in lineId.estimate_id.estimate_line])
+            #estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in lineId.estimate_id.estimate_line])
+        
         lineId.estimate_id.write(estimateData)
         return records    

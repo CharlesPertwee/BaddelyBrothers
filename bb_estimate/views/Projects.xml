@@ -1,0 +1,17 @@
+<odoo>
+    <data>
+        <record id="edit_project_bb" model="ir.ui.view">
+            <field name="name">project.project.form</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page name="Estimates" string="Estimates">
+                        <field name="Estimates" readonly="1">
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

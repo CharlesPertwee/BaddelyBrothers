@@ -3,7 +3,9 @@
 from odoo import http, tools, _
 from odoo.http import request, Controller
 import requests
+import codecs
 import datetime
+import base64
 from docx import Document
 from docx.shared import Cm, Mm, Inches, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH,WD_LINE_SPACING
@@ -14,14 +16,14 @@ from io import BytesIO
 import io
 
 class BbEstimate(http.Controller):
-    
     @http.route('/bb_estimate/bb_estimate/estimateLetter/<string:id>', auth='public')
     def estimate_letter(self, **kw):
         values = dict(kw)
         Estimate = request.env['bb_estimate.estimate'].sudo().search([('id','=',values['id'])])
         document = Document()
         
-        url = '/bb_estimate/static/src/img/BaddeleyNew.jpg'
+        #url = 'https://charlespertwee-baddelybrothers-customization-dv-444705.dev.odoo.com/bb_estimate/static/src/img/BaddeleyNew.jpg'
+        url = request.httprequest.host_url+"bb_estimate/static/src/img/BaddeleyNew.jpg"
         response = requests.get(url, stream=True)
         header = io.BytesIO(response.content)
         section = document.sections[0]   # Create a section
@@ -85,7 +87,7 @@ class BbEstimate(http.Controller):
             table.cell(x,1).text = " "
             x += 1
         
-        if Estimate.invoice_contact.zip:
+        if Estimate.invoice_address.zip:
             table.cell(x,0).text = Estimate.invoice_address.zip 
             table.cell(x,1).text = " "
             x += 1
@@ -211,7 +213,8 @@ class BbEstimate(http.Controller):
         document.add_paragraph('Yours faithfully,')
         document.add_paragraph(Estimate.estimator.name)
         
-        url1 = '/bb_estimate/static/src/img/BaddeleyFooter.png'
+        #url1 = 'https://charlespertwee-baddelybrothers-customization-dv-444705.dev.odoo.com/bb_estimate/static/src/img/BaddeleyFooter.png'
+        url1 = request.httprequest.host_url+"bb_estimate/static/src/img/BaddeleyFooter.png"
         response1 = requests.get(url1, stream=True)
         footer = io.BytesIO(response1.content)
         section = document.sections[0]
@@ -222,9 +225,19 @@ class BbEstimate(http.Controller):
         
         docx_stream = io.BytesIO()
         document.save(docx_stream)
-        docx_bytes = docx_stream.getvalue()            
-
-        pdfhttpheaders = [('Content-Type','application/msword')]        
+        docx_bytes = docx_stream.getvalue()  
+        
+        attachment = request.env['ir.attachment'].create({
+            'name': "%s.doc"%(Estimate.estimate_number),
+            'type':'binary',
+            'res_model':'bb_estimate.estimate',
+            'res_id':Estimate.id,
+            'datas_fname':"%s.doc"%(Estimate.estimate_number),
+            'mimetype':'application/msword',
+            'datas':base64.encodestring(docx_bytes)
+        })
+        
+        pdfhttpheaders = [('Content-Type','application/msword'),("content_disposition",'attachment; filename="my_filename.doc"')]        
         return request.make_response(docx_bytes, headers=pdfhttpheaders)
        
         

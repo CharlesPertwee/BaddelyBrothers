@@ -162,12 +162,20 @@ class Estimate(models.Model):
     SpecialInstuction = fields.Text('Special Instructions')
     PackingInstruction = fields.Text('Packing Instructions')
     isLocked = fields.Boolean('Locked')
+    hasDelivery = fields.Boolean('Delivery Added?')
+    priceHistory = fields.One2many('bb_estimate.price_history','Estimate','Price Adjustments')
     
     #Fields For BOM and Invoice Computation
     selectedQuantity = fields.Selection([('1','1'),('2','2'),('3','3'),('4','4')],string="Selected Quantity",default="1")
     selectedRunOn = fields.Integer('Selected Run On',default=0)
     selectedPrice = fields.Float('Total Price Selected',default=0)
     selectedRatio = fields.Float('Ratio Selected',default=0)
+    
+    Weight_1 = fields.Float('Weight 1')
+    Weight_2 = fields.Float('Weight 2')
+    Weight_3 = fields.Float('Weight 3')
+    Weight_4 = fields.Float('Weight 4')
+    Weight_run_on = fields.Float('Weight Run On')
     
     def GenerateEnvelopeDetails(self,estimate):
         line = ''
@@ -208,25 +216,19 @@ class Estimate(models.Model):
         for record in self:
             #totals
             for qty in ['1','2','3','4','run_on']:
-                record['total_price_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line])
+                #record['total_price_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line])
                 record['total_cost_'+qty] = sum([x['total_cost_'+qty] for x in record.estimate_line])
                 record['total_price_extra_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line if x.isExtra == True])
-                record['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in record.estimate_line])
+                #record['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in record.estimate_line])
                 
                 if qty != 'run_on':
                     record['unAllocated_'+qty] = record['quantity_'+qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
                 else:
                     record['unAllocated_'+qty] = record[qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
                     
-            record.compute_calc_total_price_1()
+            #record.compute_calc_total_price_1()
+            record.hasDelivery = len(record.estimate_line.filtered(lambda x: x.documentCatergory == 'Despatch')) > 0
     
-    def compute_calc_total_price_1(self):
-        for record in self:
-            record.total_price_1 = 123
-            #totals
-            for qty in ['1','2','3','4','run_on']:
-                record['total_price_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line])
-        
     
     @api.onchange('finished_size')
     def finished_size_change(self):
@@ -369,6 +371,12 @@ class Estimate(models.Model):
         total = total_delivery
 
         return self._get_price_from_picking(carrier,total, weight, volume, quantity)
+    def GetWeight(self,qty):
+        self.ensure_one()
+        weight = 0
+        for line in self.estimate_line:
+            weight += self.LineWeight(line,qty)
+        return weight
     
     def AddDelivery(self):
         prices = {}
@@ -405,31 +413,37 @@ class Estimate(models.Model):
                 'quantity_required_3': 1 if self.quantity_3 > 0 else 0,
                 'quantity_required_4': 1 if self.quantity_4 > 0 else 0,
                 'quantity_required_run_on': 1 if self.run_on > 0 else 0,
-                'cost_per_unit_1':prices['qty_1'],
-                'cost_per_unit_2':prices['qty_2'],
-                'cost_per_unit_3':prices['qty_3'],
-                'cost_per_unit_4':prices['qty_4'],
-                'cost_per_unit_run_on':prices['qty_run_on'],
-                'price_per_unit_1':prices['qty_1'],
-                'price_per_unit_2':prices['qty_2'],
-                'price_per_unit_3':prices['qty_3'],
-                'price_per_unit_4':prices['qty_4'],
-                'price_per_unit_run_on':prices['qty_run_on'],
-                'margin_1':self.DeliveryMethod.margin,
-                'margin_2':self.DeliveryMethod.margin,
-                'margin_3':self.DeliveryMethod.margin,
-                'margin_4':self.DeliveryMethod.margin,
-                'margin_run_on':self.DeliveryMethod.margin,
-                'total_cost_1':prices['qty_1'],
-                'total_cost_2':prices['qty_2'],
-                'total_cost_3':prices['qty_3'],
-                'total_cost_4':prices['qty_4'],
-                'total_cost_run_on':prices['qty_run_on'],
-                'total_price_1':prices['qty_1'],
-                'total_price_2':prices['qty_2'],
-                'total_price_3':prices['qty_3'],
-                'total_price_4':prices['qty_4'],
-                'total_price_run_on':prices['qty_run_on'],
+                'cost_per_unit_1': prices['qty_1'],
+                'cost_per_unit_2': prices['qty_2'],
+                'cost_per_unit_3': prices['qty_3'],
+                'cost_per_unit_4': prices['qty_4'],
+                'cost_per_unit_run_on': prices['qty_run_on'],
+                'price_per_unit_1': prices['qty_1'],
+                'price_per_unit_2': prices['qty_2'],
+                'price_per_unit_3': prices['qty_3'],
+                'price_per_unit_4': prices['qty_4'],
+                'price_per_unit_run_on': prices['qty_run_on'],
+                'margin_1': self.DeliveryMethod.margin,
+                'margin_2': self.DeliveryMethod.margin,
+                'margin_3': self.DeliveryMethod.margin,
+                'margin_4': self.DeliveryMethod.margin,
+                'margin_run_on': self.DeliveryMethod.margin,
+                'total_cost_1': prices['qty_1'],
+                'total_cost_2': prices['qty_2'],
+                'total_cost_3': prices['qty_3'],
+                'total_cost_4': prices['qty_4'],
+                'total_cost_run_on': prices['qty_run_on'],
+                'total_price_1': prices['qty_1'],
+                'total_price_2': prices['qty_2'],
+                'total_price_3': prices['qty_3'],
+                'total_price_4': prices['qty_4'],
+                'total_price_run_on': prices['qty_run_on'],
+                'Weight_1': self.GetWeight('1'),
+                'Weight_2': self.GetWeight('1'),
+                'Weight_3': self.GetWeight('1'),
+                'Weight_4': self.GetWeight('1'),
+                'Weight_run_on': self.GetWeight('run_on'),
+                'hasDelivery': True
                 
             })
         self.message_post(body="Delivery Added %s"%(self.DeliveryMethod.name))
@@ -452,7 +466,7 @@ class Estimate(models.Model):
         return { 
                 'type': 'ir.actions.act_url',
                 'url': '/bb_estimate/bb_estimate/estimateLetter/%s' % self.id,
-                'target': 'self',
+                'target': 'new',
                 'res_id': self.id,
                }
         

@@ -10,7 +10,7 @@
                                     <tr>
                                         <td style="width:20%;border: 1px black solid;">
                                           <span>Date Required:</span><br/>
-                                          <span><b><span t-field="o.Estimate.target_dispatch_date" /></b></span><br/>
+                                          <span><b><span t-field="o.Estimate.target_dispatch_date" t-field-options="{'format': 'MM/dd/yyyy'}" /></b></span><br/>
                                           <span>Office Contact:</span><br/>
                                           <span><b><span t-field="o.Estimate.estimator.name" /></b></span><br/>
                                           <span>Office Copy:</span><br/>
@@ -43,18 +43,18 @@
                                     </tr>
                                   <tr>
                                     <td colspan="3" style="border: 1px black solid;">
-                                      Customer: <span t-field="o.Estimate.partner_id.name"/> Project:<span class="text-right" t-field="o.Estimate.project.name"></span>
+                                      Customer: <b><u><span t-field="o.Estimate.partner_id.name"/></u></b> <span class="pull-right">Project: <b><u><span class="text-right" t-field="o.Estimate.project.name"></span></u></b></span>
                                     </td>
                                     <td colspan="3" style="border: 1px black solid;">
                                       Customer O/No: <span t-field="o.name"/>
                                     </td>
                                   </tr>
                                   <tr>
-                                    <td colspan="6" style="padding:0px;">
+                                    <td colspan="6" style="padding:0px;border:0px">
                                       <table class="table" style="margin:0px;">
                                         <tbody>
                                           <tr>
-                                            <td style="border: 1px black solid; width:40%" >
+                                            <td style="border-right: 1px black solid;border-bottom: 1px black solid; width:40%" >
                                               Job Title: <b><span t-field="o.Estimate.title" /></b>
                                             </td>
                                             <td>
@@ -71,7 +71,7 @@
                                             </td>
                                           </tr>
                                           <tr>
-                                              <td style="border: 1px black solid; width:40%">
+                                              <td style="border-right: 1px black solid; border-bottom: 1px black solid; width:40%">
                                                   Job Type: <span t-field="o.JobType"/><br/>
                                                   Spec: <span t-field="o.SpecifcationType"/><br/>
                                                   Quantity: <span t-esc="o.Estimate['quantity_'+o.Estimate.selectedQuantity] + o.Estimate.selectedRunOn"/><br/>
@@ -87,7 +87,7 @@
                                                       </t>
                                                   </t>
                                               </td>
-                                              <td>
+                                              <td style="border-top: none;">
                                                   <!-- material -->
                                                   <t t-foreach="o.Estimate.estimate_line" t-as="line">
                                                       <t t-if="line.option_type and line.option_type == 'material' and line.material.categ_id.name != 'Box' and (not (line.NonStockMaterialType and line.NonStockMaterialType == 'Customer Supplied Material'))">
@@ -104,7 +104,7 @@
                                                   <!-- end -->
                                                   <span t-esc="o.Estimate.GenerateEnvelopeDetails(o.Estimate)" />
                                               </td>
-                                              <td>
+                                              <td style="border-top: none;">
                                                   <t t-foreach="o.Estimate.estimate_line" t-as="line">
                                                       <t t-if="line.Supplier">
                                                           <span t-esc="line.Supplier.name" /><br/>
@@ -115,15 +115,15 @@
                                                   </t>
                                                   
                                               </td>
-                                              <td>
+                                              <td style="border-top: none;">
                                                   <!-- Purchase -->
                                               </td>
-                                              <td>
+                                              <td style="border-top: none;">
                                                   <!-- Qty -->
                                               </td>
                                           </tr>
                                            <tr>
-                                               <td style="border: 1px black solid; width:40%">
+                                               <td style="border-right: 1px black solid; border-bottom: 1px black solid; width:40%">
                                                    Special Instructions: <span t-field="o.Estimate.SpecialInstuction" />
                                                </td>
                                                <td colspan="5" style="border: 1px black solid;">

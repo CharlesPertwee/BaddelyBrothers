@@ -19,6 +19,18 @@
               <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
                   <attribute name="attrs">{'invisible':['|',('partnerOnHold','=',True),('state', 'not in', ['draft'])]}</attribute>
               </xpath>
+              <xpath expr="//notebook" position="inside">
+                  <page name="PriceAdjustments" string="Price Adjustments">
+                        <field name="priceHistory" readonly="1">
+                            <tree>
+                                <field name="CurrentPrice1" string="Price"/>
+                                <field name="ChangedPrice1" string="Changed Price"/>
+                                <field name="create_uid" string="By"/>
+                                <field name="create_date" string="On" />
+                             </tree>
+                        </field>
+                    </page>
+              </xpath>
           </field>
       </record>
   </data>
