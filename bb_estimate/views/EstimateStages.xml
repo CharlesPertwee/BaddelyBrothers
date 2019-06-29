@@ -19,6 +19,8 @@
                         <group>
                             <field name="name" />
                             <field name="isOrder" />
+                            <field name="ConvertedStage" />
+                            <field name="LeadStage" />
                         </group>
                     </sheet>
                 </form>

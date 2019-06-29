@@ -177,6 +177,8 @@ class Estimate(models.Model):
     Weight_4 = fields.Float('Weight 4')
     Weight_run_on = fields.Float('Weight Run On')
     
+    lead = fields.Many2one('crm.lead','Enquiry')
+    
     def GenerateEnvelopeDetails(self,estimate):
         line = ''
         if estimate.envelope_type:
@@ -216,17 +218,14 @@ class Estimate(models.Model):
         for record in self:
             #totals
             for qty in ['1','2','3','4','run_on']:
-                #record['total_price_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line])
                 record['total_cost_'+qty] = sum([x['total_cost_'+qty] for x in record.estimate_line])
                 record['total_price_extra_'+qty] = sum([x['total_price_'+qty] for x in record.estimate_line if x.isExtra == True])
-                #record['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in record.estimate_line])
                 
                 if qty != 'run_on':
                     record['unAllocated_'+qty] = record['quantity_'+qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
                 else:
                     record['unAllocated_'+qty] = record[qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
                     
-            #record.compute_calc_total_price_1()
             record.hasDelivery = len(record.estimate_line.filtered(lambda x: x.documentCatergory == 'Despatch')) > 0
     
     
@@ -283,7 +282,11 @@ class Estimate(models.Model):
 
                 
                 
-                
+    @api.onchange('state')            
+    def _computeLeadState(self):
+        if self.state:
+            if self.state.LeadStage:
+                self.lead.write({'stage_id':self.state.LeadStage.id})
     
     @api.onchange('invoice_account')
     def InvoiceAccount(self):
@@ -356,7 +359,7 @@ class Estimate(models.Model):
         if not criteria_found:
             raise UserError(_("No price rule matching this order; delivery cost cannot be computed."))
 
-        return price
+        return (price * (1.0 + (float(carrier.margin) / 100.0)))
     
     def _get_price_available(self,carrier,qty):
         self.ensure_one()
@@ -371,6 +374,7 @@ class Estimate(models.Model):
         total = total_delivery
 
         return self._get_price_from_picking(carrier,total, weight, volume, quantity)
+    
     def GetWeight(self,qty):
         self.ensure_one()
         weight = 0

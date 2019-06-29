@@ -16,7 +16,6 @@
                             attrs="{'invisible': [('active', '=', False)]}"/>
             </xpath>
             
-            
 		</field>
 	 </record>	
     

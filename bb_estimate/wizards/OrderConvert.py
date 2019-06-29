@@ -172,4 +172,8 @@ class OrderConvert(models.TransientModel):
         stage = self.env['bb_estimate.stage'].sudo().search([('ConvertedStage','=','True')],limit=1)
         if stage:
             data['state'] = stage.id
+            if stage.LeadStage:
+                self.EstimateId.lead.write({'stage_id':stage.LeadStage.id})
         self.EstimateId.write(data)
+        
+        

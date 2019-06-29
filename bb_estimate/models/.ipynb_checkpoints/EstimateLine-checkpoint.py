@@ -169,7 +169,7 @@ class EstimateLine(models.Model):
     total_price_per_1000_run_on = fields.Float('Price Per 1000 Run On', digits=(16,2))
     req_total_price_per_1000 = fields.Boolean('Req Price Per 1000')
     
-    option_type = fields.Selection([('process','Process'),('material','Material')],string="Select option")
+    option_type = fields.Selection([('process','Process'),('material','Material')],string="Select option",default="process")
     
     param_finished_size = fields.Many2one('bb_products.material_size','Finished Size',compute="compute_sizes")
     param_finished_width = fields.Integer('Finished Width',compute="compute_sizes")
@@ -324,45 +324,86 @@ class EstimateLine(models.Model):
                 
     def calc_material_fields(self):
         for record in self:
-            record.documentCatergory = 'Material'
-            if record.material.productType in ['Package','Delivery']:
-                record.documentCatergory = record.material.productType
-                if record.documentCategory == 'Delivery':
-                    record.documentCategory = 'Despatch'
+            if record.estimate_id.unAllocated_1 != 0:
+                record.param_finished_quantity_1 = record.estimate_id.unAllocated_1
+                record.estimate_id.unAllocated_1 -= record.param_finished_quantity_1
+                record.unallocated_finished_quantity_1 -= record.param_finished_quantity_1
             
-            record.customer_description = record.material.customerDescription
-            record.JobTicketText = record.material.jobTicketDescription
-            record.StandardCustomerDescription = record.material.customerDescription
-            record.StandardJobDescription = record.material.jobTicketDescription
+            if record.estimate_id.unAllocated_2 != 0:
+                record.param_finished_quantity_2 = record.estimate_id.unAllocated_2
+                record.estimate_id.unAllocated_2 -= record.param_finished_quantity_2
+                record.unallocated_finished_quantity_2 -= record.param_finished_quantity_2
             
-            record.grammage = record.material.grammage
-            record.SheetHeight = record.material.sheet_height
-            record.SheetWidth = record.material.sheet_width
-            record.SheetSize = record.material.sheetSize
-            #record.param_number_out = self.get_number_out(record.material)
-            if record.WhiteCutting:
-                record.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
-            if record.PrintedCutting:
-                record.NoPrintedCuts = self.PrintedCutting.process_type.get_printed_cuts_for_number_up(record.param_number_up)
+            if record.estimate_id.unAllocated_3 != 0:
+                record.param_finished_quantity_3 = record.estimate_id.unAllocated_3
+                record.estimate_id.unAllocated_3 -= record.param_finished_quantity_3
+                record.unallocated_finished_quantity_3 -= record.param_finished_quantity_3
+            
+            if record.estimate_id.unAllocated_4 != 0:
+                record.param_finished_quantity_4 = record.estimate_id.unAllocated_4
+                record.estimate_id.unAllocated_4 -= record.param_finished_quantity_4
+                record.unallocated_finished_quantity_4 -= record.param_finished_quantity_4
+            
+            if record.estimate_id.unAllocated_run_on != 0:
+                record.param_finished_quantity_run_on = record.estimate_id.unAllocated_run_on
+                record.estimate_id.unAllocated_run_on -= record.param_finished_quantity_run_on
+                record.unallocated_finished_quantity_run_on -= record.param_finished_quantity_run_on
+            
+            if record.material:
+                record.documentCatergory = 'Material'
+                if record.material.productType in ['Package','Delivery']:
+                    record.documentCatergory = record.material.productType
+                    if record.documentCategory == 'Delivery':
+                        record.documentCategory = 'Despatch'
+
+                record.customer_description = record.material.customerDescription
+                record.JobTicketText = record.material.jobTicketDescription
+                record.StandardCustomerDescription = record.material.customerDescription
+                record.StandardJobDescription = record.material.jobTicketDescription
+
+                record.grammage = record.material.grammage
+                record.SheetHeight = record.material.sheet_height
+                record.SheetWidth = record.material.sheet_width
+                record.SheetSize = record.material.sheetSize
+                
+                #record.param_number_out = self.get_number_out(record.material)
+                if record.WhiteCutting:
+                    record.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
+                if record.PrintedCutting:
+                    record.NoPrintedCuts = self.PrintedCutting.process_type.get_printed_cuts_for_number_up(record.param_number_up)
+                    
+    @api.onchange('MaterialName')
+    def _computeDescription(self):
+        for record in self:
+            record.customer_description = record.MaterialName
+            record.JobTicketText = record.MaterialName
     
     @api.onchange('param_finished_quantity_1')
     def _onChangeQuantities1(self):
-        if float(self.unallocated_finished_quantity_1) != 0.0:
-            ratio = self.param_finished_quantity_1 / float(self.unallocated_finished_quantity_1)
+        de = (self.estimate_id.unAllocated_1 + self.param_finished_quantity_1)
+        ratio = 0 if de == 0 else (float(self.param_finished_quantity_1) / de)
+        if ratio != 0:
             self.unallocated_finished_quantity_1 = self.estimate_id.unAllocated_1
+            self.param_finished_quantity_2 = (self.param_finished_quantity_2 + self.estimate_id.unAllocated_2) * ratio
+            self.unallocated_finished_quantity_2 = (self.param_finished_quantity_2 / ratio) - self.param_finished_quantity_2
+            self.estimate_id.unAllocated_2 = self.unallocated_finished_quantity_2
             
-            self.param_finished_quantity_2 = self.estimate_id.unAllocated_2 * ratio
-            self.param_finished_quantity_3 = self.estimate_id.unAllocated_3 * ratio
-            self.param_finished_quantity_4 = self.estimate_id.unAllocated_4 * ratio
-            self.param_finished_quantity_run_on = self.estimate_id.unAllocated_run_on * ratio
-        else:
-            self.unallocated_finished_quantity_1 = self.estimate_id.unAllocated_1
+            self.param_finished_quantity_3 = (self.param_finished_quantity_3 + self.estimate_id.unAllocated_3) * ratio
+            self.unallocated_finished_quantity_3 = (self.param_finished_quantity_3 / ratio) - self.param_finished_quantity_3
+            self.estimate_id.unAllocated_3 = self.unallocated_finished_quantity_3
             
-    
+            self.param_finished_quantity_4 = (self.param_finished_quantity_4 + self.estimate_id.unAllocated_4) * ratio
+            self.unallocated_finished_quantity_4 = (self.param_finished_quantity_4 / ratio) - self.param_finished_quantity_4
+            self.estimate_id.unAllocated_4 = self.unallocated_finished_quantity_4
+            
+            self.param_finished_quantity_run_on = (self.param_finished_quantity_run_on + self.estimate_id.unAllocated_run_on) * ratio
+            self.unallocated_finished_quantity_run_on = (self.param_finished_quantity_run_on / ratio) - self.param_finished_quantity_run_on
+            self.estimate_id.unAllocated_run_on = self.unallocated_finished_quantity_run_on
+            
     @api.onchange('param_finished_quantity_2')
     def _onChangeQuantities2(self):
         self.unallocated_finished_quantity_2 = self.estimate_id.unAllocated_2
-    
+        
     @api.onchange('param_finished_quantity_3')
     def _onChangeQuantities3(self):
         self.unallocated_finished_quantity_3 = self.estimate_id.unAllocated_3
@@ -472,22 +513,6 @@ class EstimateLine(models.Model):
         self.onChangeEventTrigger('param_die_size')
         
     #--------#
-    @api.onchange('cost_per_unit_1')
-    def calc_cost_per_unit_1(self):
-        self.onChangeEventTrigger('cost_per_unit')
-        
-    @api.onchange('cost_per_unit_2')
-    def calc_cost_per_unit_2(self):
-        self.onChangeEventTrigger('cost_per_unit')  
-        
-    @api.onchange('cost_per_unit_3')
-    def calc_cost_per_unit_3(self):
-        self.onChangeEventTrigger('cost_per_unit')
-        
-    @api.onchange('cost_per_unit_4')
-    def calc_cost_per_unit_4(self):
-        self.onChangeEventTrigger('cost_per_unit')  
-        
     @api.onchange('param_make_ready_time_1')
     def calc_param_make_ready_time_1(self):
         self.onChangeEventTrigger('param_make_ready_time')  
@@ -503,6 +528,186 @@ class EstimateLine(models.Model):
     @api.onchange('param_make_ready_time_4')
     def calc_param_make_ready_time_4(self):
         self.onChangeEventTrigger('param_make_ready_time') 
+    
+    @api.onchange('quantity_required_1')
+    def calc_quantity_required_1_change(self):
+        self.onChangeEventTrigger('quantity_required')
+        
+    @api.onchange('quantity_required_2')
+    def calc_quantity_required_2_change(self):
+        self.onChangeEventTrigger('quantity_required')
+        
+    @api.onchange('quantity_required_3')
+    def calc_quantity_required_3_change(self):
+        self.onChangeEventTrigger('quantity_required')
+        
+    @api.onchange('quantity_required_4')
+    def calc_quantity_required_4_change(self):
+        self.onChangeEventTrigger('quantity_required')
+    
+    @api.onchange('quantity_required_run_on')
+    def calc_quantity_required_run_on_change(self):
+        self.onChangeEventTrigger('quantity_required')
+    
+    @api.onchange('margin_1')
+    def calc_margin_1_change(self):
+        self.onChangeEventTrigger('margin')
+        
+    @api.onchange('margin_2')
+    def calc_margin_2_change(self):
+        self.onChangeEventTrigger('margin')
+        
+    @api.onchange('margin_3')
+    def calc_margin_3_change(self):
+        self.onChangeEventTrigger('margin')
+        
+    @api.onchange('margin_4')
+    def calc_margin_4_change(self):
+        self.onChangeEventTrigger('margin')
+    
+    @api.onchange('margin_run_on')
+    def calc_margin_run_on_change(self):
+        self.onChangeEventTrigger('margin') 
+        
+    @api.onchange('param_machine_speed_1')
+    def calc_param_machine_speed_1(self):
+        self.onChangeEventTrigger('param_machine_speed') 
+        
+    @api.onchange('param_machine_speed_2')
+    def calc_param_machine_speed_2(self):
+        self.onChangeEventTrigger('param_machine_speed')
+        
+    @api.onchange('param_machine_speed_3')
+    def calc_param_machine_speed_3(self):
+        self.onChangeEventTrigger('param_machine_speed') 
+        
+    @api.onchange('param_machine_speed_4')
+    def calc_param_machine_speed_4(self):
+        self.onChangeEventTrigger('param_machine_speed')
+        
+    @api.onchange('param_machine_speed_run_on')
+    def calc_param_machine_speed_run_on(self):
+        self.onChangeEventTrigger('param_machine_speed')
+        
+    @api.onchange('param_wash_up_time_1')
+    def calc_param_wash_up_time_1(self):
+        self.onChangeEventTrigger('param_wash_up_time')        
+        
+    @api.onchange('param_wash_up_time_2')
+    def calc_param_wash_up_time_2(self):
+        self.onChangeEventTrigger('param_wash_up_time')
+        
+    @api.onchange('param_wash_up_time_3')
+    def calc_param_wash_up_time_3(self):
+        self.onChangeEventTrigger('param_wash_up_time')
+        
+    @api.onchange('param_wash_up_time_4')
+    def calc_param_wash_up_time_4(self):
+        self.onChangeEventTrigger('param_wash_up_time')
+        
+    @api.onchange('param_wash_up_time_run_on')
+    def calc_param_wash_up_time_run_on(self):
+        self.onChangeEventTrigger('param_wash_up_time')
+    
+    @api.onchange('param_make_ready_overs_1')
+    def calc_param_make_ready_overs_1(self):
+        self.onChangeEventTrigger('param_make_ready_overs')
+        
+    @api.onchange('param_make_ready_overs_2')
+    def calc_param_make_ready_overs_2(self):
+        self.onChangeEventTrigger('param_running_overs_percent')
+    
+    @api.onchange('param_make_ready_overs_3')
+    def calc_param_make_ready_overs_3(self):
+        self.onChangeEventTrigger('param_running_overs_percent')
+        
+    @api.onchange('param_make_ready_overs_4')
+    def calc_param_make_ready_overs_4(self):
+        self.onChangeEventTrigger('param_running_overs_percent')
+        
+    @api.onchange('param_make_ready_overs_run_on')
+    def calc_param_make_ready_overs_run_on(self):
+        self.onChangeEventTrigger('param_running_overs_percent')
+        
+    @api.onchange('param_running_overs_percent_1')
+    def calc_param_running_overs_percent_1(self):
+        self.onChangeEventTrigger('param_running_overs_percent')
+        
+    @api.onchange('param_running_overs_percent_2')
+    def calc_param_running_overs_percent_2(self):
+        self.onChangeEventTrigger('param_running_overs_percent')
+    
+    @api.onchange('param_running_overs_percent_3')
+    def calc_param_running_overs_percent_3(self):
+        self.onChangeEventTrigger('param_running_overs_percent')
+        
+    @api.onchange('param_running_overs_percent_4')
+    def calc_param_running_overs_percent_4(self):
+        self.onChangeEventTrigger('param_running_overs_percent')
+        
+    @api.onchange('param_running_overs_percent_run_on')
+    def calc_param_running_overs_percent_run_on(self):
+        self.onChangeEventTrigger('param_running_overs_percent')
+    
+    @api.onchange('cost_per_unit_1')
+    def calc_cost_per_unit_1(self):
+        self.onChangeEventTrigger('cost_per_unit')
+        
+    @api.onchange('cost_per_unit_2')
+    def calc_cost_per_unit_2(self):
+        self.onChangeEventTrigger('cost_per_unit')  
+        
+    @api.onchange('cost_per_unit_3')
+    def calc_cost_per_unit_3(self):
+        self.onChangeEventTrigger('cost_per_unit')
+        
+    @api.onchange('cost_per_unit_4')
+    def calc_cost_per_unit_4(self):
+        self.onChangeEventTrigger('cost_per_unit')
+        
+    @api.onchange('cost_per_unit_run_on')
+    def calc_cost_per_unit_run_on(self):
+        self.onChangeEventTrigger('cost_per_unit')
+        
+    @api.onchange('price_per_unit_1')
+    def calc_price_per_unit_1(self):
+        self.onChangeEventTrigger('price_per_unit')
+        
+    @api.onchange('price_per_unit_2')
+    def calc_price_per_unit_2(self):
+        self.onChangeEventTrigger('price_per_unit')
+        
+    @api.onchange('price_per_unit_3')
+    def calc_price_per_unit_3(self):
+        self.onChangeEventTrigger('price_per_unit')
+        
+    @api.onchange('price_per_unit_4')
+    def calc_price_per_unit_4(self):
+        self.onChangeEventTrigger('price_per_unit')
+        
+    @api.onchange('price_per_unit_run_on')
+    def calc_price_per_unit_run_on(self):
+        self.onChangeEventTrigger('price_per_unit')
+        
+    @api.onchange('total_price_per_1000_1')
+    def calc_total_price_per_1000_1(self):
+        self.onChangeEventTrigger('total_price_per_1000')
+        
+    @api.onchange('total_price_per_1000_2')
+    def calc_total_price_per_1000_2(self):
+        self.onChangeEventTrigger('total_price_per_1000')
+        
+    @api.onchange('total_price_per_1000_3')
+    def calc_total_price_per_1000_3(self):
+        self.onChangeEventTrigger('total_price_per_1000')
+        
+    @api.onchange('total_price_per_1000_4')
+    def calc_total_price_per_1000_4(self):
+        self.onChangeEventTrigger('total_price_per_1000')
+        
+    @api.onchange('total_price_per_1000_run_on')
+    def calc_total_price_per_1000_run_on(self):
+        self.onChangeEventTrigger('total_price_per_1000')
     #--------#
         
     #Material Methods
@@ -591,8 +796,18 @@ class EstimateLine(models.Model):
 
         number_of_sheets = cost_params['params_working_sheets_needed'] if 'params_working_sheets_needed' in cost_params else 0.0
 
-        if fieldUpdated == 'total_price_per_1000' and cost_params['quantity_required'] is not None:
+        if fieldUpdated == 'total_price_per_1000' and cost_params['quantity_required']:
             cost_params['price_per_unit'] = (((cost_params['total_price_per_1000'] - extra_price_per_1000) / 1000.0) * int(cost_params['finished_quantity'])) / cost_params['quantity_required']
+            fieldUpdated = "price_per_unit"
+            
+        if fieldUpdated == 'quantity_required' and 'static_price' in qty_params:
+            if qty == '1' and qty_params['static_price']:
+                if qty_params['quantity_2'] > 0:
+                    qty_params['quantity_required_2'] = cost_params['quantity_required']
+                if qty_params['quantity_3'] > 0:
+                    qty_params['quantity_required_3'] = cost_params['quantity_required']
+                if qty_params['quantity_4'] > 0:
+                    qty_params['quantity_required_4'] = cost_params['quantity_required']
 
         if fieldUpdated == 'cost_per_unit':
             if cost_params['price_per_unit'] and cost_params['cost_per_unit']:
@@ -658,6 +873,8 @@ class EstimateLine(models.Model):
                 cost_params['total_price_per_1000'] = (cost_params['total_price'] / float(cost_params['finished_quantity']) * 1000) if float(cost_params['finished_quantity']) > 0 else 0.0
         else:
             cost_params['total_price_per_1000'] = 0.0
+            
+        #raise Exception(cost_params['price_per_unit'])
         
     @api.depends('estimate_id')                                                   
     def getEstimateParams(self):
@@ -674,64 +891,65 @@ class EstimateLine(models.Model):
     
     def onChangeEventTrigger(self,field):
         for record in self:
-            for qty in ['1','2','3','4','run_on']:
-                if qty=='run_on':
-                    quantity = record.run_on
-                else:
-                    quantity = int(eval('record.quantity_'+qty))
-                self.calc_qty_params(
-                        record.workcenterId,
-                        record.material,
-                        quantity,
-                        eval('record.param_make_ready_time_'+qty),
-                        eval('record.param_machine_speed_'+qty),
-                        eval('record.param_running_time_'+qty),
-                        eval('record.param_wash_up_time_'+qty),
-                        eval('record.param_make_ready_overs_'+qty),
-                        eval('record.param_running_overs_percent_'+qty),
-                        eval('record.param_finished_quantity_'+qty),
-                        eval('record.quantity_required_'+qty),
-                        eval('record.cost_per_unit_'+qty),
-                        eval('record.price_per_unit_'+qty),
-                        eval('record.margin_'+qty),
-                        eval('record.total_price_'+qty),
-                        eval('record.total_price_per_1000_'+qty),
-                        qty,
-                        record.param_additional_charge,
-                        record.param_number_up,
-                        record.param_number_of_colors,
-                        record.param_number_of_colors_rev,
-                        record.grammage,
-                        record.param_die_size,
-                        record.param_misc_charge_per_cm2,
-                        record.param_no_of_ink_mixes,
-                        int(record.quantity_1),
-                        int(record.quantity_2),
-                        int(record.quantity_3),
-                        int(record.quantity_4),
-                        int(record.run_on),
-                        record.param_number_out,
-                        record.param_working_width,
-                        record.param_working_height,
-                        record.param_printed_material,
-                        record.param_duplex_sheets,
-                        record.param_number_of_sheets,
-                        record.param_material_line_id,
-                        record.param_number_of_cuts,
-                        record.param_sheets_per_pile,
-                        record.param_time_per_pile,
-                        record.param_env_windowpatching,
-                        record.param_env_peelandstick,
-                        record.param_env_inlineemboss,
-                        record.param_env_gumming,
-                        record.req_param_env_windowpatching,
-                        record.req_param_env_peelandstick,
-                        record.req_param_env_inlineemboss,
-                        record.req_param_env_gumming,
-                        record.param_sheets_per_box,
-                        record.param_time_per_box,
-                        record.staticPrice,
-                        field)
+            if record.workcenterId or record.material:
+                for qty in ['1','2','3','4','run_on']:
+                    if qty=='run_on':
+                        quantity = record.run_on
+                    else:
+                        quantity = int(eval('record.quantity_'+qty))
+                    self.calc_qty_params(
+                            record.workcenterId,
+                            record.material,
+                            quantity,
+                            eval('record.param_make_ready_time_'+qty),
+                            eval('record.param_machine_speed_'+qty),
+                            eval('record.param_running_time_'+qty),
+                            eval('record.param_wash_up_time_'+qty),
+                            eval('record.param_make_ready_overs_'+qty),
+                            eval('record.param_running_overs_percent_'+qty),
+                            eval('record.param_finished_quantity_'+qty),
+                            eval('record.quantity_required_'+qty),
+                            eval('record.cost_per_unit_'+qty),
+                            eval('record.price_per_unit_'+qty),
+                            eval('record.margin_'+qty),
+                            eval('record.total_price_'+qty),
+                            eval('record.total_price_per_1000_'+qty),
+                            qty,
+                            record.param_additional_charge,
+                            record.param_number_up,
+                            record.param_number_of_colors,
+                            record.param_number_of_colors_rev,
+                            record.grammage,
+                            record.param_die_size,
+                            record.param_misc_charge_per_cm2,
+                            record.param_no_of_ink_mixes,
+                            int(record.quantity_1),
+                            int(record.quantity_2),
+                            int(record.quantity_3),
+                            int(record.quantity_4),
+                            int(record.run_on),
+                            record.param_number_out,
+                            record.param_working_width,
+                            record.param_working_height,
+                            record.param_printed_material,
+                            record.param_duplex_sheets,
+                            record.param_number_of_sheets,
+                            record.param_material_line_id,
+                            record.param_number_of_cuts,
+                            record.param_sheets_per_pile,
+                            record.param_time_per_pile,
+                            record.param_env_windowpatching,
+                            record.param_env_peelandstick,
+                            record.param_env_inlineemboss,
+                            record.param_env_gumming,
+                            record.req_param_env_windowpatching,
+                            record.req_param_env_peelandstick,
+                            record.req_param_env_inlineemboss,
+                            record.req_param_env_gumming,
+                            record.param_sheets_per_box,
+                            record.param_time_per_box,
+                            record.staticPrice,
+                            field)
                 
     
     
@@ -1098,7 +1316,7 @@ class EstimateLine(models.Model):
                             'sheet_height' : lineId.SheetHeight,
                             'standand_price': lineId.CostRate,
                             'list_price': lineId.CharegeRate,
-                            'productType': 'Non-Stock'
+                            'productType': 'Non-Stock',
                         }
                         if mto and lineId.NonStockMaterialType == 'Bespoke Material':
                             newProduct['route_ids'] = [(4,mto.id)]

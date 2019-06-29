@@ -8,7 +8,10 @@ class Leads(models.Model):
     _name = 'crm.lead'
     
     typeOfLead = fields.Selection([('Trade Counter','Trade Counter'),('Bespoke','Bespoke')],string="Opportunity Type",default="Trade Counter")
-        
+    
+    
+    
+            
     @api.multi
     def write(self,vals):
         if 'stage_id' in vals.keys():

@@ -9,3 +9,4 @@ class EstimageStage(models.Model):
     name = fields.Char('Name', required=True)
     isOrder = fields.Boolean('Conversion Stage')
     ConvertedStage = fields.Boolean('Converted Stage')
+    LeadStage = fields.Many2one('crm.stage','Enquiry Stage')

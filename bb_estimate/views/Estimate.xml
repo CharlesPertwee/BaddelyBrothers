@@ -66,6 +66,7 @@
                             <field name="invoice_account" options="{'no_create_edit': True}" required="1"/>
                             <field name="invoice_address" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account),('type','=','invoice')]" required="1"/>
                             <field name="invoice_contact" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account)]" required="1"/>
+                            <field name="lead" domain="[('typeOfLead','=','Bespoke')]" />
                         </group>
                         <group>
                             <field name="product_type" options="{'no_create_edit': True}" domain="[('productType','=','Finished')]" required="1"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
@@ -244,6 +245,14 @@
                             </sheet>
                         </page>
                     </notebook>
+                    <group col="11">
+                        <label for="total_price_1" string="Prices" colspan="6"/>
+                        <field name="total_price_1" nolabel="1" />
+                        <field name="total_price_2" nolabel="1" />
+                        <field name="total_price_3" nolabel="1" />
+                        <field name="total_price_4" nolabel="1" />
+                        <field name="total_price_run_on" nolabel="1" />
+                    </group>
                     <group>
                         <group>
                             <field name="EnquiryComments" />

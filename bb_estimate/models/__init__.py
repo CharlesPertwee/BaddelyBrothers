@@ -16,3 +16,4 @@ from . import Specification
 from . import Delivery
 from . import PriceHistory
 from . import Project
+from . import CRM

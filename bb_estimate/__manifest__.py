@@ -6,8 +6,7 @@
         This module creates the estimate and job tickets.
         """,
 
-    'description': """ 
-    
+    'description': """     
     """,
 
     'author': "Squadsoft Tech",
@@ -20,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','web','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock'],
+    'depends': ['base','web','bb_crm','crm','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock'],
 
     # always loaded
     'data': [
@@ -57,6 +56,7 @@
         'views/PurchaseOrder.xml',
         'views/Specification.xml',
         'views/Projects.xml',
+        'views/CRM.xml',
         'wizards/views/OrderConvert.xml',
         'wizards/views/MoConfirmation.xml',
         'wizards/views/Packing.xml',

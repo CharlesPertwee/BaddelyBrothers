@@ -237,7 +237,7 @@ class BbEstimate(http.Controller):
             'datas':base64.encodestring(docx_bytes)
         })
         
-        pdfhttpheaders = [('Content-Type','application/msword'),("content_disposition",'attachment; filename="my_filename.doc"')]        
+        pdfhttpheaders = [('Content-Type','application/msword'),("Content-Disposition","filename= %s.doc"%(Estimate.estimate_number))]       
         return request.make_response(docx_bytes, headers=pdfhttpheaders)
        
         

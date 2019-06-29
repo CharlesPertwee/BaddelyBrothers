@@ -57,6 +57,7 @@
                 </xpath>
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="Estimate" readonly="1"/>
+                    <field name="Project" readonly="1"/>
                     <field name="SpecifcationType" />
                     <field name="JobType" />
                 </xpath>

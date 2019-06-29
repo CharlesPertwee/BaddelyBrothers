@@ -4,11 +4,13 @@
             <field name="name">estimate.line.tree</field>
             <field name="model">bb_estimate.estimate_line</field>
             <field name="arch" type="xml">
-                <tree string="Estimate Lines" decoration-warning="isExtra==True" create="false">
+                <tree string="Estimate Lines" decoration-warning="isExtra==True" decoration-primary="option_type=='process'" decoration-danger="option_type=='material'" create="false">
                     <field name="isExtra" invisible="1"/>
                     <field name="Sequence" widget="handle"/>
                     <field name="lineName"/>
                     <field name="customer_description"/>
+                    <field name="process_ids" string="Materials"/>
+                    <field name="material_ids" string="Processes"/>
                     <field name="total_price_1" sum="Total Price 1"/>
                     <field name="total_price_2" sum="Total Price 2"/>
                     <field name="total_price_3" sum="Total Price 3"/>
@@ -94,13 +96,13 @@
                                 <page string="Description">
                                     <group>
                                         <group>
-                                            <field name="customer_description" />
+                                            <field name="customer_description" readonly="1"/>
                                             <field name="JobTicketText" />
                                             <field name="documentCatergory" />
                                         </group>
                                         <group>
-                                            <field name="StandardCustomerDescription" />
-                                            <field name="StandardJobDescription" />
+                                            <field name="StandardCustomerDescription" readonly="1"/>
+                                            <field name="StandardJobDescription" readonly="1"/>
                                             <field name="UseStadandardDescription" />
                                         </group>
                                     </group>
@@ -113,13 +115,13 @@
 
                                 <page string="Link" attrs="{'invisible':['|',('option_type','=','process'),('option_type','=',False)]}">
                                     <sheet>
-                                        <field name="material_ids" options="{'no_create_edit': True}"/>
+                                        <field name="material_ids" options="{'no_create_edit': True}" readonly="1"/>
                                     </sheet>
                                 </page>
 
                                 <page string="Link" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
                                     <sheet>
-                                        <field name="process_ids" options="{'no_create_edit': True}" />
+                                        <field name="process_ids" options="{'no_create_edit': True}" readonly="1"/>
                                     </sheet>
                                 </page>
 
@@ -408,19 +410,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Working Sheets</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_1" />
+                                                    <field name="process_working_sheets_quantity_1" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_2" />
+                                                    <field name="process_working_sheets_quantity_2" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_3" />
+                                                    <field name="process_working_sheets_quantity_3" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_4" />
+                                                    <field name="process_working_sheets_quantity_4" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_run_on" />
+                                                    <field name="process_working_sheets_quantity_run_on" readonly="1"/>
                                                 </div>
                                             </div>
 
@@ -429,19 +431,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Overs Quantity</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_1" />
+                                                    <field name="process_overs_quantity_1" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_2" />
+                                                    <field name="process_overs_quantity_2" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_3" />
+                                                    <field name="process_overs_quantity_3" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_4" />
+                                                    <field name="process_overs_quantity_4" readonly="1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_run_on" />
+                                                    <field name="process_overs_quantity_run_on" readonly="1"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['|',('option_type','=','material'),('req_param_make_ready_overs','=',False)]}">
@@ -609,19 +611,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Total Cost</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_1" />
+                                                    <field name="total_cost_1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_2" />
+                                                    <field name="total_cost_2"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_3" />
+                                                    <field name="total_cost_3"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_4" />
+                                                    <field name="total_cost_4"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_run_on" />
+                                                    <field name="total_cost_run_on"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['|',('option_type','=','material'),('req_mat_charge','=',False)]}">
@@ -629,19 +631,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Misc. Material Charge</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_1" />
+                                                    <field name="mat_charge_1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_2" />
+                                                    <field name="mat_charge_2"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_3" />
+                                                    <field name="mat_charge_3"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_4" />
+                                                    <field name="mat_charge_4"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_run_on" />
+                                                    <field name="mat_charge_run_on"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_total_price','=',False)]}">
@@ -649,13 +651,13 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Total Charge</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_1" />
+                                                    <field name="total_price_1"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
                                                     <field name="total_price_2" />
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_3" />
+                                                    <field name="total_price_3"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
                                                     <field name="total_price_4" />

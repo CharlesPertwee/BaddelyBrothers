@@ -21,6 +21,7 @@ class Manufacture(models.Model):
     def GetDie(self):
         return self.GetOptions('Die')
     
+    Project = fields.Many2one('project.project','Project',related="Estimate.project")
     
     Estimate = fields.Many2one('bb_estimate.estimate','Originating Estimate')
     NoOfCopiesRequired = fields.Char('No. File Copies Reqd', size=5)
