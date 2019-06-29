@@ -9,9 +9,9 @@ class AccountInvoice(models.Model):
     
     def create(self,vals):
         if vals['origin']:
-            sale_order = self.env['sale.order'].sudo().search([('name','=',record.origin)])
+            sale_order = self.env['sale.order'].sudo().search([('name','=',vals['origin'])])
             if sale_order.Estimate:
-                vals['Project'] = Estimate.project.id
+                vals['Project'] = sale_order.Estimate.project.id
         return super(AccountInvoice,self).create(vals)
     @api.model
     def getEstimateData(self):
