@@ -6,6 +6,7 @@
             <field name="arch" type="xml">
                 <tree string="Estimate Lines" decoration-warning="isExtra==True" decoration-primary="option_type=='process'" decoration-danger="option_type=='material'" create="false">
                     <field name="isExtra" invisible="1"/>
+                    <field name="option_type" invisible="1"/>
                     <field name="Sequence" widget="handle"/>
                     <field name="lineName"/>
                     <field name="customer_description"/>
