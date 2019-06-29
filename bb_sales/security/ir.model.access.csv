@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_bb_sales_bb_sales,bb_sales.bb_sales,model_bb_sales_bb_sales,,1,0,0,0
