@@ -672,7 +672,7 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Total Charge per 1000</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_per_1000_1" />
+                                                    <field name="total_price_per_1000_1" on_change="calc_total_price_per_1000(total_price_per_1000_1)"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
                                                     <field name="total_price_per_1000_2" />
