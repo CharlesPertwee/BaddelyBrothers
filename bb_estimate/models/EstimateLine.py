@@ -1029,8 +1029,8 @@ class EstimateLine(models.Model):
                     'total_price_'+qty          : qty_params['total_price'],
                     'total_price_per_1000_'+qty : qty_params['total_price_per_1000'],
                 })
-            
             line.write(write_vals)
+    
     @api.multi
     def unlink(self):
         estimate = self.estimate_id
@@ -1076,12 +1076,7 @@ class EstimateLine(models.Model):
     
     @api.model
     def create(self,values):
-        #values.onChangeEventTrigger('total_price_per_1000')
         records = super(EstimateLine,self).create(values)
-#         records.onChangeEventTrigger('total_price_per_1000')
-#         rec  = {key:records[key] for key in records._fields if type(records[key]) in [int,str,bool,float]}
-#         records.write(rec)
-        
         for lineId in records:
             if lineId:
                 if lineId.option_type == 'process':
@@ -1221,8 +1216,8 @@ class EstimateLine(models.Model):
                         process.calc_workcenterId_change()
                         dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
                         process.write(dictProcess)
-        estimateData = {x:lineId.estimate_id[x] for x in lineId.estimate_id._fields if 'total_price_' in x}
         
+        estimateData = {x:lineId.estimate_id[x] for x in lineId.estimate_id._fields if 'total_price_' in x}
         for qty in ['1','2','3','4','run_on']:
             estimateData['total_price_'+qty] += lineId['total_price_'+qty]
             estimateData['total_price_1000_'+qty] += lineId['total_price_per_1000_'+qty]

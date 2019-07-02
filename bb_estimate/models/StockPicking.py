@@ -16,6 +16,15 @@ import math
 class PickingType(models.Model):
     _inherit = "stock.picking"
     
+    Project = fields.Many2one('project.project','Project')
+    
+    def create(self,vals):
+        if vals['origin']:
+            sale_order = self.env['sale.order'].sudo().search([('name','=',vals['origin'])])
+            if sale_order.Estimate:
+                vals['Project'] = sale_order.Estimate.project.id
+        return super(PickingType,self).create(vals)
+    
     def _estimate_pack(self,sale):
         package = False
         picks = self.filtered(lambda p: p.state not in ('done', 'cancel'))

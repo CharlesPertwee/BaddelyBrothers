@@ -144,7 +144,7 @@
       <report
         id="delievery note"
         model="stock.picking"
-        string="Delievery Note"
+        string="Delivery Note"
         report_type="qweb-pdf"
         name="bb_estimate.report_delivery_note"
         file="bb_estimate.report_delivery_note"

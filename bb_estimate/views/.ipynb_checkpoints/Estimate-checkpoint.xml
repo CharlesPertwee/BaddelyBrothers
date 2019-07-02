@@ -60,37 +60,37 @@
                     </h1>
                     <group>
                         <group>
-                            <field name="partner_id"  options="{'no_create_edit': True}" domain="[('is_company','=',True)]" />
-                            <field name="contact"  options="{'no_create_edit': True}" domain="[('parent_id','=',partner_id)]" />
-                            <field name="project" options="{'no_create_edit': True}" domain="[('partner_id','=',partner_id)]"/>
-                            <field name="invoice_account" options="{'no_create_edit': True}" required="1"/>
-                            <field name="invoice_address" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account),('type','=','invoice')]" required="1"/>
-                            <field name="invoice_contact" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account)]" required="1"/>
-                            <field name="lead" domain="[('typeOfLead','=','Bespoke')]" />
+                            <field name="partner_id" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('is_company','=',True)]" />
+                            <field name="contact" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',partner_id)]" />
+                            <field name="project" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('partner_id','=',partner_id)]"/>
+                            <field name="invoice_account" options="{'no_create_edit': True}" required="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                            <field name="invoice_address" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account),('type','=','invoice')]" required="1"/>
+                            <field name="invoice_contact" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account)]" required="1"/>
+                            <field name="lead" attrs="{'readonly':[('isLocked','=',True)]}" domain="[('typeOfLead','=','Bespoke')]" />
                         </group>
                         <group>
-                            <field name="product_type" options="{'no_create_edit': True}" domain="[('productType','=','Finished')]" required="1"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
-                            <field name="estimate_date" required="1"/>
-                            <field name="estimator" options="{'no_create_edit': True}" required="1"/>
-                            <field name="office_copy" />
-                            <field name="estimate_number" readonly="1"/>
-                            <field name="event_date" />
-                            <field name="target_dispatch_date" required="1"/>
+                            <field name="product_type" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('productType','=','Finished')]" required="1"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
+                            <field name="estimate_date" attrs="{'readonly':[('isLocked','=',True)]}" required="1"/>
+                            <field name="estimator" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" required="1"/>
+                            <field name="office_copy" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                            <field name="estimate_number" attrs="{'readonly':[('isLocked','=',True)]}" readonly="1"/>
+                            <field name="event_date" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                            <field name="target_dispatch_date" attrs="{'readonly':[('isLocked','=',True)]}" required="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page name="EstimateDetails" string="Estimate Details">
                             <group>
                                 <group>
-                                    <field name="quantity_1" required="1" attrs="{'readonly':[('estimate_line','=',False)]}"/>
-                                    <field name="quantity_2" attrs="{'readonly':[('estimate_line','=',False)]}"/>
-                                    <field name="run_on" attrs="{'readonly':[('estimate_line','=',False)]}"/>
-                                    <field name="number_up" attrs="{'readonly':[('estimate_line','=',False)]}"/>
+                                    <field name="quantity_1" required="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="quantity_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="number_up" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                 </group>
                                 <group>
-                                    <field name="quantity_3" attrs="{'readonly':[('estimate_line','=',False)]}"/>
-                                    <field name="quantity_4" attrs="{'readonly':[('estimate_line','=',False)]}"/>
-                                    <field name="grammage" attrs="{'readonly':[('estimate_line','=',False)]}"/>
+                                    <field name="quantity_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="quantity_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="grammage" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                 </group>
                             </group>
                             <div class="container">
@@ -100,17 +100,17 @@
                                             <div class='row'>
                                                 <div class='col-md-6'>
                                                     <label for="working_size" class="col-md-4"/>
-                                                    <field name="working_size" class="col-md-7"/>
+                                                    <field name="working_size" class="col-md-7" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class='col-md-6'>
                                                     <div class="row">
                                                         <div class='form-group'>
                                                             <label for="working_height"  class="col-md-4"/>
-                                                            <field name="working_height" class="col-md-7"/>
+                                                            <field name="working_height" class="col-md-7" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                         </div>
                                                         <div class='form-group'>
                                                             <label for="working_width" class="col-md-4"/>
-                                                            <field name="working_width" class="col-md-7"/>
+                                                            <field name="working_width" class="col-md-7" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -122,17 +122,17 @@
                                            <div class='row'>
                                               <div class='col-md-6'>
                                                   <label for="finished_size" class="col-md-4"/>
-                                                  <field name="finished_size" class="col-md-7"/>
+                                                  <field name="finished_size" class="col-md-7" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                </div>
                                                <div class='col-md-6'>
                                                    <div class="row">
                                                        <div class='form-group'>
                                                            <label for="finished_height" class="col-md-4"/>
-                                                           <field name="finished_height" class="col-md-7"/>
+                                                           <field name="finished_height" class="col-md-7" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                        </div>
                                                        <div class='form-group'>
                                                           <label for="finished_width" class="col-md-4"/>
-                                                          <field name="finished_width" class="col-md-7"/>
+                                                          <field name="finished_width" class="col-md-7" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                        </div>
                                                    </div>
                                                </div>
@@ -145,33 +145,33 @@
                         <page string="Envelope Details" attrs="{'invisible':[('isEnvelope','=',False)]}">
                             <group>
                                 <group>
-                                    <field name="envelope_type"/>
-                                    <field name="flap_glue_type"/>
-                                    <field name="embossed"/>
+                                    <field name="envelope_type" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="flap_glue_type" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="embossed" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                 </group>
                                 <group>                                    
-                                    <field name="tissue_lined"/>
-                                    <field name="knife_number"/>
-                                    <field name="windowed"/>
+                                    <field name="tissue_lined" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="knife_number" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="windowed" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                 </group>
                             </group>
                             <group attrs="{'invisible':[('windowed','!=',True)]}">
                                 <group>
-                                    <field name="standardWindowSize"/>
+                                    <field name="standardWindowSize" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                 </group>
                                 <group attrs="{'invisible':[('standardWindowSize','!=',True)]}">
-                                    <field name="windowHeight"/>
-                                    <field name="windowWidth"/>
-                                    <field name="windowFlhs"/>
-                                    <field name="windowUp"/>
+                                    <field name="windowHeight" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="windowWidth" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="windowFlhs" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                    <field name="windowUp" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                 </group>
                             </group>
                         </page>
                         <page name="EstimateLines" string="Estimate Lines" attrs="{'invisible':[('id','=',False)]}">
-                            <field name="estimate_line"/>
+                            <field name="estimate_line" attrs="{'readonly':[('isLocked','=',True)]}"/>
                         </page>
                         <page string="Estimate Conditions" attrs="{'invisible':[('id','=',False)]}">
-                            <field name="estimateConditions"/>
+                            <field name="estimateConditions" attrs="{'readonly':[('isLocked','=',True)]}"/>
                         </page>
                         <page name="PriceAdjustments" string="Price Adjustments">
                             <field name="priceHistory" readonly="1">
@@ -245,32 +245,32 @@
                             </sheet>
                         </page>
                     </notebook>
-                    <group col="11">
-                        <label for="total_price_1" string="Prices" colspan="6"/>
-                        <field name="total_price_1" nolabel="1" />
-                        <field name="total_price_2" nolabel="1" />
-                        <field name="total_price_3" nolabel="1" />
-                        <field name="total_price_4" nolabel="1" />
-                        <field name="total_price_run_on" nolabel="1" />
+                    <group col="15">
+                        <label for="total_price_1" string="Prices" colspan="10"/>
+                        <field name="total_price_1" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                        <field name="total_price_2" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                        <field name="total_price_3" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                        <field name="total_price_4" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                        <field name="total_price_run_on" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                     </group>
                     <group>
                         <group>
-                            <field name="EnquiryComments" />
+                            <field name="EnquiryComments" attrs="{'readonly':[('isLocked','=',True)]}"/>
                         </group>
                         <group>
-                            <field name="SpecialInstuction" />
-                            <field name="PackingInstruction" />
+                            <field name="SpecialInstuction" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                            <field name="PackingInstruction" attrs="{'readonly':[('isLocked','=',True)]}"/>
                         </group>
                     </group>
                     <group>
                         <group>
-                            <field name="Delivery" />
-                            <field name="DeliveryContact" />
+                            <field name="Delivery" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                            <field name="DeliveryContact" attrs="{'readonly':[('isLocked','=',True)]}"/>
                         </group>
                         
                         <group>
-                            <field name="DeliveryMethod" domain="[('delivery_type','=','base_on_rule')]"/>
-                            <field name="DeliveryLabel" />
+                            <field name="DeliveryMethod" attrs="{'readonly':[('isLocked','=',True)]}" domain="[('delivery_type','=','base_on_rule')]"/>
+                            <field name="DeliveryLabel" attrs="{'readonly':[('isLocked','=',True)]}" />
                         </group>
                     </group>
                 </sheet>

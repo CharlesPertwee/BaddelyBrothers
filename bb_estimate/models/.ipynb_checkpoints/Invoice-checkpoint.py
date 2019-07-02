@@ -13,6 +13,7 @@ class AccountInvoice(models.Model):
             if sale_order.Estimate:
                 vals['Project'] = sale_order.Estimate.project.id
         return super(AccountInvoice,self).create(vals)
+    
     @api.model
     def getEstimateData(self):
         for record in self:
