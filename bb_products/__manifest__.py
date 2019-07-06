@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Products Baddely Brothers",
+    'name': "Products Baddeley Brothers",
 
     'summary': """
         Product Customizations for Baddely Brothers

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Processes Baddely Brothers",
+    'name': "Processes Baddeley Brothers",
 
     'summary': """
         This module adds the process type to work centers.

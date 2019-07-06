@@ -14,3 +14,4 @@ class Project(models.Model):
     Productions = fields.One2many('mrp.production','Project','Job Tickets')
     Invoices = fields.One2many('account.invoice','Project','Invoices')
     Deliveries = fields.One2many('stock.picking','Project','Deliveries')
+    Purchase = fields.Many2many('purchase.order',string='Purchase')

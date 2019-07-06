@@ -168,7 +168,7 @@ cost_params = estimate.cost_params
 qty_params = estimate.qty_params
 qty = estimate.qty
 
-fields = ['workcenterId','material','grammage','param_number_up','param_number_of_colours','param_number_of_colours_rev','param_number_of_mixes','param_die_size']
+fields = ['workcenterId','material','grammage','param_number_up','param_number_of_colors','param_number_of_colors_rev','param_number_of_mixes','param_die_size']
 if estimate.fieldUpdated in fields:
     load_qty_break_params(workcenter,qty_params,cost_params,qty)
     

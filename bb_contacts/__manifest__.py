@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Contacts Baddely Brothers",
+    'name': "Contacts Baddeley Brothers",
 
     'summary': """
         Contact customization for Baddely Brothers

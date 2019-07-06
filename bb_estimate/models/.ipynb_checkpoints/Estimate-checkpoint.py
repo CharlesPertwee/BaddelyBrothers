@@ -58,8 +58,8 @@ class Estimate(models.Model):
     contact = fields.Many2one('res.partner', string='Contact')
     project = fields.Many2one('project.project', string='Project',required=True)
     invoice_account = fields.Many2one('res.partner', string='Invoice Account')
-    invoice_address = fields.Many2one('res.partner', string='Invoice Address')
-    invoice_contact = fields.Many2one('res.partner', string='Invoice Contact')
+    #invoice_address = fields.Many2one('res.partner', string='Invoice Address')
+    #invoice_contact = fields.Many2one('res.partner', string='Invoice Contact')
     
     #Estimate Summary
     title = fields.Char('Title',required=True)
@@ -76,13 +76,14 @@ class Estimate(models.Model):
                             , ondelete='restrict'
                             , track_visibility='onchange'
                             , index=True
+                            , copy=False
                             , group_expand='_read_group_state'
                             , default=lambda self: self.env['bb_estimate.stage'].search([])[0])
     estimate_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Line')
     
     #Delievery Details
-    Delivery = fields.Many2one('res.partner',string="Delivery To",domain="[('type','=','delivery')]",required=True)
-    DeliveryContact = fields.Many2one('res.partner',string="Delivery Contact",required=True)
+    Delivery = fields.Many2one('res.partner',string="Delivery To",required=True)
+    #DeliveryContact = fields.Many2one('res.partner',string="Delivery Contact",required=True)
     DeliveryMethod = fields.Many2one('delivery.carrier',string="Delivery Method",required=True) #delivery.carrier
     DeliveryLabel = fields.Boolean('Plain Label')
     
@@ -92,11 +93,11 @@ class Estimate(models.Model):
     quantity_4 = fields.Integer('Quantity 4')
     run_on =  fields.Integer('Run on')
     
-    total_price_1 = fields.Float('Total Price 1',store=True)
-    total_price_2 = fields.Float('Total Price 2',store=True)
-    total_price_3 = fields.Float('Total Price 3',store=True)
-    total_price_4 = fields.Float('Total Price 4',store=True)
-    total_price_run_on = fields.Float('Run On',store=True)
+    total_price_1 = fields.Float('Total Price 1',store=True,copy=False)
+    total_price_2 = fields.Float('Total Price 2',store=True,copy=False)
+    total_price_3 = fields.Float('Total Price 3',store=True,copy=False)
+    total_price_4 = fields.Float('Total Price 4',store=True,copy=False)
+    total_price_run_on = fields.Float('Run On',store=True,copy=False)
     
     total_price_extra_1 = fields.Float('Total Price 1',store=True,compute="_get_estimate_line")
     total_price_extra_2 = fields.Float('Total Price 2',store=True,compute="_get_estimate_line")
@@ -104,17 +105,17 @@ class Estimate(models.Model):
     total_price_extra_4 = fields.Float('Total Price 4',store=True,compute="_get_estimate_line")
     total_price_extra_run_on = fields.Float('Run On',store=True,compute="_get_estimate_line")
     
-    total_price_1000_1 = fields.Float('Total Price 1000 1',store=True)
-    total_price_1000_2 = fields.Float('Total Price 1000 2',store=True)
-    total_price_1000_3 = fields.Float('Total Price 1000 3',store=True)
-    total_price_1000_4 = fields.Float('Total Price 1000 4 ',store=True)
-    total_price_1000_run_on = fields.Float('Total Price 1000 Run On',store=True)
+    total_price_1000_1 = fields.Float('Total Price 1000 1',store=True,copy=False)
+    total_price_1000_2 = fields.Float('Total Price 1000 2',store=True,copy=False)
+    total_price_1000_3 = fields.Float('Total Price 1000 3',store=True,copy=False)
+    total_price_1000_4 = fields.Float('Total Price 1000 4 ',store=True,copy=False)
+    total_price_1000_run_on = fields.Float('Total Price 1000 Run On',store=True,copy=False)
     
-    total_cost_1 = fields.Float('Total Cost 1',store=True,compute="_get_estimate_line")
-    total_cost_2 = fields.Float('Total Cost 2',store=True,compute="_get_estimate_line")
-    total_cost_3 = fields.Float('Total Cost 3',store=True,compute="_get_estimate_line")
-    total_cost_4 = fields.Float('Total Cost 4',store=True,compute="_get_estimate_line")
-    total_cost_run_on = fields.Float('Run On',store=True,compute="_get_estimate_line")
+    total_cost_1 = fields.Float('Total Cost 1',store=True,compute="_get_estimate_line",copy=False)
+    total_cost_2 = fields.Float('Total Cost 2',store=True,compute="_get_estimate_line",copy=False)
+    total_cost_3 = fields.Float('Total Cost 3',store=True,compute="_get_estimate_line",copy=False)
+    total_cost_4 = fields.Float('Total Cost 4',store=True,compute="_get_estimate_line",copy=False)
+    total_cost_run_on = fields.Float('Run On',store=True,compute="_get_estimate_line",copy=False)
     
     unAllocated_1 = fields.Integer('Un Allocated Quantity 1',store=True,compute="_get_estimate_line")
     unAllocated_2 = fields.Integer('Un Allocated Quantity 1',store=True,compute="_get_estimate_line")
@@ -122,10 +123,10 @@ class Estimate(models.Model):
     unAllocated_4 = fields.Integer('Un Allocated Quantity 1',store=True,compute="_get_estimate_line")
     unAllocated_run_on = fields.Integer('Un Allocated Quantity 1',store=True,compute="_get_estimate_line")
     
-    nett_value_1 = fields.Float('Nett Value') 
-    nett_value_2 = fields.Float('Nett Value 1')
-    nett_value_3 = fields.Float('Nett Value 3')
-    nett_value_4 = fields.Float('Nett Value 4')
+    nett_value_1 = fields.Float('Nett Value',copy=False) 
+    nett_value_2 = fields.Float('Nett Value 1',copy=False)
+    nett_value_3 = fields.Float('Nett Value 3',copy=False)
+    nett_value_4 = fields.Float('Nett Value 4',copy=False)
 
     number_up = fields.Integer('Number up', default=1 ,required=True )
     grammage = fields.Integer('Grammage (G.S.M)', required=True)
@@ -149,10 +150,10 @@ class Estimate(models.Model):
     windowFlhs = fields.Float('Window Pos: FLHS')
     windowUp = fields.Float('Window Pos: Up')
     
-    routings = fields.Many2one('mrp.routing','Generated Routing')
-    bom = fields.Many2one('mrp.bom', 'Generated BOM')
-    manufacturingOrder = fields.Many2one('mrp.production','Job Ticket')
-    salesOrder = fields.Many2one('sale.order','Sales Order')
+    routings = fields.Many2one('mrp.routing','Generated Routing',copy=False)
+    bom = fields.Many2one('mrp.bom', 'Generated BOM',copy=False)
+    manufacturingOrder = fields.Many2one('mrp.production','Job Ticket',copy=False)
+    salesOrder = fields.Many2one('sale.order','Sales Order',copy=False)
     
     hasExtra = fields.Boolean('Has Extra',compute="getExtras")
     estimateConditions = fields.Many2many('bb_estimate.conditions', string="Estimate Conditions")
@@ -161,24 +162,29 @@ class Estimate(models.Model):
     EnquiryComments = fields.Text('Enquiry Comments')
     SpecialInstuction = fields.Text('Special Instructions')
     PackingInstruction = fields.Text('Packing Instructions')
-    isLocked = fields.Boolean('Locked')
-    hasDelivery = fields.Boolean('Delivery Added?')
-    priceHistory = fields.One2many('bb_estimate.price_history','Estimate','Price Adjustments')
+    isLocked = fields.Boolean('Locked',copy=False)
+    hasDelivery = fields.Boolean('Delivery Added?',copy=False)
+    priceHistory = fields.One2many('bb_estimate.price_history','Estimate','Price Adjustments',copy=False)
     
     #Fields For BOM and Invoice Computation
-    selectedQuantity = fields.Selection([('1','1'),('2','2'),('3','3'),('4','4')],string="Selected Quantity",default="1")
-    selectedRunOn = fields.Integer('Selected Run On',default=0)
-    selectedPrice = fields.Float('Total Price Selected',default=0)
-    selectedRatio = fields.Float('Ratio Selected',default=0)
+    selectedQuantity = fields.Selection([('1','1'),('2','2'),('3','3'),('4','4')],string="Selected Quantity",default="1",copy=False)
+    selectedRunOn = fields.Integer('Selected Run On',default=0,copy=False)
+    selectedPrice = fields.Float('Total Price Selected',default=0,copy=False)
+    selectedRatio = fields.Float('Ratio Selected',default=0,copy=False)
     
-    Weight_1 = fields.Float('Weight 1')
-    Weight_2 = fields.Float('Weight 2')
-    Weight_3 = fields.Float('Weight 3')
-    Weight_4 = fields.Float('Weight 4')
-    Weight_run_on = fields.Float('Weight Run On')
+    Weight_1 = fields.Float('Weight 1',copy=False)
+    Weight_2 = fields.Float('Weight 2',copy=False)
+    Weight_3 = fields.Float('Weight 3',copy=False)
+    Weight_4 = fields.Float('Weight 4',copy=False)
+    Weight_run_on = fields.Float('Weight Run On',copy=False)
     
-    lead = fields.Many2one('crm.lead','Enquiry')
+    lead = fields.Many2one('crm.lead','Enquiry',copy=False)
+    reSyncCount = fields.Integer('Re Sync Count',compute='_compute_reSync')
     
+    def _compute_reSync(self):
+        for record in self:
+            record.reSyncCount = len([x for x in record.estimate_line if x.reSync])
+            
     def GenerateEnvelopeDetails(self,estimate):
         line = ''
         if estimate.envelope_type:
@@ -257,48 +263,44 @@ class Estimate(models.Model):
     
     @api.onchange('partner_id')
     def PartnerUpdate(self):
-        for record in self:
-            if record.partner_id:
-                record.invoice_account = record.partner_id
-                customerDeliveryContact = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','contact')],limit=1)
-                if customerDeliveryContact:
-                    record.DeliveryContact = customerDeliveryContact[0]
-                else:
-                    record.DeliveryContact = record.partner_id
-            
-                customerDeliveryAddress = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','delivery')])
-                if customerDeliveryAddress:
-                    record.Delivery = customerDeliveryAddress[0]
+        """
+        Update the following fields when the partner is changed:
+        - Invoice address
+        - Delivery address
+        """
+        if not self.partner_id:
+            self.update({
+                'contact': False,
+                'invoice_account': False,
+                'Delivery': False
+            })
+            return
 
-                customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','invoice')])
-                if customer_account_addresses and not record.invoice_address:
-                    record.invoice_address = customer_account_addresses[0]
-
-                customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',record.partner_id.id),('type','=','contact'),('employeeStatus','=','current')])
-                if customer_contacts and not (record.invoice_contact or record.invoice_contact):
-                    record.invoice_contact = customer_contacts[0]
-
-                record.contact = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.partner_id.id),('type','=','contact'),('employeeStatus','=','current')],limit=1)
-
-                
-                
+        addr = self.partner_id.address_get(['delivery', 'invoice','contact'])
+        values = {
+            'contact': addr['contact'],
+            'invoice_account': addr['invoice'],
+            'Delivery': addr['delivery'],
+        }
+        self.update(values)
+    
     @api.onchange('state')            
     def _computeLeadState(self):
         if self.state:
-            if self.state.LeadStage:
+            if self.state.LeadStage and self.lead:
                 self.lead.write({'stage_id':self.state.LeadStage.id})
     
-    @api.onchange('invoice_account')
-    def InvoiceAccount(self):
-        for record in self:
-            if record.invoice_account:
-                customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.invoice_account.id),('type','=','invoice')])
-                if customer_account_addresses:
-                    record.invoice_address = customer_account_addresses[0]
+#     @api.onchange('invoice_account')
+#     def InvoiceAccount(self):
+#         for record in self:
+#             if record.invoice_account:
+#                 customer_account_addresses = self.env['res.partner'].sudo().search(['&',('parent_id','=',record.invoice_account.id),('type','=','invoice')])
+#                 if customer_account_addresses:
+#                     record.invoice_address = customer_account_addresses[0]
 
-                customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',record.invoice_account.id),('type','=','contact'),('employeeStatus','=','current')])
-                if customer_contacts:
-                    record.invoice_contact = customer_contacts[0]
+#                 customer_contacts = self.env['res.partner'].sudo().search(['&','&',('parent_id','=',record.invoice_account.id),('type','=','contact'),('employeeStatus','=','current')])
+#                 if customer_contacts:
+#                     record.invoice_contact = customer_contacts[0]
 
             
     def CreateManufacturingOrder(self):
@@ -359,7 +361,7 @@ class Estimate(models.Model):
         if not criteria_found:
             raise UserError(_("No price rule matching this order; delivery cost cannot be computed."))
 
-        return (price * (1.0 + (float(carrier.margin) / 100.0)))
+        return price
     
     def _get_price_available(self,carrier,qty):
         self.ensure_one()
@@ -422,10 +424,10 @@ class Estimate(models.Model):
                 'cost_per_unit_3': prices['qty_3'],
                 'cost_per_unit_4': prices['qty_4'],
                 'cost_per_unit_run_on': prices['qty_run_on'],
-                'price_per_unit_1': prices['qty_1'],
-                'price_per_unit_2': prices['qty_2'],
-                'price_per_unit_3': prices['qty_3'],
-                'price_per_unit_4': prices['qty_4'],
+                'price_per_unit_1': prices['qty_1'] * (1.0 + (float(self.DeliveryMethod.margin) / 100.0)),
+                'price_per_unit_2': prices['qty_2'] * (1.0 + (float(self.DeliveryMethod.margin) / 100.0)),
+                'price_per_unit_3': prices['qty_3'] * (1.0 + (float(self.DeliveryMethod.margin) / 100.0)),
+                'price_per_unit_4': prices['qty_4'] * (1.0 + (float(self.DeliveryMethod.margin) / 100.0)),
                 'price_per_unit_run_on': prices['qty_run_on'],
                 'margin_1': self.DeliveryMethod.margin,
                 'margin_2': self.DeliveryMethod.margin,
@@ -437,19 +439,22 @@ class Estimate(models.Model):
                 'total_cost_3': prices['qty_3'],
                 'total_cost_4': prices['qty_4'],
                 'total_cost_run_on': prices['qty_run_on'],
-                'total_price_1': prices['qty_1'],
-                'total_price_2': prices['qty_2'],
-                'total_price_3': prices['qty_3'],
-                'total_price_4': prices['qty_4'],
+                'total_price_1': prices['qty_1'] * (1.0 + (float(self.DeliveryMethod.margin) / 100.0)),
+                'total_price_2': prices['qty_2'] * (1.0 + (float(self.DeliveryMethod.margin) / 100.0)),
+                'total_price_3': prices['qty_3'] * (1.0 + (float(self.DeliveryMethod.margin) / 100.0)),
+                'total_price_4': prices['qty_4'] * (1.0 + (float(self.DeliveryMethod.margin) / 100.0)),
                 'total_price_run_on': prices['qty_run_on'],
-                'Weight_1': self.GetWeight('1'),
-                'Weight_2': self.GetWeight('1'),
-                'Weight_3': self.GetWeight('1'),
-                'Weight_4': self.GetWeight('1'),
-                'Weight_run_on': self.GetWeight('run_on'),
                 'hasDelivery': True
                 
             })
+        self.write(
+                {
+                    'Weight_1': self.GetWeight('1'),
+                    'Weight_2': self.GetWeight('2'),
+                    'Weight_3': self.GetWeight('3'),
+                    'Weight_4': self.GetWeight('4'),
+                    'Weight_run_on': self.GetWeight('run_on')
+                })
         self.message_post(body="Delivery Added %s"%(self.DeliveryMethod.name))
 
     def LineWeight(self,line, qty):

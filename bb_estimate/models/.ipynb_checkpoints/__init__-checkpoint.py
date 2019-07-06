@@ -17,3 +17,5 @@ from . import Delivery
 from . import PriceHistory
 from . import Project
 from . import CRM
+from . import Purchase
+#from . import StockRule

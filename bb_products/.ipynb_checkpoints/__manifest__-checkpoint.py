@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Products Baddely Brothers",
+    'name': "Products Baddeley Brothers",
 
     'summary': """
         Product Customizations for Baddely Brothers
@@ -21,7 +21,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','product','stock'],
+    'depends': ['base','product','stock','uom'],
 
     # always loaded
     'data': [

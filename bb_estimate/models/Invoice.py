@@ -2,7 +2,7 @@
 
 from odoo import models, fields, api
 
-class AccountInvoice(models.Model):
+class AccountInvoiceBB(models.Model):
     _inherit = "account.invoice"
     
     Project = fields.Many2one('project.project','Project')
@@ -12,7 +12,7 @@ class AccountInvoice(models.Model):
             sale_order = self.env['sale.order'].sudo().search([('name','=',vals['origin'])])
             if sale_order.Estimate:
                 vals['Project'] = sale_order.Estimate.project.id
-        return super(AccountInvoice,self).create(vals)
+        return super(AccountInvoiceBB,self).create(vals)
     
     @api.model
     def getEstimateData(self):

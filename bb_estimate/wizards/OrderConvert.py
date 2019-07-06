@@ -124,7 +124,8 @@ class OrderConvert(models.TransientModel):
             'product_tmpl_id' : self.EstimateId.product_type.product_tmpl_id.id,
             'product_id' : self.EstimateId.product_type.id,
             'product_uom_id':  self.EstimateId.product_type.uom_id.id,
-            'Estimate' : self.EstimateId.id
+            'Estimate' : self.EstimateId.id,
+            'Project':self.EstimateId.project.id
         }
         
         mo = order.create(newOrder)
@@ -161,6 +162,7 @@ class OrderConvert(models.TransientModel):
             'Estimate' : self.EstimateId.id,
             'JobTicket': mo.id,
             'user_id': self.EstimateId.estimator.id,
+            'Project':self.EstimateId.project.id,
             'order_line':[(0,0,salesProduct)]
         }
 
@@ -172,7 +174,7 @@ class OrderConvert(models.TransientModel):
         stage = self.env['bb_estimate.stage'].sudo().search([('ConvertedStage','=','True')],limit=1)
         if stage:
             data['state'] = stage.id
-            if stage.LeadStage:
+            if stage.LeadStage and self.EstimateId.lead:
                 self.EstimateId.lead.write({'stage_id':stage.LeadStage.id})
         self.EstimateId.write(data)
         

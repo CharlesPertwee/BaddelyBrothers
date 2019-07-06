@@ -30,5 +30,24 @@ class MaterialLink(models.Model):
     process_number = fields.Integer('Process Number Up',related="processLine.param_number_up", readonly=True)
     work_twist = fields.Boolean('Work & Twist',related="processLine.work_twist", readonly=True)
     
+   
+    def ComputePrice(self):
+        line = self.materialLine
+        work_twist = self.work_twist
+        line.RecalculatePrices(line,work_twist)
     
+    def create(self,vals):
+        rec = super(MaterialLink, self).create(vals)
+        line = rec.materialLine
+        work_twist = rec.work_twist
+        line.RecalculatePrices(line,work_twist)
+        return rec
+    
+    @api.multi
+    def unlink(self):
+        line = self.materialLine
+        work_twist = self.work_twist
+        rec = super(MaterialLink, self).unlink()
+        line.RecalculatePrices(line,work_twist)
+        return rec
     

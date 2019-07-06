@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 import math
+from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
 
 DIE_SIZES = [
     ('standard','No Die (No Charge)'),
@@ -212,11 +213,19 @@ class EstimateLine(models.Model):
     CostRate = fields.Float('Cost Rate')
     CharegeRate = fields.Float('Charge Rate')
     Margin = fields.Float('Margin')
-    
+    isLocked = fields.Boolean('Is Locked',related="estimate_id.isLocked")
     Sequence = fields.Integer('Sequence', default=1, help='Gives the sequence order when displaying a product list')
     staticPrice = fields.Boolean('Static Price', related="estimate_id.product_type.staticPrice")
+    hasComputed = fields.Boolean('Has Computed in Total')
+    reSync = fields.Boolean('ReSync')
     
     #General Parameters
+    param_supplier = fields.Many2one('res.partner','Supplier',domain="[('supplier','=',True)]")
+    req_param_supplier = fields.Boolean('Req Supplier')
+    
+    param_material_vendor = fields.Many2one('product.supplierinfo',string='Vendor',domain="[('product_id','=',True)]")
+    req_param_material_vendor = fields.Boolean('Req Vendor')
+    
     param_number_up = fields.Integer('Number Up', related="estimate_id.number_up")#compute="getEstimateParams")
     req_param_number_up = fields.Boolean('Req Number Up')
     
@@ -311,16 +320,6 @@ class EstimateLine(models.Model):
             elif record.option_type == 'material':
                 record.lineName = record.material.name
     
-#     @api.depends('estimate_id')
-#     def compute_sizes(self):
-#         for record in self:
-#             if record.estimate_id:
-#                 record.param_finished_size = record.estimate_id.finished_size
-#                 record.param_finished_width = record.estimate_id.finished_width
-#                 record.param_finished_height = record.estimate_id.finished_height
-#                 record.param_working_size = record.estimate_id.working_size
-#                 record.param_working_width = record.estimate_id.working_width
-#                 record.param_working_height = record.estimate_id.working_height
                 
     def calc_material_fields(self):
         for record in self:
@@ -350,6 +349,15 @@ class EstimateLine(models.Model):
                 record.unallocated_finished_quantity_run_on -= record.param_finished_quantity_run_on
             
             if record.material:
+                if record.material.purchase_ok:
+                    if record.material.seller_ids:
+                        record.param_material_vendor = record.material.seller_ids[0]
+                        record.req_param_material_vendor = True
+                        if len(record.material.seller_ids) > 1:
+                            record.req_param_material_vendor = True
+                    else:
+                        raise ValidationError("There is no vendor associated to the product %s. Please define a vendor for this product."%(record.material.name))
+                    
                 record.documentCatergory = 'Material'
                 if record.material.productType in ['Package','Delivery']:
                     record.documentCatergory = record.material.productType
@@ -366,7 +374,6 @@ class EstimateLine(models.Model):
                 record.SheetWidth = record.material.sheet_width
                 record.SheetSize = record.material.sheetSize
                 
-                #record.param_number_out = self.get_number_out(record.material)
                 if record.WhiteCutting:
                     record.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
                 if record.PrintedCutting:
@@ -496,7 +503,6 @@ class EstimateLine(models.Model):
     @api.onchange('workcenterId')  
     def calc_workcenterId_change(self):
         self.UpdateRequiredFields()
-        #self.getEstimateParams()
         self.onChangeEventTrigger('workcenterId')
         
     @api.onchange('material')  
@@ -532,7 +538,6 @@ class EstimateLine(models.Model):
     @api.onchange('param_wash_up_time_1','param_wash_up_time_2','param_wash_up_time_3','param_wash_up_time_4','param_wash_up_time_run_on')
     def calc_param_wash_up_time(self):
         self.onChangeEventTrigger('param_wash_up_time')        
-        
     
     @api.onchange('param_make_ready_overs_1','param_make_ready_overs_2','param_make_ready_overs_3','param_make_ready_overs_4','param_make_ready_overs_run_on')
     def calc_param_make_ready_overs(self):
@@ -549,6 +554,19 @@ class EstimateLine(models.Model):
     @api.onchange('price_per_unit_1','price_per_unit_2','price_per_unit_3','price_per_unit_4','price_per_unit_run_on')
     def calc_price_per_unit(self):
         self.onChangeEventTrigger('price_per_unit')
+        
+    @api.onchange('param_number_of_colors')
+    def calc_param_number_of_colors_changes(self):
+        self.onChangeEventTrigger('param_number_of_colors')
+        
+    @api.onchange('param_number_of_colors_rev')
+    def calc_param_number_of_colors_rev_changes(self):
+        self.onChangeEventTrigger('param_number_of_colors_rev')
+        
+    @api.onchange('param_no_of_ink_mixes')
+    def calc_param_no_of_ink_mixes_changes(self):
+        self.onChangeEventTrigger('param_no_of_ink_mixes')
+
         
 #     @api.onchange('total_price_per_1000_1','total_price_per_1000_2','total_price_per_1000_3','total_price_per_1000_4','total_price_per_1000_run_on')
 #     def calc_total_price_per_1000(self):
@@ -623,6 +641,15 @@ class EstimateLine(models.Model):
             else:
                 cost_param['quantity_required'] = math.ceil( math.ceil(qty_required * finished_quantity_ratio) / float(qty_param['param_number_out']) )
                 new_value = cost_param['quantity_required']
+            
+            #packs
+            if cost_param['quantity_required'] > 0 and self.param_material_vendor:
+                multiplier = self.param_material_vendor.multiplier if self.param_material_vendor.multiplier > 0 else 1
+                if self.param_material_vendor.minQuantity > cost_param['quantity_required']:
+                    cost_param['quantity_required'] = self.param_material_vendor.minQuantity - cost_param['quantity_required']
+                else:
+                    cost_param['quantity_required'] -= self.param_material_vendor.minQuantity
+                cost_param['quantity_required'] = self.param_material_vendor.minQuantity + (math.ceil(cost_param['quantity_required']/multiplier) * multiplier)
             
             if 'material_ids' not in qty_param and old_value != new_value:
                 message = "Qty %s from %s to %s" % (qty, old_value, new_value)
@@ -790,7 +817,7 @@ class EstimateLine(models.Model):
             self._calc_prices(qty_params, cost_params, fieldUpdated, qty)
             return_values.update(cost_params)
             self.update_values(qty_params,return_values,qty,fieldUpdated) 
-            
+                                  
     def _calc_prices(self,qty_params, cost_params, fieldUpdated, qty):
         extra_price_per_1000 = 0.0
         if ('param_additional_charge' in qty_params) and qty_params['param_additional_charge'] != 0:
@@ -880,18 +907,6 @@ class EstimateLine(models.Model):
         else:
             cost_params['total_price_per_1000'] = 0.0
             
-        
-#     @api.depends('estimate_id')                                                   
-#     def getEstimateParams(self):
-#         for record in self:
-#             if record.estimate_id:
-#                 record.quantity_1 = record.estimate_id.quantity_1
-#                 record.quantity_2 = record.estimate_id.quantity_2
-#                 record.quantity_3 = record.estimate_id.quantity_3
-#                 record.quantity_4 = record.estimate_id.quantity_4
-#                 record.run_on = record.estimate_id.run_on
-#                 record.param_number_up = record.estimate_id.number_up                             
-    
     def update_values(self,qty_params,return_values,qty,fieldUpdated):
         for record in self:
             record['param_make_ready_time_'+qty] = return_values['param_make_ready_time'] if qty != 'run_on' else None
@@ -960,7 +975,7 @@ class EstimateLine(models.Model):
                         newLink['overs_only'] = True
                     
                     link.create(newLink)
-    
+        
     def CreateMaterialLink(self,process,work_twist):
         link = self.env['bb_estimate.material_link'].sudo()
         materials = process.estimate_id.estimate_line.search([('estimate_id','=',process.estimate_id.id),('option_type','=','material'),('documentCatergory','=','Material')])
@@ -982,7 +997,7 @@ class EstimateLine(models.Model):
                         newLink['overs_only'] = True
                     
                     link.create(newLink)
-            
+    
     def RecalculatePrices(self,line,work_twist):
         if line.option_type and line.option_type == "material":
             estimate = line.estimate_id
@@ -1041,8 +1056,6 @@ class EstimateLine(models.Model):
         for qty in ['1','2','3','4','run_on']:
             estimateData['total_price_'+qty] -= self['total_price_'+qty]
             estimateData['total_price_1000_'+qty] -= self['total_price_per_1000_'+qty]
-            #estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in estimate.estimate_line])
-            #estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in estimate.estimate_line])
         estimate.write(estimateData)
         
         rec = super(EstimateLine, self).unlink()
@@ -1053,23 +1066,39 @@ class EstimateLine(models.Model):
                     m.RecalculatePrices(m,work_twist)
                     
         return rec
-    
+    def _checkResync(self,vals):
+        resync = False
+        recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
+        if (len(recs) > 0) and self.option_type == 'material':
+            for field in vals.keys():
+                if (self[field] != vals[field]) and field != 'reSync':
+                    resync = True
+                    break
+        elif self.option_type == 'process':
+            if self.process_ids:
+                for x in ['1','2','3','4','run_on']:
+                    if 'process_overs_quantity_%s'%(x) in vals.keys():
+                        if (self['process_overs_quantity_%s'%(x)] != vals['process_overs_quantity_%s'%(x)]):
+                            resync = True
+                    if 'process_working_sheets_quantity_%s'%(x) in vals.keys():
+                        if (self['process_working_sheets_quantity_%s'%(x)] != vals['process_working_sheets_quantity_%s'%(x)]):
+                            resync = True
+        
+        return resync
+        
     @api.multi
     def write(self,vals):
+        #check if resync is required
+        vals['reSync'] = self._checkResync(vals)
         estimateData = {x : self.estimate_id[x] for x in self.estimate_id._fields if 'total_price_' in x}
         for qty in ['1','2','3','4','run_on']:
             if 'total_price_'+qty in vals.keys():
-                estimateData['total_price_'+qty] -= self['total_price_'+qty]
-            if 'total_price_per_1000_'+qty in vals.keys():
-                estimateData['total_price_1000_'+qty] -= self['total_price_per_1000_'+qty]
-            #estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in estimate.estimate_line])
-            #estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in estimate.estimate_line])
-        for qty in ['1','2','3','4','run_on']:
-            if 'total_price_'+qty in vals.keys():
+                estimateData['total_price_'+qty] -= 0 if 'hasComputed' in vals.keys() else self['total_price_'+qty]
                 estimateData['total_price_'+qty] += vals['total_price_'+qty]
             if 'total_price_per_1000_'+qty in vals.keys():
+                estimateData['total_price_1000_'+qty] -= 0 if 'hasComputed' in vals.keys() else self['total_price_per_1000_'+qty]
                 estimateData['total_price_1000_'+qty] += vals['total_price_per_1000_'+qty]
-       
+        vals['hasComputed'] = True
         self.estimate_id.write(estimateData)
         return super(EstimateLine, self).write(vals)
         
@@ -1082,11 +1111,6 @@ class EstimateLine(models.Model):
                 if lineId.option_type == 'process':
                     work_twist = False
                     self.CreateMaterialLink(lineId,work_twist)
-                    for m in lineId.estimate_id.estimate_line:
-                        #m.material.productType != 'Package':
-                        if m.option_type == 'material' and m.documentCatergory not in ['Packing','Despatch']:
-                            m.RecalculatePrices(m,work_twist)
-                            
                     if lineId.workcenterId.associatedBoxId:
                         data = {}
                         material = lineId.workcenterId.associatedBoxId
@@ -1190,8 +1214,7 @@ class EstimateLine(models.Model):
                     if lineId.documentCatergory not in ['Packing','Despatch']:   
                         work_twist = False
                         self.CreateLink(lineId,work_twist)
-                        self.RecalculatePrices(lineId,work_twist)
-                    
+                        
                     if lineId.WhiteCutting:
                         newProcess = {
                             'option_type' : 'process',
@@ -1203,6 +1226,7 @@ class EstimateLine(models.Model):
                         process = self.create(newProcess)
                         process.calc_workcenterId_change()
                         dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
+                        dictProcess.pop('hasComputed')
                         process.write(dictProcess)
                     
                     if lineId.PrintedCutting:
@@ -1215,14 +1239,35 @@ class EstimateLine(models.Model):
                         process = self.create(newProcess)
                         process.calc_workcenterId_change()
                         dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
+                        dictProcess.pop('hasComputed')
                         process.write(dictProcess)
-        
-        estimateData = {x:lineId.estimate_id[x] for x in lineId.estimate_id._fields if 'total_price_' in x}
-        for qty in ['1','2','3','4','run_on']:
-            estimateData['total_price_'+qty] += lineId['total_price_'+qty]
-            estimateData['total_price_1000_'+qty] += lineId['total_price_per_1000_'+qty]
-            #estimateData['total_price_'+qty] = sum([x['total_price_'+qty] for x in lineId.estimate_id.estimate_line])
-            #estimateData['total_price_1000_'+qty] = sum([x['total_price_per_1000_'+qty] for x in lineId.estimate_id.estimate_line])
-        
-        lineId.estimate_id.write(estimateData)
+            
+            if not lineId.hasComputed:
+                lineId.write({'hasComputed': True,
+                              'total_price_1':lineId.total_price_1,
+                              'total_price_2':lineId.total_price_2,
+                              'total_price_3':lineId.total_price_3,
+                              'total_price_4':lineId.total_price_4,
+                              'total_price_run_on':lineId.total_price_run_on,
+                              'total_price_per_1000_1':lineId.total_price_per_1000_1,
+                              'total_price_per_1000_2':lineId.total_price_per_1000_2,
+                              'total_price_per_1000_3':lineId.total_price_per_1000_3,
+                              'total_price_per_1000_4':lineId.total_price_per_1000_4,
+                              'total_price_per_1000_run_on':lineId.total_price_per_1000_run_on
+                             })
         return records    
+    
+    def ReSyncPrices(self):
+        if self.option_type == 'process':
+            for line in self.process_ids:
+                line.ComputePrice()
+        
+        if self.option_type == 'material':
+            recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
+            for process in recs:
+                process.calc_param_material_line_id_charge()
+                dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
+                dictProcess.pop('hasComputed')
+                process.write(dictProcess)
+        
+        self.write({'reSync': False})

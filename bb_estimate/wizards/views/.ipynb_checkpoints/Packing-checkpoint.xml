@@ -18,21 +18,14 @@
                             <group>
                                 <field name="NoOfBox1" string="Boxes of"/>
                                 <field name="NoOfBox2" string="Boxes of"/>
-                                <field name="SecondaryBoxes"  string="Boxes of"/>
+                                <field name="SecondaryPacking" options="{'no_create_edit': True}" string="Secondary Packaging"/>
                             </group>
                             <group>
                                 <field name="CapacityBox1" string="Per Box"/>
                                 <field name="CapacityBox2" string="Per Box"/>
-                                <field name="SecondaryPacking" options="{'no_create_edit': True}" string="Packaging Type"/>
+                                <field name="SecondaryBoxes"  string="#Boxes"/>
                             </group>
                         </group>
-<!--                         <field name="Packages">
-                            <tree editable="top">
-                                <field name="PickId" invisible="1"/>
-                                <field name="NoOfBoxes" />
-                                <field name="QuantityPerBox" />
-                            </tree>
-                        </field> -->
                         <footer>
                             <button name="Confirm" string="Confirm" class="oe_right oe_highlight" type="object"/>
                             <button string="Cancel" class="oe_right" special="cancel"/>

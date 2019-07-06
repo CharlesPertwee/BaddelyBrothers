@@ -26,7 +26,11 @@
             <field name="model">bb_estimate.estimate_line</field>
             <field name="arch" type="xml">
                 <form string="Estimate Line">
+                    <header>
+                        <button name="ReSyncPrices" string="Sync Prices" class="oe_right oe_highlight" type="object" attrs="{'invisible':[('reSync','=',False)]}"/>
+                    </header>
                     <sheet>
+                        <field name="isLocked" invisible="1" />
                         <field name="estimate_id" invisible="1"/>
                         <field name="staticPrice" invisible="1"/>
                         <field name="req_param_number_up" invisible="1" />
@@ -74,22 +78,26 @@
                         <field name="req_total_price_per_1000" invisible="1" />
                         <field name="req_process_working_sheets_quantity" invisible="1" />
                         <field name="req_process_overs_quantity" invisible="1" />
+                        <field name="req_param_supplier" invisible="1" />
+                        <field name="req_param_material_vendor" invisible="1" />
                         <field name="isEnvelope" invisible="1" />
+                        <field name="reSync" invisible="1" />
+                        
                         <div class="container">
                             <div class="row">
                                 <div class="col-md-4 oe-title pull-left">
-                                    <field name="option_type" attrs="{'readonly':[('id','!=',False)]}" options="{'horizontal': true}" widget="radio" />
+                                    <field name="option_type" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}" options="{'horizontal': true}" widget="radio" />
                                 </div>
                                 <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','process')]}">
                                     <div class="form-group">
                                         <label for="workcenterId" class="col-md-4" />
-                                        <field name="workcenterId" attrs="{'readonly':[('id','!=',False)]}" options="{'no_create_edit': True}" class="col-md-7" domain="[('process_type','!=',False)]"/>
+                                        <field name="workcenterId" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}" options="{'no_create_edit': True}" class="col-md-7" create="false" domain="[('process_type','!=',False)]"/>
                                     </div>
                                 </div>
                                 <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','material')]}">
                                     <div class="form-group">
                                         <label for="MaterialTypes" class="col-md-4" />
-                                        <field name="MaterialTypes" attrs="{'readonly':[('id','!=',False)]}" class="col-md-7" />
+                                        <field name="MaterialTypes" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}" class="col-md-7" />
                                     </div>
                                 </div>
                             </div>
@@ -99,7 +107,7 @@
                                         <group>
                                             <field name="customer_description" />
                                             <field name="JobTicketText" />
-                                            <field name="documentCatergory" attrs="{'readonly':[('id','!=',False)]}"/>
+                                            <field name="documentCatergory" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                         </group>
                                         <group>
                                             <field name="StandardCustomerDescription" readonly="1"/>
@@ -116,56 +124,57 @@
 
                                 <page string="Link" attrs="{'invisible':['|',('option_type','=','process'),('option_type','=',False)]}">
                                     <sheet>
-                                        <field name="material_ids" options="{'no_create_edit': True}" readonly="1"/>
+                                        <field name="material_ids" context="{'default_estimate':estimate_id}" options="{'no_create_edit': True}" />
                                     </sheet>
                                 </page>
 
                                 <page string="Link" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
                                     <sheet>
-                                        <field name="process_ids" options="{'no_create_edit': True}" readonly="1"/>
+                                        <field name="process_ids" context="{'default_estimate':estimate_id}" options="{'no_create_edit': True}" />
                                     </sheet>
                                 </page>
 
                                 <page string="Parameters &amp; Costing" autofocus="autofocus" attrs="{'invisible':['&amp;',('workcenterId','=',False),('MaterialTypes','=',False)]}">
                                     <group col="3" attrs="{'invisible':[('option_type','=','material')]}">
                                         <group>
-                                            <field name="param_printed_material" attrs="{'invisible':[('req_param_printed_material','=',False)],'required':[('req_param_number_of_cuts','=',True)],'readonly':[('id','!=',False)]}"/>
-                                            <field name="param_duplex_sheets" attrs="{'invisible':[('req_param_duplex_sheets','=',False)],'required':[('req_param_duplex_sheets','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_number_of_cuts" attrs="{'invisible':[('req_param_number_of_cuts','=',False)],'readonly':[('id','!=',False)]}"/>
-                                            <field name="param_sheets_per_pile" attrs="{'invisible':[('req_param_sheets_per_pile','=',False)],'required':[('req_param_sheets_per_pile','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_number_of_sheets" attrs="{'invisible':[('req_param_number_of_sheets','=',False)],'required':[('req_param_number_of_sheets','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_time_per_pile" attrs="{'invisible':[('req_param_time_per_pile','=',False)],'required':[('req_param_time_per_pile','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_additional_charge" attrs="{'invisible':[('req_param_additional_charge','=',False)],'required':[('req_param_additional_charge','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_number_out" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_number_out','=',False)],'required':[('req_param_number_out','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="grammage" attrs="{'invisible':[('req_grammage','=',False)],'required':[('req_grammage','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_sheets_per_box" attrs="{'invisible':[('req_param_sheets_per_box','=',False)],'required':[('req_param_sheets_per_box','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_number_up" readonly="1" attrs="{'invisible':[('req_param_number_up','=',False)],'required':[('req_param_number_up','=',True)],'readonly':[('id','!=',False)]}" />
+                                            <field name="param_printed_material" attrs="{'invisible':[('req_param_printed_material','=',False)],'required':[('req_param_number_of_cuts','=',True)],'readonly':[('isLocked','=',True)]}"/>
+                                            <field name="param_duplex_sheets" attrs="{'invisible':[('req_param_duplex_sheets','=',False)],'required':[('req_param_duplex_sheets','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_number_of_cuts" attrs="{'invisible':[('req_param_number_of_cuts','=',False)],'readonly':[('isLocked','=',True)]}"/>
+                                            <field name="param_sheets_per_pile" attrs="{'invisible':[('req_param_sheets_per_pile','=',False)],'required':[('req_param_sheets_per_pile','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_number_of_sheets" attrs="{'invisible':[('req_param_number_of_sheets','=',False)],'required':[('req_param_number_of_sheets','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_time_per_pile" attrs="{'invisible':[('req_param_time_per_pile','=',False)],'required':[('req_param_time_per_pile','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_additional_charge" attrs="{'invisible':[('req_param_additional_charge','=',False)],'required':[('req_param_additional_charge','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_number_out" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_number_out','=',False)],'required':[('req_param_number_out','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="grammage" attrs="{'invisible':[('req_grammage','=',False)],'required':[('req_grammage','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_sheets_per_box" attrs="{'invisible':[('req_param_sheets_per_box','=',False)],'required':[('req_param_sheets_per_box','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_number_up" readonly="1" attrs="{'invisible':[('req_param_number_up','=',False)],'required':[('req_param_number_up','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_supplier" attrs="{'invisible':[('req_param_supplier','=',False)],'required':[('req_param_supplier','=',True)],'readonly':[('isLocked','=',True)]}" />
                                         </group>
                                         
                                         <group>
-                                            <field name="param_number_of_colors" attrs="{'invisible':[('req_param_number_of_colors','=',False)],'required':[('req_param_number_of_colors','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="work_twist" attrs="{'invisible':[('req_work_twist','=',False)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_time_per_box" attrs="{'invisible':[('req_param_time_per_box','=',False)],'required':[('req_param_time_per_box','=',True)],'readonly':[('id','!=',False)]}"/>
-                                            <field name="param_misc_charge_per_cm2" attrs="{'invisible':[('req_param_misc_charge_per_cm2','=',False)],'readonly':[('id','!=',False)]}"/>
-                                            <field name="param_misc_charge_per_cm2_area" attrs="{'invisible':[('req_param_misc_charge_per_cm2_area','=',False)],'readonly':[('id','!=',False)]}"/>
-                                            <field name="param_material_line_id" options="{'no_create_edit': True}" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)],'required':[('req_param_material_line_id','=',True)],'readonly':[('id','!=',False)]}" />
+                                            <field name="param_number_of_colors" attrs="{'invisible':[('req_param_number_of_colors','=',False)],'required':[('req_param_number_of_colors','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="work_twist" attrs="{'invisible':[('req_work_twist','=',False)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_time_per_box" attrs="{'invisible':[('req_param_time_per_box','=',False)],'required':[('req_param_time_per_box','=',True)],'readonly':[('isLocked','=',True)]}"/>
+                                            <field name="param_misc_charge_per_cm2" attrs="{'invisible':[('req_param_misc_charge_per_cm2','=',False)],'readonly':[('isLocked','=',True)]}"/>
+                                            <field name="param_misc_charge_per_cm2_area" attrs="{'invisible':[('req_param_misc_charge_per_cm2_area','=',False)],'readonly':[('isLocked','=',True)]}"/>
+                                            <field name="param_material_line_id" options="{'no_create_edit': True}" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)],'required':[('req_param_material_line_id','=',True)],'readonly':[('isLocked','=',True)]}" />
                                         </group>
                                         <group>
-                                            <field name="param_number_of_colors_rev" attrs="{'invisible':[('req_param_number_of_colors_rev','=',False)],'required':[('req_param_number_of_colors_rev','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_no_of_ink_mixes" attrs="{'invisible':[('req_param_no_of_ink_mixes','=',False)],'required':[('req_param_no_of_ink_mixes','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_die_size" attrs="{'invisible':[('req_param_die_size','=',False)],'required':[('req_param_number_of_colors','=',True)],'readonly':[('id','!=',False)]}" />
+                                            <field name="param_number_of_colors_rev" attrs="{'invisible':[('req_param_number_of_colors_rev','=',False)],'required':[('req_param_number_of_colors_rev','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_no_of_ink_mixes" attrs="{'invisible':[('req_param_no_of_ink_mixes','=',False)],'required':[('req_param_no_of_ink_mixes','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_die_size" attrs="{'invisible':[('req_param_die_size','=',False)],'required':[('req_param_number_of_colors','=',True)],'readonly':[('isLocked','=',True)]}" />
                                         </group>
                                         <group>
-                                            <field name="param_env_windowpatching" attrs="{'invisible':[('req_param_env_windowpatching','=',False)],'required':[('req_param_env_windowpatching','=',True)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_env_peelandstick" attrs="{'invisible':[('req_param_env_peelandstick','=',False)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_env_inlineemboss" attrs="{'invisible':[('req_param_env_inlineemboss','=',False)],'readonly':[('id','!=',False)]}" />
-                                            <field name="param_env_gumming" attrs="{'invisible':[('req_param_env_gumming','=',False)],'readonly':[('id','!=',False)]}" />
+                                            <field name="param_env_windowpatching" attrs="{'invisible':[('req_param_env_windowpatching','=',False)],'required':[('req_param_env_windowpatching','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_env_peelandstick" attrs="{'invisible':[('req_param_env_peelandstick','=',False)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_env_inlineemboss" attrs="{'invisible':[('req_param_env_inlineemboss','=',False)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_env_gumming" attrs="{'invisible':[('req_param_env_gumming','=',False)],'readonly':[('isLocked','=',True)]}" />
                                         </group>
                                      </group>
                                     
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Stock')]}">
                                         <group>
-                                            <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Stock'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')],'readonly':[('id','!=',False)]}"/>
+                                            <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Stock'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                         </group>
                                         <group string="Stock Material Properties">
                                             <group>
@@ -179,91 +188,96 @@
                                         </group>
                                         <group string="Material Parameters" col="1">
                                             <group>
-                                                <field name="param_number_out" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':[('id','!=',False)]}"/>
+                                                <field name="param_number_out" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':[('isLocked','=',True)]}"/>
+                                                <field name="param_material_vendor" domain="[('product_id','=',material)]" attrs="{'invisible':[('req_param_material_vendor','=',False)],'readonly':[('isLocked','=',True)]}"/>
                                             </group>
                                             <group>
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':[('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':[('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                    <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':[('id','!=',False)]}"/>
+                                                    <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
                                     </group>
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Trade Counter')]}">
                                         <group>
-                                            <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Trade Counter'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Trade Counter')],'readonly':[('id','!=',False)]}"/>
+                                            <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Trade Counter'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Trade Counter')],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                         </group>
                                         <group string="Material Parameters" col="1">
                                             <group>
-                                                <field name="param_number_out" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':[('id','!=',False)]}"/>
+                                                <field name="param_number_out" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':[('isLocked','=',True)]}"/>
+                                                <field name="param_material_vendor" domain="[('product_id','=',material)]" attrs="{'invisible':[('req_param_material_vendor','=',False)],'readonly':[('isLocked','=',True)]}"/>
                                             </group>
                                             <group >
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':[('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':[('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                    <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':[('id','!=',False)]}"/>
+                                                    <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
                                     </group>
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Non-Stockable')]}">
                                         <group>
-                                            <field name="NonStockMaterialType" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable')],'readonly':[('id','!=',False)]}"/>
+                                            <field name="NonStockMaterialType" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable')],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                         </group>
                                         <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','=',False)]}">
                                             <group>
-                                                <field name="MaterialName" colspan="4" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
+                                                <field name="MaterialName" colspan="4" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                             </group>
                                             <group>
                                                 <group>
-                                                    <field name="SheetSize" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="PurchaseUnit" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="CostRate" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}" />
-                                                    <field name="grammage" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="Margin" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
+                                                    <field name="SheetSize" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="PurchaseUnit" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="CostRate" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}" />
+                                                    <field name="grammage" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="Margin" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                 </group>
                                                 <group>
-                                                    <field name="SheetHeight" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="SheetWidth" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="CharegeRate" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="Supplier" options="{'no_create_edit': True}" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
+                                                    <field name="SheetHeight" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="SheetWidth" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="CharegeRate" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="Supplier" options="{'no_create_edit': True}" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
                                         <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','=',False)]}">
                                             <group>
-                                                <field name="MaterialName" colspan="4" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
+                                                <field name="MaterialName" colspan="4" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                             </group>
                                             <group>
                                                 <group>
-                                                    <field name="SheetSize" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="grammage" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
+                                                    <field name="SheetSize" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="grammage" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                 </group>
                                                 <group>
-                                                    <field name="SheetHeight" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
-                                                    <field name="SheetWidth" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':[('id','!=',False)]}"/>
+                                                    <field name="SheetHeight" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="SheetWidth" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
-                                        <group string="Material Parameters" attrs="{'invisible':[('NonStockMaterialType','=','process')]}">
-                                            <field name="param_number_out" attrs="{'readonly':[('id','!=',False)]}"/>
+                                        <group string="Material Parameters">
+                                            <group>
+                                                <field name="param_number_out" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                                                <field name="param_material_vendor" domain="[('product_id','=',material)]" attrs="{'invisible':[('req_param_material_vendor','=',False)],'readonly':[('isLocked','=',True)]}"/>
+                                            </group>
                                             <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':[('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':[('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                             </group>
 
                                             <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)],'readonly':[('id','!=',False)]}"/>
-                                                <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':[('id','!=',False)]}"/>
+                                                <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                             </group>
                                         </group>
                                     </group>
@@ -330,19 +344,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Make Ready Time(Hours)</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_time_1" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_time_1" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_time_2" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_time_2" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_time_3" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_time_3" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_time_4" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_time_4" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_time_run_on" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_time_run_on" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['|',('option_type','=','material'),('req_param_machine_speed','=',False)]}">
@@ -350,19 +364,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Speed(sheets per Hour)</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_machine_speed_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_machine_speed_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_machine_speed_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_machine_speed_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_machine_speed_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_machine_speed_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_machine_speed_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_machine_speed_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_machine_speed_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_machine_speed_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['|',('option_type','=','material'),('req_param_running_time','=',False)]}">
@@ -370,19 +384,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier text-danger">* Running Time(Hours)</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_time_1" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_time_1" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_time_2" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_time_2" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_time_3" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_time_3" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_time_4" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_time_4" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_time_run_on" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_time_run_on" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['|',('option_type','=','material'),('req_param_wash_up_time','=',False)]}">
@@ -390,19 +404,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Wash up Time(Hours)</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_wash_up_time_1" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_wash_up_time_1" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_wash_up_time_2" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_wash_up_time_2" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_wash_up_time_3" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_wash_up_time_3" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_wash_up_time_4" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_wash_up_time_4" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_wash_up_time_run_on" widget="float_time" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_wash_up_time_run_on" widget="float_time" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             
@@ -411,19 +425,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Working Sheets</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_working_sheets_quantity_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_working_sheets_quantity_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_working_sheets_quantity_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_working_sheets_quantity_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_working_sheets_quantity_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_working_sheets_quantity_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
 
@@ -432,19 +446,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Overs Quantity</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_overs_quantity_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_overs_quantity_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_overs_quantity_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_overs_quantity_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="process_overs_quantity_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="process_overs_quantity_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['|',('option_type','=','material'),('req_param_make_ready_overs','=',False)]}">
@@ -452,19 +466,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Make Ready Overs</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_overs_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_overs_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_overs_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_overs_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_overs_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_overs_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_overs_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_overs_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_make_ready_overs_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_make_ready_overs_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['|',('option_type','=','material'),('req_param_running_overs_percent','=',False)]}">
@@ -472,19 +486,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Running Overs(percent)</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_overs_percent_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_overs_percent_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_overs_percent_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_overs_percent_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_overs_percent_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_overs_percent_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_overs_percent_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_overs_percent_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_running_overs_percent_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_running_overs_percent_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_unallocated_finished_quantity','=',False)]}">
@@ -512,19 +526,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Finished Quantity in this Material</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_finished_quantity_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_finished_quantity_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_finished_quantity_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_finished_quantity_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_finished_quantity_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_finished_quantity_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_finished_quantity_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_finished_quantity_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="param_finished_quantity_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="param_finished_quantity_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_quantity_required','=',False)]}">
@@ -532,19 +546,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Quantity/Hours</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="quantity_required_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="quantity_required_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="quantity_required_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="quantity_required_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="quantity_required_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="quantity_required_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="quantity_required_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="quantity_required_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="quantity_required_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="quantity_required_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_cost_per_unit','=',False)]}">
@@ -552,19 +566,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Cost Rate</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="cost_per_unit_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="cost_per_unit_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="cost_per_unit_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="cost_per_unit_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="cost_per_unit_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="cost_per_unit_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="cost_per_unit_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="cost_per_unit_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="cost_per_unit_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="cost_per_unit_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_price_per_unit','=',False)]}">
@@ -572,19 +586,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Charge Rate</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="price_per_unit_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="price_per_unit_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="price_per_unit_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="price_per_unit_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="price_per_unit_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="price_per_unit_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="price_per_unit_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="price_per_unit_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="price_per_unit_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="price_per_unit_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_margin','=',False)]}">
@@ -592,19 +606,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier">Margin</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="margin_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="margin_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="margin_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="margin_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="margin_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="margin_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="margin_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="margin_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="margin_run_on" attrs="{'readonly':[('id','!=',False)]}" />
+                                                    <field name="margin_run_on" attrs="{'readonly':[('isLocked','=',True)]}" />
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_total_cost','=',False)]}">
@@ -612,19 +626,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier text-danger">* Total Cost</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_cost_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_cost_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_cost_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_cost_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_cost_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_cost_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['|',('option_type','=','material'),('req_mat_charge','=',False)]}">
@@ -632,19 +646,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier text-danger">* Misc. Material Charge</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="mat_charge_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="mat_charge_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="mat_charge_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="mat_charge_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="mat_charge_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="mat_charge_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_total_price','=',False)]}">
@@ -652,19 +666,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier text-danger">* Total Charge</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_total_price_per_1000','=',False)]}">
@@ -672,19 +686,19 @@
                                                     <span class="o_field_char o_field_widget o_readonly_modifier text-danger">* Total Charge per 1000</span>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_per_1000_1" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_per_1000_1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_per_1000_2" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_per_1000_2" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_per_1000_3" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_per_1000_3" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_per_1000_4" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_per_1000_4" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                                 <div class="col-md-2 form-group">
-                                                    <field name="total_price_per_1000_run_on" attrs="{'readonly':[('id','!=',False)]}"/>
+                                                    <field name="total_price_per_1000_run_on" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 </div>
                                             </div>
                                             <div class="row" >
@@ -698,6 +712,7 @@
                             </notebook>
                         </div>
                     </sheet>
+                    
                 </form>
             </field>
         </record>
@@ -712,5 +727,17 @@
                 <p class="oe_view_nocontent_create">Estimate Line</p>
             </field>
         </record>
+        <record id="bb_estimate.action_window_line_reSync" model="ir.actions.act_window">
+            <field name="name">Resync Estimate Line</field>
+            <field name="res_model">bb_estimate.estimate_line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('reSync', '=', True)]</field>
+            <field name="context">{'default_estimate_id': active_id}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Estimate Line</p>
+            </field>
+        </record>
+        
     </data>
 </odoo>

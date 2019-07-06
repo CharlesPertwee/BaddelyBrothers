@@ -4,7 +4,7 @@
             <field name="name">material.link.form</field>
             <field name="model">bb_estimate.material_link</field>
             <field name="arch" type="xml">
-                <tree string="Stages">
+                <tree string="Stages" >
                     <field name="materialLine" />
                     <field name="processLine" />
                     <field name="overs_only" />
@@ -27,12 +27,12 @@
             <field name="name">material.link.tree</field>
             <field name="model">bb_estimate.material_link</field>
             <field name="arch" type="xml">
-                <form string="Stages">
+                <form string="Linkage">
                     <sheet>
                         <group>
-                            <field name="estimate" />
-                            <field name="materialLine" />
-                            <field name="processLine" />
+                            <field name="estimate" readonly="1"/>
+                            <field name="materialLine" domain="[('estimate_id','=',estimate),('option_type','=','material')]" required="1"/>
+                            <field name="processLine" domain="[('estimate_id','=',estimate),('option_type','=','process')]" required="1"/>
                         </group>
                     </sheet>
                 </form>

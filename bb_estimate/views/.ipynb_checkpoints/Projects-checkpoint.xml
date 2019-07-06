@@ -25,6 +25,9 @@
                     <page name="Invoice" string="Invoices">
                         <field name="Invoices" readonly="1"/>
                     </page>
+                    <page name="Purchases" string="Purchase Orders">
+                        <field name="Purchase" readonly="1"/>
+                    </page>
                     <page name="Deliveries" string="Deliveries">
                         <field name="Deliveries" readonly="1"/>
                     </page>

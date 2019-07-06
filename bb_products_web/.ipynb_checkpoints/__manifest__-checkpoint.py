@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "ECommerce Baddely Brothers",
+    'name': "ECommerce Baddeley Brothers",
 
     'summary': """
         Product Customization for ECommerce

@@ -1,6 +1,6 @@
 <odoo>
   <data>
-      <report
+      <!--report
         id="report_estimate"
         model="bb_estimate.estimate"
         string="Estimate Letter"
@@ -10,7 +10,7 @@
         paperformat="bb_estimate.paperformat_invoice"
         attachment="((object.estimate_number or '').replace('/','')+'.pdf')"
         print_report_name="(object.estimate_number or '')"
-      />
+      /-->
           
     <record id="estimate_tree_view" model="ir.ui.view">
         <field name="name">estimate.tree</field>
@@ -53,6 +53,9 @@
                       <button class="oe_stat_button" icon="fa-play" type="object" name="CreateManufacturingOrder" attrs="{'invisible':['|',('showMo','=',False),('isLocked','!=',False)]}">
                           <span>Create Job</span>
                       </button>
+                      <button class="oe_stat_button" context="{'default_reSync': True,'default_estimate_id': active_id}" icon="fa-cirlce" type="action" name="%(bb_estimate.action_window_line_reSync)d" attrs="{'invisible':[('isLocked','!=',False)]}">
+                         <field name="reSyncCount" string="Re Sync" widget="statinfo"/>
+                      </button>
                     </div>
                     
                     <h1>
@@ -64,8 +67,6 @@
                             <field name="contact" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',partner_id)]" />
                             <field name="project" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('partner_id','=',partner_id)]"/>
                             <field name="invoice_account" options="{'no_create_edit': True}" required="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
-                            <field name="invoice_address" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account),('type','=','invoice')]" required="1"/>
-                            <field name="invoice_contact" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',invoice_account)]" required="1"/>
                             <field name="lead" attrs="{'readonly':[('isLocked','=',True)]}" domain="[('typeOfLead','=','Bespoke')]" />
                         </group>
                         <group>
@@ -265,7 +266,6 @@
                     <group>
                         <group>
                             <field name="Delivery" attrs="{'readonly':[('isLocked','=',True)]}"/>
-                            <field name="DeliveryContact" attrs="{'readonly':[('isLocked','=',True)]}"/>
                         </group>
                         
                         <group>

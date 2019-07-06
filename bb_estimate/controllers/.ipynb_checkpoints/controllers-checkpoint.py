@@ -228,7 +228,7 @@ class BbEstimate(http.Controller):
         docx_bytes = docx_stream.getvalue()  
         
         attachment = request.env['ir.attachment'].create({
-            'name': "%s.doc"%(Estimate.estimate_number),
+            'name': "%s.docx"%(Estimate.estimate_number),
             'type':'binary',
             'res_model':'bb_estimate.estimate',
             'res_id':Estimate.id,
@@ -237,7 +237,7 @@ class BbEstimate(http.Controller):
             'datas':base64.encodestring(docx_bytes)
         })
         
-        pdfhttpheaders = [('Content-Type','application/msword'),("Content-Disposition","filename= %s.doc"%(Estimate.estimate_number))]       
+        pdfhttpheaders = [('Content-Type','application/msword'),("Content-Disposition","filename= %s.docx"%(Estimate.estimate_number))]       
         return request.make_response(docx_bytes, headers=pdfhttpheaders)
        
         

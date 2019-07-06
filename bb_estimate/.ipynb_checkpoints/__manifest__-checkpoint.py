@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Estimate Baddely Brothers",
+    'name': "Estimate Baddeley Brothers",
 
     'summary': """
         This module creates the estimate and job tickets.
         """,
 
     'description': """     
-    
     """,
 
     'author': "Squadsoft Tech",
