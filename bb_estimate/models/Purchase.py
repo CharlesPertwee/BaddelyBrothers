@@ -28,7 +28,8 @@ class Purchase(models.Model):
                                 mrp.Project.write({'Purchase':[(4, self.id)]})
                             
         return super(Purchase,self).write(vals)
-            
+    
+    @api.model
     def create(self,vals):
         record = super(Purchase,self).create(vals)
         if vals['origin']:

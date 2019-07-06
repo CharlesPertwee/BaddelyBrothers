@@ -18,6 +18,7 @@ class PickingType(models.Model):
     
     Project = fields.Many2one('project.project','Project')
     
+    @api.model
     def create(self,vals):
         if vals['origin']:
             sale_order = self.env['sale.order'].sudo().search([('name','=',vals['origin'])])
