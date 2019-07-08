@@ -7,20 +7,16 @@
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
                     <page name="Estimates" string="Estimates">
-                        <field name="Estimates" readonly="1">
-                        </field>
+                        <field name="Estimates" readonly="1"/>
                     </page>
                     <page name="Leads_Opportunity" string="Leads/Opportunity">
-                        <field name="Leads" readonly="1">
-                        </field>
+                        <field name="Leads" readonly="1"/>
                     </page>
                     <page name="SalesOrders" string="Sales Orders">
-                        <field name="SalesOrder" readonly="1">
-                        </field>
+                        <field name="SalesOrder" readonly="1"/>
                     </page>
                     <page name="JobTicket" string="Job Ticket">
-                        <field name="Productions" readonly="1">
-                        </field>
+                        <field name="Productions" readonly="1"/>
                     </page>
                     <page name="Invoice" string="Invoices">
                         <field name="Invoices" readonly="1"/>

@@ -312,6 +312,30 @@ class EstimateLine(models.Model):
             name =  '%s %s gsm' % (name, Grammage)
         return name
     
+    @api.onchange('CostRate')
+    def computePricesNonStockCost(self):
+        for record in self:
+            if record.CharegeRate:
+                record.Margin = ((record.CharegeRate / record.CostRate) - 1) * 100
+            elif record.Margin:
+                record.CharegeRate = ((record.Margin / 100) + 1) * record.CostRate
+                
+    
+    @api.onchange('Margin')
+    def computePricesNonStockMargin(self):
+        for record in self:
+            record.CharegeRate = ((record.Margin / 100) + 1) * record.CostRate
+            
+    
+    @api.onchange('CharegeRate')
+    def computePricesNonStockPrice(self):
+        for record in self:
+            if record.CharegeRate:
+                record.Margin = ((record.CharegeRate / record.CostRate) - 1) * 100
+            elif record.Margin:
+                record.CostRate = record.CharegeRate / ((record.Margin / 100) + 1)
+            
+    
     @api.depends('workcenterId','material')
     def _computeName(self):
         for record in self:
@@ -352,7 +376,7 @@ class EstimateLine(models.Model):
                 if record.material.purchase_ok:
                     if record.material.seller_ids:
                         record.param_material_vendor = record.material.seller_ids[0]
-                        record.req_param_material_vendor = True
+                        record.req_param_material_vendor = False
                         if len(record.material.seller_ids) > 1:
                             record.req_param_material_vendor = True
                     else:
@@ -425,10 +449,13 @@ class EstimateLine(models.Model):
     
     @api.onchange('param_number_out')
     def _onChangeNumberOut(self):
-        if self.WhiteCutting:
-            self.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(self.param_number_out)
-        if self.PrintedCutting:
-            self.NoPrintedCuts = self.PrintedCutting.process_type.get_printed_cuts_for_number_up(self.param_number_up)
+        if self.option_type == 'process':
+            self.onChangeEventTrigger('param_number_out')
+        else:
+            if self.WhiteCutting:
+                self.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(self.param_number_out)
+            if self.PrintedCutting:
+                self.NoPrintedCuts = self.PrintedCutting.process_type.get_printed_cuts_for_number_up(self.param_number_up)
     
     @api.onchange('SheetSize')
     def _onChangeSheetSize(self):
@@ -1182,6 +1209,9 @@ class EstimateLine(models.Model):
                             'standand_price': lineId.CostRate,
                             'list_price': lineId.CharegeRate,
                             'productType': 'Non-Stock',
+                            'customerDescription': lineId.customer_description,
+                            'jobTicketDescription': lineId.JobTicketText,
+                            'purchase_ok':False
                         }
                         if mto and lineId.NonStockMaterialType == 'Bespoke Material':
                             newProduct['route_ids'] = [(4,mto.id)]
@@ -1192,6 +1222,7 @@ class EstimateLine(models.Model):
                         productId = product.create(newProduct)
                         
                         if productId and lineId.Supplier:
+                            newProduct['purchase_ok'] = True
                             newSeller = {
                                 'product_id' : productId.id,
                                 'product_tmpl_id' : productId.product_tmpl_id.id,

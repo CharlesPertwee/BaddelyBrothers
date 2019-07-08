@@ -134,7 +134,7 @@
                                     </sheet>
                                 </page>
 
-                                <page string="Parameters &amp; Costing" autofocus="autofocus" attrs="{'invisible':['&amp;',('workcenterId','=',False),('MaterialTypes','=',False)]}">
+                                <page string="Parameters &amp; Costing" autofocus="autofocus">
                                     <group col="3" attrs="{'invisible':[('option_type','=','material')]}">
                                         <group>
                                             <field name="param_printed_material" attrs="{'invisible':[('req_param_printed_material','=',False)],'required':[('req_param_number_of_cuts','=',True)],'readonly':[('isLocked','=',True)]}"/>
@@ -188,7 +188,7 @@
                                         </group>
                                         <group string="Material Parameters" col="1">
                                             <group>
-                                                <field name="param_number_out" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':[('isLocked','=',True)]}"/>
+                                                <field name="param_number_out" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 <field name="param_material_vendor" domain="[('product_id','=',material)]" attrs="{'invisible':[('req_param_material_vendor','=',False)],'readonly':[('isLocked','=',True)]}"/>
                                             </group>
                                             <group>
@@ -210,7 +210,7 @@
                                         </group>
                                         <group string="Material Parameters" col="1">
                                             <group>
-                                                <field name="param_number_out" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':[('isLocked','=',True)]}"/>
+                                                <field name="param_number_out" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 <field name="param_material_vendor" domain="[('product_id','=',material)]" attrs="{'invisible':[('req_param_material_vendor','=',False)],'readonly':[('isLocked','=',True)]}"/>
                                             </group>
                                             <group >
@@ -265,19 +265,21 @@
                                                 </group>
                                             </group>
                                         </group>
-                                        <group string="Material Parameters">
+                                        <group string="Material Parameters" col="1">
                                             <group>
                                                 <field name="param_number_out" attrs="{'readonly':[('isLocked','=',True)]}"/>
                                                 <field name="param_material_vendor" domain="[('product_id','=',material)]" attrs="{'invisible':[('req_param_material_vendor','=',False)],'readonly':[('isLocked','=',True)]}"/>
                                             </group>
-                                            <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                            </group>
+                                            <group>
+                                                <group attrs="{'invisible':[('isEnvelope','=',True)]}">
+                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                </group>
 
-                                            <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
-                                                <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                <group attrs="{'invisible':[('isEnvelope','=',True)]}">
+                                                    <field name="NoWhiteCuts" attrs="{'invisible':[('WhiteCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="NoPrintedCuts" attrs="{'invisible':[('PrintedCutting','=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                </group>
                                             </group>
                                         </group>
                                     </group>

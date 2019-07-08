@@ -248,11 +248,11 @@
                     </notebook>
                     <group col="15">
                         <label for="total_price_1" string="Prices" colspan="10"/>
-                        <field name="total_price_1" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
-                        <field name="total_price_2" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
-                        <field name="total_price_3" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
-                        <field name="total_price_4" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
-                        <field name="total_price_run_on" nolabel="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                        <field name="total_price_1" nolabel="1" readonly="1"/>
+                        <field name="total_price_2" nolabel="1" readonly="1"/>
+                        <field name="total_price_3" nolabel="1" readonly="1" />
+                        <field name="total_price_4" nolabel="1" readonly="1"/>
+                        <field name="total_price_run_on" nolabel="1" readonly="1"/>
                     </group>
                     <group>
                         <group>

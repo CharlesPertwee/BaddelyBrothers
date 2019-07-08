@@ -72,23 +72,23 @@ class BbEstimate(http.Controller):
         
         x = 1
         
-        if Estimate.invoice_address.street:
-            table.cell(x,0).text = Estimate.invoice_address.street
+        if Estimate.invoice_account.street:
+            table.cell(x,0).text = Estimate.invoice_account.street
             table.cell(x,1).text = " "
             x += 1
             
-        if Estimate.invoice_address.street2 :
-            table.cell(x,0).text = Estimate.invoice_address.street2 
+        if Estimate.invoice_account.street2 :
+            table.cell(x,0).text = Estimate.invoice_account.street2 
             table.cell(x,1).text = " "
             x += 1
             
-        if Estimate.invoice_address.city:
-            table.cell(x,0).text = Estimate.invoice_address.city 
+        if Estimate.invoice_account.city:
+            table.cell(x,0).text = Estimate.invoice_account.city 
             table.cell(x,1).text = " "
             x += 1
         
-        if Estimate.invoice_address.zip:
-            table.cell(x,0).text = Estimate.invoice_address.zip 
+        if Estimate.invoice_account.zip:
+            table.cell(x,0).text = Estimate.invoice_account.zip 
             table.cell(x,1).text = " "
             x += 1
           
