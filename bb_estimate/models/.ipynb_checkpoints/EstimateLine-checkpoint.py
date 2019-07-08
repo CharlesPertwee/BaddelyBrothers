@@ -680,8 +680,6 @@ class EstimateLine(models.Model):
             
             if 'material_ids' not in qty_param and old_value != new_value:
                 message = "Qty %s from %s to %s" % (qty, old_value, new_value)
-                #self.pool.get('estimate.log').create(cr, uid, {'estimate_id': estimate_id, 'estimate_line_id': estimate_line_id, 'name': message,         })
-            
                 
     #end
     def onChangeEventTrigger(self,field):
