@@ -1114,7 +1114,7 @@ class EstimateLine(models.Model):
     @api.multi
     def write(self,vals):
         #check if resync is required
-        vals['reSync'] = self._checkResync(vals)
+        #vals['reSync'] = self._checkResync(vals)
         estimateData = {x : self.estimate_id[x] for x in self.estimate_id._fields if 'total_price_' in x}
         for qty in ['1','2','3','4','run_on']:
             if 'total_price_'+qty in vals.keys():
@@ -1125,7 +1125,20 @@ class EstimateLine(models.Model):
                 estimateData['total_price_1000_'+qty] += vals['total_price_per_1000_'+qty]
         vals['hasComputed'] = True
         self.estimate_id.write(estimateData)
-        return super(EstimateLine, self).write(vals)
+        
+        currentRecord = super(EstimateLine, self).write(vals)
+        
+        if self.option_type == 'process':
+            for mat in self.process_ids:
+                mat.ComputePrice()
+        elif self.option_type == 'material':
+            recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
+            for process in recs:
+                process.calc_param_material_line_id_charge()
+                dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
+                dictProcess.pop('hasComputed')
+                process.write(dictProcess)
+        return currentRecord
         
     
     @api.model
