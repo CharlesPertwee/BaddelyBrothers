@@ -23,7 +23,7 @@ class Manufacture(models.Model):
     
     Project = fields.Many2one('project.project','Project')
     
-    Estimate = fields.Many2one('bb_estimate.estimate','Originating Estimate')
+    Estimate = fields.Many2one('bb_estimate.estimate','Originating Estimate',ondelete='restrict')
     NoOfCopiesRequired = fields.Char('No. File Copies Reqd', size=5)
     NoOfCustomerCopies = fields.Char('Customer Files', size=5)
     OversRequired = fields.Char('No. Overs Reqd', size=5)

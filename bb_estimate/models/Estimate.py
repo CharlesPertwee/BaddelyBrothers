@@ -56,7 +56,7 @@ class Estimate(models.Model):
     #Estimate For Fields
     partner_id = fields.Many2one('res.partner', string='Customer', required=True)
     contact = fields.Many2one('res.partner', string='Contact')
-    project = fields.Many2one('project.project', string='Project',required=True)
+    project = fields.Many2one('project.project', string='Project',required=True,ondelete='restrict')
     invoice_account = fields.Many2one('res.partner', string='Invoice Account')
     #invoice_address = fields.Many2one('res.partner', string='Invoice Address')
     #invoice_contact = fields.Many2one('res.partner', string='Invoice Contact')

@@ -1083,13 +1083,18 @@ class EstimateLine(models.Model):
             estimateData['total_price_1000_'+qty] -= self['total_price_per_1000_'+qty]
         estimate.write(estimateData)
         
+        if self.option_type == 'material':
+            recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
+            for process in recs:
+                process.unlink()
+        
         rec = super(EstimateLine, self).unlink()
         
         if optionType == 'process':
             for m in estimate.estimate_line:
                 if m.option_type == 'material' and m.documentCatergory not in ['Packing','Despatch']:
                     m.RecalculatePrices(m,work_twist)
-                    
+                   
         return rec
     def _checkResync(self,vals):
         resync = False

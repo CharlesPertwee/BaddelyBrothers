@@ -8,7 +8,7 @@ class Leads(models.Model):
     
     Estimates = fields.One2many('bb_estimate.estimate','lead','Estimates')
     Estimate_Count = fields.Integer('Processes',compute='_compute_estimates')
-    Project = fields.Many2one('project.project')
+    Project = fields.Many2one('project.project',ondelete='restrict')
     
     def _compute_estimates(self):
             for record in self:
