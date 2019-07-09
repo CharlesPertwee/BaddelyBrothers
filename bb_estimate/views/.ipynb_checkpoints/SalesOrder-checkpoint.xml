@@ -20,6 +20,9 @@
               <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
                   <attribute name="attrs">{'invisible':['|',('partnerOnHold','=',True),('state', 'not in', ['draft'])]}</attribute>
               </xpath>
+              <xpath expr="//field[@name='note']" position="attributes">
+                  <attribute name="attrs">{'invisible':[('Estimate','!=',False)]}</attribute>
+              </xpath>
               <xpath expr="//notebook" position="inside">
                   <page name="PriceAdjustments" string="Price Adjustments">
                         <field name="priceHistory" readonly="1">
