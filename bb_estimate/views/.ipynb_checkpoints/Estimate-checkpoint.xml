@@ -53,9 +53,9 @@
                       <button class="oe_stat_button" icon="fa-play" type="object" name="CreateManufacturingOrder" attrs="{'invisible':['|',('showMo','=',False),('isLocked','!=',False)]}">
                           <span>Create Job</span>
                       </button>
-                      <button class="oe_stat_button" context="{'default_reSync': True,'default_estimate_id': active_id}" icon="fa-cirlce" type="action" name="%(bb_estimate.action_window_line_reSync)d" attrs="{'invisible':[('isLocked','!=',False)]}">
+                      <!--button class="oe_stat_button" context="{'default_reSync': True,'default_estimate_id': active_id}" icon="fa-cirlce" type="action" name="%(bb_estimate.action_window_line_reSync)d" attrs="{'invisible':[('isLocked','!=',False)]}">
                          <field name="reSyncCount" string="Re Sync" widget="statinfo"/>
-                      </button>
+                      </button-->
                     </div>
                     
                     <h1>

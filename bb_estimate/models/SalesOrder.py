@@ -6,7 +6,7 @@ class Sales(models.Model):
     _inherit = "sale.order"
     
     Project = fields.Many2one('project.project','Project')
-    Estimate = fields.Many2one('bb_estimate.estimate',string='Originating Estimate')
+    Estimate = fields.Many2one('bb_estimate.estimate',string='Originating Estimate',ondelete='restrict')
     JobTicket = fields.Many2one('mrp.production',string="Job Ticket")
     partnerOnHold = fields.Boolean('Account on Hold')
     priceHistory = fields.One2many('bb_estimate.price_history','SalesOrder','Price Adjustments')
