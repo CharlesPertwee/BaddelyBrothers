@@ -9,6 +9,7 @@ import base64
 from docx import Document
 from docx.shared import Cm, Mm, Inches, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH,WD_LINE_SPACING
+from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.table import WD_ROW_HEIGHT_RULE
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -28,6 +29,7 @@ class BbEstimate(http.Controller):
         header = io.BytesIO(response.content)
         section = document.sections[0]   # Create a section
         sec_header = section.header   # Create header 
+        sec_header.left_margin = Cm(0)
         header_tp = sec_header.add_paragraph(style='No Spacing')  # Add a paragraph in the header, you can add any anything in the paragraph
         header_run = header_tp.add_run()   # Add a run in the paragraph. In the run you can set the values 
         header_run.add_picture(header,width=Inches(7.26772)) 
@@ -35,11 +37,12 @@ class BbEstimate(http.Controller):
         universalTableStyle = "borderColor:white"
         styles = document.styles['No Spacing']
         font = styles.font
-        font.name = 'Times New Roman'
+        font.name = 'Tahoma'
         font.size = Pt(12)
         
         
         table = document.add_table(6, 3)
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
         table.style = 'Table Grid'
         tbl = table._tbl # get xml element in table
         for cell in tbl.iter_tcs():
@@ -95,11 +98,25 @@ class BbEstimate(http.Controller):
         table.cell(x,0).text = "Attn: %s"%(Estimate.contact.name)
         table.cell(x,2).text = "Estimate Number: %s"%(str(Estimate.estimate_number))
         
-        document.add_paragraph("Dear %s,"%(Estimate.contact.name.split()[0]))
-        document.add_paragraph("Thank you for your enquiry, we have pleasure in submitting our estimate as follows:")
+        for row in table.rows:
+            for cell in row.cells:
+                paragraphs = cell.paragraphs
+                for paragraph in paragraphs:
+                    for run in paragraph.runs:
+                        font = run.font
+                        font.name= "Tahoma"
+        
+        parag = document.add_paragraph("")
+        senten = parag.add_run("Dear %s,"%(Estimate.contact.name.split()[0]))
+        senten.font.name = "Tahoma"
+        
+        parag1 = document.add_paragraph("")
+        senten1 = parag1.add_run("Thank you for your enquiry, we have pleasure in submitting our estimate as follows:")
+        senten1.font.name = "Tahoma"
         
         record_length = len([x for x in Estimate.estimate_line if not x.isExtra])
         data_table = document.add_table(record_length+7, 3) 
+        data_table.alignment = WD_TABLE_ALIGNMENT.CENTER
         data_table.style = 'Table Grid'
         tblData = data_table._tbl # get xml element in table
         for cell in tblData.iter_tcs():
@@ -163,6 +180,14 @@ class BbEstimate(http.Controller):
         if Estimate.total_price_run_on:
             data_table.cell(y+4,0).text=""
             data_table.cell(y+4,1).text="Run on: £%s per %s"%(str(Estimate.total_price_run_on).encode("utf-8").decode("utf-8"),str(Estimate.run_on).encode("utf-8").decode("utf-8"))
+            
+        for row in data_table.rows:
+            for cell in row.cells:
+                paragraphs = cell.paragraphs
+                for paragraph in paragraphs:
+                    for run in paragraph.runs:
+                        font = run.font
+                        font.name= "Tahoma"
         
         for condition in Estimate.estimateConditions:
             document.add_paragraph(condition.description)
@@ -207,11 +232,27 @@ class BbEstimate(http.Controller):
                     extra_table.cell(z+4,1).text = "%s @ £%s"%(str(extra.quantity_4).encode("utf-8").decode("utf-8"),str(extra.total_price_4).encode("utf-8").decode("utf-8"))
                     extra_table.cell(z+5,1).text = "Run on: £%s per %s"%(str(extra.total_price_run_on).encode("utf-8").decode("utf-8"),str(extra.run_on).encode("utf-8").decode("utf-8"))
                     z += 6
+                    
+            for row in extra_table.rows:
+                for cell in row.cells:
+                    paragraphs = cell.paragraphs
+                    for paragraph in paragraphs:
+                        for run in paragraph.runs:
+                            font = run.font
+                            font.name= "Tahoma"
                            
-        document.add_paragraph("Should you require any more information or wish to discuss your detailed requirements further, please contact us on 020 8986 2666.")
+        p = document.add_paragraph("")
+        sen = p.add_run('Should you require any more information or wish to discuss your detailed requirements further, please contact us on 020 8986 2666.')
+        sen.font.name = 'Tahoma'
         
-        document.add_paragraph('Yours faithfully,')
-        document.add_paragraph(Estimate.estimator.name)
+        p1 = document.add_paragraph('')
+        sen1 = p1.add_run('Yours faithfully,')
+        sen1.font.name = 'Tahoma'
+        
+        p2 = document.add_paragraph("")
+        sen2 = p2.add_run(Estimate.estimator.name)
+        sen2.font.name = 'Tahoma'
+        
         
         #url1 = 'https://charlespertwee-baddelybrothers-customization-dv-444705.dev.odoo.com/bb_estimate/static/src/img/BaddeleyFooter.png'
         url1 = request.httprequest.host_url+"bb_estimate/static/src/img/BaddeleyFooter.png"
@@ -221,7 +262,7 @@ class BbEstimate(http.Controller):
         default_footer = section.footer   # Add a footer
         footer_p = default_footer.add_paragraph()
         footer_r = footer_p.add_run()
-        footer_r.add_picture(footer,width=Inches(6.26772)) 
+        footer_r.add_picture(footer,width=Inches(6)) 
         
         docx_stream = io.BytesIO()
         document.save(docx_stream)
@@ -232,7 +273,7 @@ class BbEstimate(http.Controller):
             'type':'binary',
             'res_model':'bb_estimate.estimate',
             'res_id':Estimate.id,
-            'datas_fname':"%s.doc"%(Estimate.estimate_number),
+            'datas_fname':"%s.docx"%(Estimate.estimate_number),
             'mimetype':'application/msword',
             'datas':base64.encodestring(docx_bytes)
         })
