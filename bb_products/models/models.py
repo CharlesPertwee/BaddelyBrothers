@@ -12,21 +12,44 @@ class ProductsTemplate(models.Model):
     estimateAvailable = fields.Boolean(string='Available in Estimating?')
     grammage = fields.Char(string='Grammage (G.S.M)')
     sheetSize = fields.Many2one('bb_products.material_size', string='Sheet Size')
-    margin = fields.Float(string='Margin', compute='_compute_margin')
+    margin = fields.Float(string='Margin')#,compute="_compute_margin")
     sheet_width = fields.Integer(string='Sheet Width(mm)')
     sheet_height = fields.Integer(string='Sheet Height(mm)')
     thickness = fields.Float(string='Thickness(microns)')
     staticPrice = fields.Boolean('Static Price')
     
-    def _compute_margin(self):
+    @api.onchange('margin')
+    def calcPriceChange(self):
         for record in self:
-            margin = 0
-            if record.standard_price == 0:
-                margin = 100
-            else:
-                margin = ((record.list_price - record.standard_price)/record.standard_price) * 100
+            record.list_price = ((record.margin / 100) + 1) * record.standard_price
+            
+    @api.onchange('list_price')
+    def calcListPriceChange(self):
+        for record in self:
+            if record.list_price:
+                record.margin = ((record.list_price / record.standard_price) - 1) * 100 if record.standard_price else 0.0
+            elif record.margin:
+                record.standard_price = record.list_price / ((record.margin / 100) + 1)
+                
+    @api.onchange('standard_price')
+    def calcStandardPriceChange(self):
+        for record in self:
+            if record.list_price:
+                record.margin = ((record.list_price / record.standard_price) - 1) * 100 if record.standard_price else 0.0
+            elif record.margin:
+                record.list_price = ((record.margin / 100) + 1) * record.standard_price
+                
+                
+    
+#     def _compute_margin(self):
+#         for record in self:
+#             margin = 0
+#             if record.standard_price == 0:
+#                 margin = 100
+#             else:
+#                 margin = ((record.list_price - record.standard_price)/record.standard_price) * 100
 
-            record.margin = margin
+#             record.margin = margin
         
     @api.onchange('sheetSize')
     def calc_sheet_dimen(self):

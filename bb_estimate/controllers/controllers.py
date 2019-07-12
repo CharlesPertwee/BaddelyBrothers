@@ -24,7 +24,7 @@ class BbEstimate(http.Controller):
         document = Document()
         
         #url = 'https://charlespertwee-baddelybrothers-customization-dv-444705.dev.odoo.com/bb_estimate/static/src/img/BaddeleyNew.jpg'
-        url = request.httprequest.host_url+"bb_estimate/static/src/img/BaddeleyNew.jpg"
+        url = request.httprequest.host_url+"bb_estimate/static/src/img/Header.png"
         response = requests.get(url, stream=True)
         header = io.BytesIO(response.content)
         section = document.sections[0]   # Create a section
@@ -32,7 +32,7 @@ class BbEstimate(http.Controller):
         sec_header.left_margin = Cm(0)
         header_tp = sec_header.add_paragraph(style='No Spacing')  # Add a paragraph in the header, you can add any anything in the paragraph
         header_run = header_tp.add_run()   # Add a run in the paragraph. In the run you can set the values 
-        header_run.add_picture(header,width=Inches(7.26772)) 
+        header_run.add_picture(header,width=Inches(6)) 
         
         universalTableStyle = "borderColor:white"
         styles = document.styles['No Spacing']

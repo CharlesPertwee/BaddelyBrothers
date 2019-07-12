@@ -10,7 +10,7 @@ class ProductSize(models.Model):
     height = fields.Integer('Height(m.m)')
     flatWidth = fields.Integer('Flat / Working Width(m.m)')
     flatHeight = fields.Integer('Flat / Working Height(m.m)')
-    isEnvelopeEstimate = fields.Boolean('Is Envelope Estimate?')
+    isEnvelopeEstimate = fields.Boolean('Is EnvelopeSize?')
     isPrintSize = fields.Boolean('Is Print Size?')
     isEnquirySize = fields.Boolean('Available for Enquiries?')
     knifeNumber = fields.Char('Knife Number')
