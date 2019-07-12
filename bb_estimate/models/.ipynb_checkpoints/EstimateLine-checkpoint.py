@@ -373,7 +373,8 @@ class EstimateLine(models.Model):
                 record.unallocated_finished_quantity_run_on -= record.param_finished_quantity_run_on
             
             if record.material:
-                if record.material.purchase_ok:
+                proc = self.env['stock.location.route'].sudo().search(['|',('name','=','Buy'),('name','=','Make To Order')])
+                if set(record.material.route_ids).issubset(proc) and record.material.route_ids:
                     if record.material.seller_ids:
                         record.param_material_vendor = record.material.seller_ids[0]
                         record.req_param_material_vendor = False
@@ -742,9 +743,10 @@ class EstimateLine(models.Model):
                             record.param_sheets_per_box,
                             record.param_time_per_box,
                             record.staticPrice,
+                            record.param_misc_charge_per_cm2_area,
                             field)
     
-    def calc_qty_params(self,workcenterId,material,finished_quantity,param_make_ready_time,param_machine_speed,param_running_time,param_wash_up_time,param_make_ready_overs,param_running_overs_percent,param_finished_quantity,quantity_required,cost_per_unit,price_per_unit,margin,total_price,total_price_per_1000,qty,param_additional_charge,param_number_up,param_number_of_colors,param_number_of_colors_rev,param_grammage,param_die_size,param_misc_charge_per_cm2,param_no_of_ink_mixes,quantity_1,quantity_2,quantity_3,quantity_4,run_on,param_number_out,param_working_width,param_working_height,param_printed_material,param_duplex_sheets,param_number_of_sheets,param_material_line_id,param_number_of_cuts,param_sheets_per_pile,param_time_per_pile,param_env_windowpatching,param_env_peelandstick,param_env_inlineemboss,param_env_gumming,req_param_env_windowpatching,req_param_env_peelandstick,req_param_env_inlineemboss,req_param_env_gumming,param_sheets_per_box,param_time_per_box,static_price,fieldUpdated):
+    def calc_qty_params(self,workcenterId,material,finished_quantity,param_make_ready_time,param_machine_speed,param_running_time,param_wash_up_time,param_make_ready_overs,param_running_overs_percent,param_finished_quantity,quantity_required,cost_per_unit,price_per_unit,margin,total_price,total_price_per_1000,qty,param_additional_charge,param_number_up,param_number_of_colors,param_number_of_colors_rev,param_grammage,param_die_size,param_misc_charge_per_cm2,param_no_of_ink_mixes,quantity_1,quantity_2,quantity_3,quantity_4,run_on,param_number_out,param_working_width,param_working_height,param_printed_material,param_duplex_sheets,param_number_of_sheets,param_material_line_id,param_number_of_cuts,param_sheets_per_pile,param_time_per_pile,param_env_windowpatching,param_env_peelandstick,param_env_inlineemboss,param_env_gumming,req_param_env_windowpatching,req_param_env_peelandstick,req_param_env_inlineemboss,req_param_env_gumming,param_sheets_per_box,param_time_per_box,static_price,param_misc_charge_per_cm2_area,fieldUpdated):
         #Variables required for calculations        
         return_values = {}
         process_type = workcenterId.process_type
@@ -778,6 +780,7 @@ class EstimateLine(models.Model):
             'param_time_per_pile':param_time_per_pile,
             'param_additional_charge':param_additional_charge,
             'param_die_size':param_die_size,
+            'param_misc_charge_per_cm2_area':param_misc_charge_per_cm2_area,
             'param_minimum_price': 0,
             'param_misc_charge_per_cm2':param_misc_charge_per_cm2,
             'param_no_of_ink_mixes':param_no_of_ink_mixes,
@@ -1207,13 +1210,14 @@ class EstimateLine(models.Model):
                             'lineName' : material.name
                         }
                         newRecord.update(data)
-                        super(EstimateLine,self).create(newRecord)
+                        self.create(newRecord)
                         
                 elif lineId.option_type == 'material':
                     if lineId.MaterialTypes == 'Non-Stockable':
                         product = self.env['product.product'].sudo()
                         seller = self.env['product.supplierinfo'].sudo()
-                        mto =self.env['stock.location.route'].sudo().search([('name','=','Make To Order')])
+                        mto =self.env['stock.location.route'].sudo().search([('name','=','Make To Order')],limit=1)
+                        buy =self.env['stock.location.route'].sudo().search([('name','=','Buy')],limit=1)
                         newProduct = {
                             'name' : lineId.MaterialName,
                             'type': 'product',
@@ -1231,6 +1235,7 @@ class EstimateLine(models.Model):
                         }
                         if mto and lineId.NonStockMaterialType == 'Bespoke Material':
                             newProduct['route_ids'] = [(4,mto.id)]
+                            newProduct['route_ids'] = [(4,buy.id)]
                         if lineId.PurchaseUnit:
                             newProduct['uom_id'] = lineId.PurchaseUnit.id
                             newProduct['uom_po_id'] = lineId.PurchaseUnit.id
@@ -1250,11 +1255,13 @@ class EstimateLine(models.Model):
 
                             lineId.write({'material':productId.id})
                             lineId.calc_material_change()
+                            lineId._onChangeNumberOut()
                             dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}
                             lineId.write(dictLine)
                         elif productId:
                             lineId.write({'material':productId.id})    
                             lineId.calc_material_change()
+                            lineId._onChangeNumberOut()
                             dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}
                             lineId.write(dictLine)
                     
