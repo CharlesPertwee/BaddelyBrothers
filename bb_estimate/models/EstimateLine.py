@@ -1226,11 +1226,12 @@ class EstimateLine(models.Model):
                             'sheetSize' : lineId.SheetSize.id,
                             'sheet_width' : lineId.SheetWidth,
                             'sheet_height' : lineId.SheetHeight,
-                            'standand_price': lineId.CostRate,
+                            'standard_price': lineId.CostRate,
                             'list_price': lineId.CharegeRate,
                             'productType': 'Non-Stock',
                             'customerDescription': lineId.customer_description,
                             'jobTicketDescription': lineId.JobTicketText,
+                            'margin': lineId.Margin,
                             'purchase_ok':False
                         }
                         if mto and lineId.NonStockMaterialType == 'Bespoke Material':
