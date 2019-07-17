@@ -210,9 +210,9 @@ class EstimateLine(models.Model):
     SheetSize = fields.Many2one('bb_products.material_size',string="Sheet Size")
     PurchaseUnit = fields.Many2one('uom.uom',string="Purchase Unit")
     Supplier = fields.Many2one('res.partner',string="Supplier",domain="[('supplier','=',True)]")
-    CostRate = fields.Float('Cost Rate')
-    CharegeRate = fields.Float('Charge Rate')
-    Margin = fields.Float('Margin')
+    CostRate = fields.Float('Cost Rate',digits=(16,2))
+    CharegeRate = fields.Float('Charge Rate',digits=(16,2))
+    Margin = fields.Float('Margin',digits=(10,2))
     isLocked = fields.Boolean('Is Locked',related="estimate_id.isLocked")
     Sequence = fields.Integer('Sequence', default=1, help='Gives the sequence order when displaying a product list')
     staticPrice = fields.Boolean('Static Price', related="estimate_id.product_type.staticPrice")
@@ -247,10 +247,10 @@ class EstimateLine(models.Model):
     param_no_of_ink_mixes = fields.Integer('No of Ink mixes')
     req_param_no_of_ink_mixes = fields.Boolean('No of Ink mixes')
     
-    param_additional_charge = fields.Float('Misc. Material Charge (per 1000)')
+    param_additional_charge = fields.Float('Misc. Material Charge (per 1000)',digits=(10,2))
     req_param_additional_charge = fields.Boolean('Misc. Material Charge (per 1000)')
     
-    param_misc_charge_per_cm2 = fields.Float('Misc. Material Charge (Per cm2)')
+    param_misc_charge_per_cm2 = fields.Float('Misc. Material Charge (Per cm2)',digits=(10,6))
     req_param_misc_charge_per_cm2 = fields.Boolean('Misc. Material Charge (Per cm2)')
     
     param_misc_charge_per_cm2_area = fields.Float('Misc. Mat. Charge Area (cm2)')
@@ -271,7 +271,7 @@ class EstimateLine(models.Model):
     param_sheets_per_box = fields.Integer('Sheets per Box')
     req_param_sheets_per_box = fields.Boolean('Req. Sheets per Box')
     
-    param_time_per_box = fields.Float('Time per Box(Hours)')
+    param_time_per_box = fields.Float('Time per Box(Hours)',digits=(10,2))
     req_param_time_per_box =fields.Boolean('Req. Time per Box (Hours)')
     
     param_number_of_cuts = fields.Integer('Number of cuts')
@@ -280,7 +280,7 @@ class EstimateLine(models.Model):
     param_sheets_per_pile = fields.Integer('Sheets per pile')
     req_param_sheets_per_pile = fields.Boolean('Sheets per pile')
     
-    param_time_per_pile = fields.Float('Time per pile')
+    param_time_per_pile = fields.Float('Time per pile',digits=(10,2))
     req_param_time_per_pile = fields.Boolean('Time per pile')
     
     param_env_windowpatching = fields.Boolean('Window Patching')
@@ -374,7 +374,7 @@ class EstimateLine(models.Model):
             
             if record.material:
                 proc = self.env['stock.location.route'].sudo().search(['|',('name','=','Buy'),('name','=','Make To Order')])
-                if set(record.material.route_ids).issubset(proc) and record.material.route_ids:
+                if set(proc).issubset(record.material.route_ids) and record.material.route_ids:
                     if record.material.seller_ids:
                         record.param_material_vendor = record.material.seller_ids[0]
                         record.req_param_material_vendor = False

@@ -20,11 +20,11 @@ class QtyBreakParams(models.Model):
     qty_greater_than = fields.Integer('Quantity Greater Than')
     weight_greater_than = fields.Integer('Weight Greater Than')
     qty_upto = fields.Integer('Quantity Upto')
-    make_ready_time = fields.Float('Make Ready Time(Hours)')
-    machine_speed = fields.Float('Machine Speed')
-    wash_up_time = fields.Float('Wash Up Time(Hours)')
+    make_ready_time = fields.Float('Make Ready Time(Hours)',digits=(10,2))
+    machine_speed = fields.Float('Machine Speed',digits=(10,2))
+    wash_up_time = fields.Float('Wash Up Time(Hours)',digits=(10,2))
     make_ready_overs = fields.Integer('Make Ready Overs')
-    running_overs_percent = fields.Float('Running Overs(%)')
+    running_overs_percent = fields.Float('Running Overs(%)',digits=(10,2))
     
     standard_price = fields.Float('Hourly Cost')
     list_price = fields.Float('Hourly Rate')
@@ -32,7 +32,7 @@ class QtyBreakParams(models.Model):
     minimum_price = fields.Float('Minimum Charge', digits=(16,2))
     time_per_pile = fields.Float('Running Time(per pile)',digits=(10,2))
     sheets_per_pile = fields.Integer('Sheets Per Pile')
-    margin_percent = fields.Float('Margin(%)')
+    margin_percent = fields.Float('Margin(%)',digits=(16,2))
     isDefault = fields.Boolean('Default Breaks')
     
     #_sql_constraints = [('DefaultQtyBreaks', 'unique(process_id, isDefault)', 'Default Quantity Breaks is already set for this process.') ]
@@ -57,9 +57,9 @@ class MrpWorkcenter(models.Model):
     standard_price = fields.Float('Hourly Cost', default= 50.00)
     list_price = fields.Float('Hourly Rate', default= 75.00)
     margin_percent = fields.Float('Margin(%)', default= 48.60)
-    additional_charge = fields.Float('Misc. Material Charge per 1000', default=10.00)
-    misc_charge_per_cm2 = fields.Float('Misc. Material Charge per cm2', default=0.0)
-    ink_mix_time = fields.Float('Ink Mix Time (hours)', default=0.28)
+    additional_charge = fields.Float('Misc. Material Charge per 1000',digits=(10,2))
+    misc_charge_per_cm2 = fields.Float('Misc. Material Charge per cm2',digits=(16,6))
+    ink_mix_time = fields.Float('Ink Mix Time (hours)',digits=(10,2))
     
     associatedBoxId = fields.Many2one('product.product',string="Packaging Product")
     sheetsPerBox = fields.Integer('Sheets Per Box')
