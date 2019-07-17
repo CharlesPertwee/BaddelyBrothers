@@ -22,7 +22,7 @@ class BbEstimate(http.Controller):
         values = dict(kw)
         Estimate = request.env['bb_estimate.estimate'].sudo().search([('id','=',values['id'])])
         document = Document()
-        
+        paragraph_format = document.styles['No Spacing']
         #url = 'https://charlespertwee-baddelybrothers-customization-dv-444705.dev.odoo.com/bb_estimate/static/src/img/BaddeleyNew.jpg'
         url = request.httprequest.host_url+"bb_estimate/static/src/img/Header.png"
         response = requests.get(url, stream=True)
@@ -70,9 +70,15 @@ class BbEstimate(http.Controller):
             tcPr.append(tcBorders)
             
         table.line_spacing_rule = 0
+        table.autofit = True
         table.cell(0,0).text = Estimate.partner_id.name
-        paraDate = table.cell(0,2).add_paragraph("Date: %s"%(str(datetime.datetime.now().strftime('%d/%m/%Y'))))
-        paraDate.alignment=WD_ALIGN_PARAGRAPH.RIGHT
+        table.cell(0,2).paragraphs[0].text = "Date: %s"%(str(datetime.datetime.now().strftime('%d/%m/%Y')))
+        table.cell(0,2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        
+        #.add_paragraph("Date: %s"%(str(datetime.datetime.now().strftime('%d/%m/%Y'))))
+        
+        #table.cell(0,2).vertical_alignment = WD_ALIGN_VERTICAL.TOP
+        #paraDate.alignment=WD_ALIGN_PARAGRAPH.RIGHT
         
         x = 1
         
@@ -121,7 +127,8 @@ class BbEstimate(http.Controller):
         addtitional = sum([1 for x in ['quantity_1','quantity_2','quantity_3','quantity_4','run_on'] if Estimate[x] > 0]) + 2
         data_table = document.add_table(record_length + addtitional, 2) 
         data_table.alignment = WD_TABLE_ALIGNMENT.CENTER
-        data_table.allow_autofit = False
+        data_table.allow_autofit = True
+        data_table.autofit = True
         data_table.style = 'Table Grid'
         tblData = data_table._tbl # get xml element in table
         for cell in tblData.iter_tcs():
@@ -148,14 +155,14 @@ class BbEstimate(http.Controller):
             tcBorders.append(right)
             tcPr.append(tcBorders)
         
-        inches = 0.5  
+        inches = 1.0 
         
         data_table.cell(0,0).text = "Title: "   
-        data_table.cell(0,0).width = Inches(inches)
+        #data_table[0].width = Inches(inches)
         data_table.cell(0,1).text = Estimate.title
         
         data_table.cell(1,0).text = "Size: "    
-        data_table.cell(1,0).width = Inches(inches)
+        #data_table[0].width = Inches(inches)
         data_table.cell(1,1).text = "%s X %s\n"%(Estimate.finished_height,Estimate.finished_width)
         data_table.cell(1,1).vertical_alignment = WD_ALIGN_VERTICAL.TOP
        
@@ -163,47 +170,49 @@ class BbEstimate(http.Controller):
         for estimate_line_material in Estimate.estimate_line:
             if estimate_line_material.option_type == 'material' and estimate_line_material.customer_description and not estimate_line_material.isExtra:
                 data_table.cell(y,0).text = "Material: "
-                data_table.cell(y,0).width = Inches(inches)
+                #data_table.cell(y,0).width = Inches(inches)
                 data_table.cell(y,1).text = estimate_line_material.customer_description
                 y += 1
         
         if Estimate.isEnvelope:
-            document.add_paragraph(Estimate.GenerateEnvelopeDetails(Estimate))
+            envDet = document.add_paragraph("")
+            envDetail = envDet.add_run(Estimate.GenerateEnvelopeDetails(Estimate))
+            envDetail.font.name = "Tahoma"
         
         for estimate_line_process in Estimate.estimate_line:
             if estimate_line_process.option_type == 'process' and estimate_line_process.customer_description and not estimate_line_process.isExtra:
                 data_table.cell(y,0).text = "Process: "
-                data_table.cell(y,0).width = Inches(inches)
+                #data_table.cell(y,0).width = Inches(inches)
                 data_table.cell(y,1).text = estimate_line_process.customer_description
                 y += 1
         
         if Estimate.quantity_1:
             data_table.cell(y,0).text="Qty/Price"
-            data_table.cell(y,0).width = Inches(inches)
+            #data_table.cell(y,0).width = Inches(inches)
             data_table.cell(y,1).text="%s    @    £%s"%(str(Estimate.quantity_1).encode("utf-8").decode("utf-8"),str(Estimate.total_price_1).encode("utf-8").decode("utf-8"))
             y+=1
         
         if Estimate.quantity_2:
             data_table.cell(y,0).text=""
-            data_table.cell(y,0).width = Inches(inches)
+            #data_table.cell(y,0).width = Inches(inches)
             data_table.cell(y,1).text="%s    @    £%s"%(str(Estimate.quantity_2).encode("utf-8").decode("utf-8"),str(Estimate.total_price_2).encode("utf-8").decode("utf-8"))
             y+=1
         
         if Estimate.quantity_3:
             data_table.cell(y,0).text=""
-            data_table.cell(y,0).width = Inches(inches)
+            #data_table.cell(y,0).width = Inches(inches)
             data_table.cell(y,1).text="%s    @    £%s"%(str(Estimate.quantity_3).encode("utf-8").decode("utf-8"),str(Estimate.total_price_3).encode("utf-8").decode("utf-8"))
             y+=1
         
         if Estimate.quantity_4:
             data_table.cell(y,0).text=""
-            data_table.cell(y,0).width = Inches(inches)
+            #data_table.cell(y,0).width = Inches(inches)
             data_table.cell(y,1).text="%s    @    £%s"%(str(Estimate.quantity_4).encode("utf-8").decode("utf-8"),str(Estimate.total_price_4).encode("utf-8").decode("utf-8"))
             y+=1
         
         if Estimate.total_price_run_on:
             data_table.cell(y,0).text=""
-            data_table.cell(y,0).width = Inches(inches)
+            #data_table.cell(y,0).width = Inches(inches)
             data_table.cell(y,1).text="Run on: £%s per %s"%(str(Estimate.total_price_run_on).encode("utf-8").decode("utf-8"),str(Estimate.run_on).encode("utf-8").decode("utf-8"))
             y+=1
             
@@ -214,11 +223,17 @@ class BbEstimate(http.Controller):
                     for run in paragraph.runs:
                         font = run.font
                         font.name= "Tahoma"
-        
+                        
+        #for column in data_table.columns[0]:
+        data_table.columns[0].width = Inches(inches)
+        data_table.columns[1].width = Inches(5)
+            
+#         for row in data_table.rows:
+#             row.cells[0].width = Inches(0.5)
+            
         run = document.add_paragraph().add_run()
         #run.add_break() 
         
-        paragraph_format = document.styles['No Spacing']
         line = False
         for condition in Estimate.estimateConditions:
             line = document.add_paragraph(condition.description,style=paragraph_format)
@@ -230,7 +245,8 @@ class BbEstimate(http.Controller):
         
         if Estimate.hasExtra:
             extra_length = (len([x for x in Estimate.estimate_line if x.isExtra]))*6
-            extra_table = document.add_table(extra_length, 3)            
+            extra_table = document.add_table(extra_length, 2)  
+            extra_table.alignment = WD_TABLE_ALIGNMENT.CENTER
             extra_table.style = 'Table Grid'
             tblExtraData = extra_table._tbl # get xml element in table
             for cell in tblExtraData.iter_tcs():
@@ -276,6 +292,9 @@ class BbEstimate(http.Controller):
                         for run in paragraph.runs:
                             font = run.font
                             font.name= "Tahoma"
+                            
+            extra_table.columns[0].width = Inches(inches)
+            extra_table.columns[1].width = Inches(5)
                            
         p = document.add_paragraph("")
         sen = p.add_run('Should you require any more information or wish to discuss your detailed requirements further, please contact us on 020 8986 2666.')
