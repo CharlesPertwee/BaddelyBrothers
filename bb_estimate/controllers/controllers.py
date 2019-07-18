@@ -256,7 +256,7 @@ class BbEstimate(http.Controller):
 #         for row in data_table.rows:
 #             row.cells[0].width = Inches(0.5)
             
-        run = document.add_paragraph().add_run()
+        #run = document.add_paragraph().add_run()
         #run.add_break() 
         
         line = False

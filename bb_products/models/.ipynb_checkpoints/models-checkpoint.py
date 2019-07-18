@@ -54,7 +54,7 @@ class Products(models.Model):
         product = self
         name = product.name
         if product.sheetSize:
-            name = "%s (%d X %d) - %d G.S.M"%(name,product.sheet_width,product.sheet_height,product.grammage)            
+            name = "%s (%d X %d) - %s G.S.M"%(name,product.sheet_width,product.sheet_height,product.grammage)            
             #name = name + "  " + product.sheetSize.name
         return name
     
