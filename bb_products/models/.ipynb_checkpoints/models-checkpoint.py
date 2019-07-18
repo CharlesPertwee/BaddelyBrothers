@@ -39,17 +39,6 @@ class ProductsTemplate(models.Model):
             elif record.margin:
                 record.list_price = ((record.margin / 100) + 1) * record.standard_price
                 
-                
-    
-#     def _compute_margin(self):
-#         for record in self:
-#             margin = 0
-#             if record.standard_price == 0:
-#                 margin = 100
-#             else:
-#                 margin = ((record.list_price - record.standard_price)/record.standard_price) * 100
-
-#             record.margin = margin
         
     @api.onchange('sheetSize')
     def calc_sheet_dimen(self):
@@ -57,3 +46,22 @@ class ProductsTemplate(models.Model):
             if record.sheetSize:
                 record.sheet_width = record.sheetSize.width
                 record.sheet_height = record.sheetSize.height
+
+class Products(models.Model):
+    _inherit = 'product.product'
+    
+    def _get_name(self):
+        product = self
+        name = product.name
+        if product.sheetSize:
+            name = "%s (%d X %d) - %d G.S.M"%(name,product.sheet_width,product.sheet_height,product.grammage)            
+            #name = name + "  " + product.sheetSize.name
+        return name
+    
+    @api.multi
+    def name_get(self):
+        res = []
+        for product in self:
+            name = product._get_name()
+            res.append((product.id, name))
+        return res

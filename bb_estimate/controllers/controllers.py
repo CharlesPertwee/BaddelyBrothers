@@ -188,32 +188,57 @@ class BbEstimate(http.Controller):
         
         if Estimate.quantity_1:
             data_table.cell(y,0).text="Qty/Price"
-            #data_table.cell(y,0).width = Inches(inches)
-            data_table.cell(y,1).text="%s    @    £%s"%(str(Estimate.quantity_1).encode("utf-8").decode("utf-8"),str(Estimate.total_price_1).encode("utf-8").decode("utf-8"))
+            price = 0
+            if Estimate.total_price_1 > Estimate.total_price_extra_1:
+                price =  (Estimate.total_price_1 - Estimate.total_price_extra_1)
+            else:
+                price = (Estimate.total_price_extra_1 - Estimate.total_price_1)
+                                
+            data_table.cell(y,1).text="%d    @    £%.2f"%(Estimate.quantity_1,price)
             y+=1
         
         if Estimate.quantity_2:
             data_table.cell(y,0).text=""
-            #data_table.cell(y,0).width = Inches(inches)
-            data_table.cell(y,1).text="%s    @    £%s"%(str(Estimate.quantity_2).encode("utf-8").decode("utf-8"),str(Estimate.total_price_2).encode("utf-8").decode("utf-8"))
+            price = 0
+            if Estimate.total_price_2 > Estimate.total_price_extra_2:
+                price =  (Estimate.total_price_2 - Estimate.total_price_extra_2)
+            else:
+                price = (Estimate.total_price_extra_2 - Estimate.total_price_2)
+                                
+            data_table.cell(y,1).text="%d    @    £%.2f"%(Estimate.quantity_2,price)
             y+=1
         
         if Estimate.quantity_3:
             data_table.cell(y,0).text=""
-            #data_table.cell(y,0).width = Inches(inches)
-            data_table.cell(y,1).text="%s    @    £%s"%(str(Estimate.quantity_3).encode("utf-8").decode("utf-8"),str(Estimate.total_price_3).encode("utf-8").decode("utf-8"))
+            price = 0
+            if Estimate.total_price_3 > Estimate.total_price_extra_3:
+                price =  (Estimate.total_price_3 - Estimate.total_price_extra_3)
+            else:
+                price = (Estimate.total_price_extra_3 - Estimate.total_price_3)
+                                
+            data_table.cell(y,1).text="%s    @    £%.2f"%(Estimate.quantity_3,price)
             y+=1
         
         if Estimate.quantity_4:
             data_table.cell(y,0).text=""
-            #data_table.cell(y,0).width = Inches(inches)
-            data_table.cell(y,1).text="%s    @    £%s"%(str(Estimate.quantity_4).encode("utf-8").decode("utf-8"),str(Estimate.total_price_4).encode("utf-8").decode("utf-8"))
+            price = 0
+            if Estimate.total_price_4 > Estimate.total_price_extra_4:
+                price =  (Estimate.total_price_4 - Estimate.total_price_extra_4)
+            else:
+                price = (Estimate.total_price_extra_4 - Estimate.total_price_4)
+                                
+            data_table.cell(y,1).text="%s    @    £%.2f"%(Estimate.quantity_4,price)
             y+=1
         
         if Estimate.total_price_run_on:
             data_table.cell(y,0).text=""
-            #data_table.cell(y,0).width = Inches(inches)
-            data_table.cell(y,1).text="Run on: £%s per %s"%(str(Estimate.total_price_run_on).encode("utf-8").decode("utf-8"),str(Estimate.run_on).encode("utf-8").decode("utf-8"))
+            price = 0
+            if Estimate.total_price_run_on > Estimate.total_price_extra_run_on:
+                price =  (Estimate.total_price_run_on - Estimate.total_price_extra_run_on)
+            else:
+                price = (Estimate.total_price_extra_run_on - Estimate.total_price_run_on)
+                                
+            data_table.cell(y,1).text="Run on: £%s per %.2f"%(Estimate.quantity_4,price)
             y+=1
             
         for row in data_table.rows:
