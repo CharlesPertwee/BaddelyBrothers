@@ -8,7 +8,6 @@
         """,
 
     'description': """
-    
     """,
 
     'author': "SquadsoftTech",

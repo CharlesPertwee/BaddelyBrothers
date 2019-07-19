@@ -469,7 +469,7 @@ class EstimateLine(models.Model):
         self.onChangeEventTrigger('param_additional_charge')
         
     @api.onchange('param_misc_charge_per_cm2')
-    def calc_param_misc_charge_per_cm2_area(self):
+    def calc_param_misc_charge_per_cm2(self):
         self.onChangeEventTrigger('param_misc_charge_per_cm2')
         
     @api.onchange('param_misc_charge_per_cm2_area')
