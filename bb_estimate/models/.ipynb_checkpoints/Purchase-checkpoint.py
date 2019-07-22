@@ -24,7 +24,9 @@ class Purchase(models.Model):
                     if sq.prefix in po:
                         mrp = self.env['mrp.production'].search([('name','=',po.strip())])
                         if mrp:
-                            if self not in mrp.Project.Purchase:
+                            if self not in mrp.Purchases:
+                                mrp.write({'Purchases':[(4, self.id)]})
+                            if self not in mrp.Project.Purchase:                                
                                 mrp.Project.write({'Purchase':[(4, self.id)]})
                             
         return super(Purchase,self).write(vals)
@@ -40,6 +42,8 @@ class Purchase(models.Model):
                     if sq.prefix in po:
                         mrp = self.env['mrp.production'].search([('name','=',po.strip())])
                         if mrp:
+                            if self not in mrp.Purchases:
+                                mrp.write({'Purchases':[(4, record.id)]})
                             if self not in mrp.Project.Purchase:
                                 mrp.Project.write({'Purchase':[(4, record.id)]})
                             

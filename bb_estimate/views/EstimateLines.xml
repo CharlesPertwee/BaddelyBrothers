@@ -147,7 +147,7 @@
                                             <field name="param_number_out" attrs="{'invisible':['&amp;',('option_type','!=','material'),('req_param_number_out','=',False)],'required':[('req_param_number_out','=',True)],'readonly':[('isLocked','=',True)]}" />
                                             <field name="grammage" attrs="{'invisible':[('req_grammage','=',False)],'required':[('req_grammage','=',True)],'readonly':[('isLocked','=',True)]}" />
                                             <field name="param_sheets_per_box" attrs="{'invisible':[('req_param_sheets_per_box','=',False)],'required':[('req_param_sheets_per_box','=',True)],'readonly':[('isLocked','=',True)]}" />
-                                            <field name="param_number_up" readonly="1" attrs="{'invisible':[('req_param_number_up','=',False)],'required':[('req_param_number_up','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_number_up" attrs="{'invisible':[('req_param_number_up','=',False)],'required':[('req_param_number_up','=',True)],'readonly':[('isLocked','=',True)]}" />
                                             <field name="param_supplier" attrs="{'invisible':[('req_param_supplier','=',False)],'required':[('req_param_supplier','=',True)],'readonly':[('isLocked','=',True)]}" />
                                         </group>
                                         
