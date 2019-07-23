@@ -68,6 +68,16 @@
                     <field name="ChargeOvers"/>
                     <field name="DieType" />
                 </xpath>
+                
+                <xpath expr="//field[@name='routing_id']" position="after">
+                    <field name="customerRef"/>
+                </xpath>
+                
+                <xpath expr="//notebook[1]/page[3]" position="after">
+                    <page name="Purchases" string="Purchase Orders">
+                        <field name="Purchases" readonly="1"/>
+                    </page>
+                </xpath>
             </field>
         </record>
     </data>
