@@ -6,8 +6,7 @@
         This module creates the estimate and job tickets.
         """,
 
-    'description': """     
-    
+    'description': """   
     """,
 
     'author': "Squadsoft Tech",
