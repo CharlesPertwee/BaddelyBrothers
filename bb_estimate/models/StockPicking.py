@@ -62,11 +62,12 @@ class PickingType(models.Model):
     def GetProductData(self):
         packs = {}
         for x in self.move_line_ids_without_package:
-            if x.qty_done > 0:
-                if "%d,%d"%(x.product_id.id,x.qty_done) in packs.keys():
-                    packs["%d,%d"%(x.product_id.id,x.qty_done)] += 1
-                else:
-                    packs["%d,%d"%(x.product_id.id,x.qty_done)] = 1
+            if not (x.product_id.productType == 'Package'):
+                if x.qty_done > 0:
+                    if "%d,%d"%(x.product_id.id,x.qty_done) in packs.keys():
+                        packs["%d,%d"%(x.product_id.id,x.qty_done)] += 1
+                    else:
+                        packs["%d,%d"%(x.product_id.id,x.qty_done)] = 1
         
         result = ["%d box(es) of %s per box"%(packs[x],x.split(',')[1]) for x in packs.keys()]
         return result
