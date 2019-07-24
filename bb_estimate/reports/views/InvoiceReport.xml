@@ -76,11 +76,12 @@
                                                     <td name="account_invoice_line_name" >
                                                       <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/><br/><span t-field="estimate.title"/><br/>Size: <span t-field="estimate.finished_size.width"/> x <span t-field="estimate.finished_size.height"/></p>
                                                       <p>
-                                                        <t t-foreach="estimate.estimate_line" t-as="line">
+<!--                                                         <t t-foreach="estimate.estimate_line" t-as="line">
                                                             <t t-if="line.customer_description">
                                                                 <span t-field="line.customer_description"/><br/>
                                                             </t>
-                                                        </t>
+                                                        </t> -->
+                                                          <span t-field="o.invoiceDescription"/>
                                                       </p>
                                                     </td>
                                                 </t>

@@ -77,7 +77,7 @@ class Estimate(models.Model):
                             , copy=False
                             , group_expand='_read_group_state'
                             , default=lambda self: self.env['bb_estimate.stage'].search([])[0])
-    estimate_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Line')
+    estimate_line = fields.One2many('bb_estimate.estimate_line','estimate_id',string='Estimate Line', copy = True)
     
     #Delievery Details
     Delivery = fields.Many2one('res.partner',string="Delivery To",required=True)
@@ -91,11 +91,11 @@ class Estimate(models.Model):
     quantity_4 = fields.Integer('Quantity 4')
     run_on =  fields.Integer('Run on')
     
-    total_price_1 = fields.Float('Total Price 1',digits=(10,2),store=True,copy=False)
-    total_price_2 = fields.Float('Total Price 2',digits=(10,2),store=True,copy=False)
-    total_price_3 = fields.Float('Total Price 3',digits=(10,2),store=True,copy=False)
-    total_price_4 = fields.Float('Total Price 4',digits=(10,2),store=True,copy=False)
-    total_price_run_on = fields.Float('Run On',digits=(10,2),store=True,copy=False)
+    total_price_1 = fields.Float('Total Price 1',digits=(10,2),store=True,copy=True)
+    total_price_2 = fields.Float('Total Price 2',digits=(10,2),store=True,copy=True)
+    total_price_3 = fields.Float('Total Price 3',digits=(10,2),store=True,copy=True)
+    total_price_4 = fields.Float('Total Price 4',digits=(10,2),store=True,copy=True)
+    total_price_run_on = fields.Float('Run On',digits=(10,2),store=True,copy=True)
     
     total_price_extra_1 = fields.Float('Total Price 1',digits=(10,2),store=True,compute="_get_estimate_line")
     total_price_extra_2 = fields.Float('Total Price 2',digits=(10,2),store=True,compute="_get_estimate_line")
@@ -170,6 +170,8 @@ class Estimate(models.Model):
     selectedPrice = fields.Float('Total Price Selected',default=0,digits=(10,2),copy=False)
     selectedRatio = fields.Float('Ratio Selected',default=0,digits=(10,2),copy=False)
     
+    duplicateProcess = fields.Boolean('Process Duplicate')
+    
     Weight_1 = fields.Float('Weight 1',copy=False)
     Weight_2 = fields.Float('Weight 2',copy=False)
     Weight_3 = fields.Float('Weight 3',copy=False)
@@ -200,6 +202,13 @@ class Estimate(models.Model):
                 line += '\n%s mm  x  %s mm' % (estimate.windowHeight, estimate.windowWidth)
                 line += '\n%s mm FLHS,  %s mm Up' % (estimate.windowFlhs, estimate.windowUp)
         return line
+    
+    @api.multi
+    def copy(self,default=None):
+        default = dict(default or {})
+        default.update({'duplicateProcess': True})
+        return super(Estimate, self).copy(default)
+
     
     @api.model
     def create(self,val):
@@ -475,7 +484,5 @@ class Estimate(models.Model):
                 'url': '/bb_estimate/bb_estimate/estimateLetter/%s' % self.id,
                 'target': 'new',
                 'res_id': self.id,
-               }
-        
-    
+               }       
     
