@@ -33,16 +33,16 @@ class Manufacture(models.Model):
     JobType = fields.Selection(GetJob,string="Job Type")
     DieType = fields.Selection(GetDie,string="Return Die / Block To :")
     
-    customerRef = fields.Char('Customer Reference')
+#     customerRef = fields.Char('Customer Reference')
     Purchases = fields.Many2many('purchase.order',string='Purchase')   
     
-    def write(self,vals):
-        if 'customerRef' in vals.keys():
-            if self.Estimate:
-                sale_order = self.Estimate.salesOrder
-                sale_order.write({'client_order_ref':vals['customerRef']})
+#     def write(self,vals):
+#         if 'customerRef' in vals.keys():
+#             if self.Estimate:
+#                 sale_order = self.Estimate.salesOrder
+#                 sale_order.write({'client_order_ref':vals['customerRef']})
                 
-        return super(Manufacture,self).write(vals)
+#         return super(Manufacture,self).write(vals)
         
   
     def ConfirmOrder(self):

@@ -17,6 +17,7 @@ class PickingType(models.Model):
     _inherit = "stock.picking"
     
     Project = fields.Many2one('project.project','Project')
+    customerRef = fields.Char('Customer Reference')
     
     @api.model
     def create(self,vals):

@@ -35,7 +35,7 @@ class EstimateLine(models.Model):
     
     workcenterId = fields.Many2one('mrp.workcenter', string="Process")
     material = fields.Many2one('product.product', string="Materials")
-    estimate_id = fields.Many2one('bb_estimate.estimate','Estimate')
+    estimate_id = fields.Many2one('bb_estimate.estimate','Estimate', copy = False)
     isEnvelope = fields.Boolean('Is Envelope',related="estimate_id.product_type.isEnvelope")
     
     isExtra = fields.Boolean('Extra')
@@ -1269,33 +1269,38 @@ class EstimateLine(models.Model):
                     if lineId.documentCatergory not in ['Packing','Despatch']:   
                         work_twist = False
                         self.CreateLink(lineId,work_twist)
-                        
-                    if lineId.WhiteCutting:
-                        newProcess = {
-                            'option_type' : 'process',
-                            'workcenterId' : lineId.WhiteCutting.id,
-                            'param_material_line_id' : lineId.id,
-                            'estimate_id' : lineId.estimate_id.id,
-                            #'param_number_of_cuts' : lineId.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
-                        }
-                        process = self.create(newProcess)
-                        process.calc_workcenterId_change()
-                        dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
-                        dictProcess.pop('hasComputed')
-                        process.write(dictProcess)
                     
-                    if lineId.PrintedCutting:
-                        newProcess = {
-                            'option_type' : 'process',
-                            'workcenterId' : lineId.PrintedCutting.id,
-                            'param_material_line_id' : lineId.id,
-                            'estimate_id' : lineId.estimate_id.id,
-                        }
-                        process = self.create(newProcess)
-                        process.calc_workcenterId_change()
-                        dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
-                        dictProcess.pop('hasComputed')
-                        process.write(dictProcess)
+                    
+                    if not lineId.estimate_id.duplicateProcess:
+                        if lineId.WhiteCutting:
+                            newProcess = {
+                                'option_type' : 'process',
+                                'workcenterId' : lineId.WhiteCutting.id,
+                                'param_material_line_id' : lineId.id,
+                                'estimate_id' : lineId.estimate_id.id,
+                                #'param_number_of_cuts' : lineId.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
+                            }
+                            process = self.create(newProcess)
+                            process.calc_workcenterId_change()
+                            dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
+                            dictProcess.pop('hasComputed')
+                            process.write(dictProcess)
+
+                        if lineId.PrintedCutting:
+                            newProcess = {
+                                'option_type' : 'process',
+                                'workcenterId' : lineId.PrintedCutting.id,
+                                'param_material_line_id' : lineId.id,
+                                'estimate_id' : lineId.estimate_id.id,
+                            }
+                            process = self.create(newProcess)
+                            process.calc_workcenterId_change()
+                            dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
+                            dictProcess.pop('hasComputed')
+                            process.write(dictProcess)
+                    lineId.estimate_id.write({'duplicateProcess':False})
+                            
+                    
             
             if not lineId.hasComputed:
                 lineId.write({'hasComputed': True,
