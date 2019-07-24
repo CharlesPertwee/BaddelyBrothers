@@ -77,5 +77,22 @@
             groups="account.group_account_invoice"
             paperformat="bb_estimate.paperformat_invoice"
         />
+        
+        <record id="account_invoice_inherited" model="ir.ui.view">
+            <field name="name">account_invoice.inherited</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" icon="fa-pencil" type="object" name="EditInvoiceLine">
+                          <span>Edit Invoice Lines</span>
+                      </button>
+                </xpath>
+                <xpath expr="//field[@name='team_id']" position="after">
+                    <field name="invoiceDescription" widget="html" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+        
     </data>
 </odoo>

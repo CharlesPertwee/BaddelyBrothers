@@ -73,7 +73,9 @@
 
                                 </td>
                                 <td>
-                                    <p>Your Ref: <span t-field="o.origin"/></p>
+                                    <t t-if="o.customerRef">
+                                        <p>Your Ref: <span t-field="o.customerRef"/></p>
+                                    </t>
                                 </td>
                                 <td>
                                     <t t-if="estimate">
