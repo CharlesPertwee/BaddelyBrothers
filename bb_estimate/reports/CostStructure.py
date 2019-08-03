@@ -86,7 +86,7 @@ class MrpCostStructure(models.AbstractModel):
                 
                 estimate_line = workorder.operation_id.EstimateLineId
                 
-                unitPrice = (estimate_line['total_price_'+estimate.selectedQuantity] + (estimate_line.total_price_run_on * estimate.selectedRatio)) / (estimate_line['quantity_required_'+estimate.selectedQuantity] + (estimate_line.quantity_required_run_on * estimate.selectedRatio))
+                unitPrice = ((estimate_line['total_price_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate_line.total_price_run_on * estimate.selectedRatio)) / ((estimate_line['quantity_required_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate_line.quantity_required_run_on * estimate.selectedRatio))
                 working_time = sum([x.duration for x in workorder.time_ids])
 
                 if working_time < workorder.ActualTime:
@@ -110,7 +110,7 @@ class MrpCostStructure(models.AbstractModel):
                         m_qty += sum([y.MaterialUsed for y in x.EstimateMaterials if y.EstimateLineId.id == estimate_line.id])
                     if m_qty == 0:
                         m_qty = 1
-                    unitPrice = (estimate_line['total_price_'+estimate.selectedQuantity] + (estimate_line.total_price_run_on * estimate.selectedRatio)) / (estimate_line['quantity_required_'+estimate.selectedQuantity] + (estimate_line.quantity_required_run_on *estimate.selectedRatio))
+                    unitPrice = ((estimate_line['total_price_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate_line.total_price_run_on * estimate.selectedRatio)) / ((estimate_line['quantity_required_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate_line.quantity_required_run_on *estimate.selectedRatio))
                     total_cost += (m_qty * unitPrice)
                     bom_line_id = production.bom_id.search([('id','=',production.bom_id.id),('product_id','=',product.product_id.id)])
                     raw_material_moves.append({

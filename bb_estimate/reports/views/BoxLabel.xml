@@ -11,8 +11,11 @@
                                     <div class="col-6">
                                         <p><span t-field="o.name"/></p>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-3">
                                         <p class="pull-right">Cust Ref:</p>
+                                    </div>
+                                    <div class="col-3">
+                                        <p class="pull-left"><span t-field="o.customerRef"/></p>
                                     </div>
                                 </div>
                                 <p><span t-field="o.Estimate.finished_size.name" /> </p>

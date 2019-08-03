@@ -7,17 +7,17 @@
                             <div class="container" style="font-family:arial; font-size:11pt; padding:1px;">
                                 <div class="row">
                                     <div class="col-6">
-                                        <p><b><span t-field="mo.name"/></b></p>
+                                        <p><b><span t-field="o.name"/></b></p>
                                     </div>
                                     <div class="col-6">
-                                        <p><b>Qty: <span t-field="mo.product_qty"/></b></p>
+                                        <p><b>Qty: <span t-field="o.product_qty"/></b></p>
                                     </div>
                                 </div>
                                 
                                 <p>Prev Job: </p>                                
-                                <p>Customer: <b><span t-field="mo.Estimate.partner_id.name"/></b></p>
-                                <p>Job Title: <b><span t-field="mo.Estimate.title"/></b></p>
-                                <p>Date: <b><span t-field="mo.create_date"/></b></p>
+                                <p>Customer: <b><span t-field="o.Estimate.partner_id.name"/></b></p>
+                                <p>Job Title: <b><span t-field="o.Estimate.title"/></b></p>
+                                <p>Date: <b><span t-field="o.create_date"/></b></p>
                                                               
                                 <p>Notes: </p>
                                 

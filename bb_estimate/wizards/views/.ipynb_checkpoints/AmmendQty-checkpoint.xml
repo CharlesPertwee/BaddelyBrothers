@@ -1,0 +1,47 @@
+<odoo>
+    <data>
+        <record id="wizard_ammend_qty" model="ir.ui.view">
+            <field name="name">Ammend Quantity</field>
+            <field name="model">bb_estimate.wizard_amend_qty</field>
+            <field name="arch" type="xml">
+                <form string="Ammend">
+                    <sheet>
+                        <field name="EstimateId" invisible="1"/>
+                        <h5>Quantities</h5>
+                        <hr/>
+                        <group>
+                            <field name="Quantity" readonly="1"/>
+                            <field name="RunOn" readonly="1"/>
+                            <field name="TotalPrice" readonly="1"/>
+                        </group>
+                        <hr/>
+                        <group>
+                            <field name="AmmendedQty" />
+                            <field name="AmmendedPrice" readonly="1"/>
+                        </group>
+                        <hr/>
+                        <field name="ChangeLog">
+                            <tree editable="top" create="0" delete="0">
+                                <field name="EstimateId" invisible="1"/>
+                                <field name="product_id" invisible="1"/>
+                                <field name="workcenter_id" invisible="1"/>
+                                <field name="EstimateLineId" invisible="1"/>
+                                <field name="AmmendId" invisible="1"/>
+                                <field name="LineName" />
+                                <field name="CurrentRequired"/>
+                                <field name="NewRequired"/>
+                                <field name="POQty"/>
+                                <field name="POComment"/>
+                            </tree>
+                        </field>
+                        <footer>
+                            <button name="Confirm" string="Confirm" class="oe_right oe_highlight" type="object"/>
+                            <button string="Cancel" class="oe_right" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

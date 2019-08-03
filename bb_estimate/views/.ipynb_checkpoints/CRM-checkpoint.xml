@@ -14,7 +14,7 @@
         <field name="context">{'default_lead': active_id}</field>
     </record> 
     
-      <record id="crm_case_form_view_oppor_pro_estimate" model="ir.ui.view">
+    <record id="crm_case_form_view_oppor_pro_estimate" model="ir.ui.view">
 		<field name="name">crm.lead.form.opportunity.estimate</field>
 		<field name="model">crm.lead</field>
 		<field name="inherit_id" ref="bb_crm.crm_case_form_view_oppor_bb"/>
@@ -22,11 +22,40 @@
             <xpath expr="//header" position="inside">
                     <button string="New Estimate" name="%(bb_estimate_enquiry)d" type="action" class="oe_highlight"
                             attrs="{'invisible': ['|','&amp;',  ('probability', '=', 0), ('active', '=', False), ('typeOfLead','=','Trade Counter')]}"
-                            context="{'default_lead': active_id, 'default_project': Project, 'default_partner_id': partner_id }" />
+                            context="{'default_lead': active_id, 'default_project': Project, 'default_partner_id': partner_id,'default_quantity_1':Quantity1,'default_quantity_2':Quantity2,'default_quantity_3':Quantity3,'default_quantity_4':Quantity4, 'default_run_on':runOn, 'default_envelope_type':enquiryEnvelopeType, 'default_flap_glue_type':enquiryEnvelopeFlaptype, 'default_tissue_lined':enquiryEnvelopeTissuelIne, 'default_windowed':enquiryEnvelopeWindow, 'default_grammage':enquiryWeightGsm, 'default_finished_size':size, 'default_working_size':size }" />
 
                 </xpath>
             <xpath expr="//field[@name='typeOfLead']" position="after">
                 <field name="Project" options="{'no_create_edit': True}" domain="[('partner_id','=',partner_id)]"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Estimate Details">
+                    <group>
+                        <field name="enquiryType" string="Enquiry Type"/>                        
+                    </group>
+                    <group>
+                        <group>
+                            <field name="Quantity1"/>
+                            <field name="Quantity2"/>
+                            <field name="runOn"/>
+                            <field name="enquiryEnvelopeType" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
+                            <field name="enquiryPrintEdging" attrs="{'invisible':[('enquiryType','!=','Print Estimate')]}"/>
+                        </group>
+                        <group>
+                            <field name="Quantity3"/>
+                            <field name="Quantity4"/>
+                            <field name="size"/>
+                            <field name="enquiryEnvelopeTissuelIne" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
+                            <field name="enquiryEnvelopeFlaptype" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
+                            <field name="enquiryEnvelopeWindow" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="enquiryMaterial"/>
+                        <field name="enquiryWeightGsm"/>
+                        <field name="enquiryPrintOrigination" attrs="{'invisible':[('enquiryType','!=','Print Estimate')]}"/>
+                    </group>
+                </page>
             </xpath>
 		</field>
 	 </record>
@@ -78,18 +107,43 @@
          </record>
      
     
-<!--       <record id="crm_case_form_view_leads_bb" model="ir.ui.view">
-		<field name="name">crm.lead.form.lead.bb</field>
+      <record id="crm_case_form_view_leads_inherit" model="ir.ui.view">
+		<field name="name">bb.crm.lead.form.lead</field>
 		<field name="model">crm.lead</field>
-		<field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+		<field name="inherit_id" ref="bb_crm.crm_case_form_view_leads_bb"/>
 		<field name="arch" type="xml">
-            
-            <xpath expr="//field[@name='mobile']" position="after">
-                <field name="typeOfLead" />
-            </xpath>
-            
+            <xpath expr="//notebook" position="inside">
+                <page string="Estimate Details">
+                    <group>
+                        <field name="enquiryType" string="Enquiry Type"/>                        
+                    </group>
+                    <group>
+                        <group>
+                            <field name="Quantity1"/>
+                            <field name="Quantity2"/>
+                            <field name="runOn"/>
+                            <field name="enquiryEnvelopeType" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
+                            <field name="enquiryPrintEdging" attrs="{'invisible':[('enquiryType','!=','Print Estimate')]}"/>
+                            <field name="enquiryPrintDuplex" attrs="{'invisible':[('enquiryType','!=','Print Estimate')]}"/>
+                        </group>
+                        <group>
+                            <field name="Quantity3"/>
+                            <field name="Quantity4"/>
+                            <field name="size"/>
+                            <field name="enquiryEnvelopeTissuelIne" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
+                            <field name="enquiryEnvelopeFlaptype" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
+                            <field name="enquiryEnvelopeWindow" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="enquiryMaterial"/>
+                        <field name="enquiryWeightGsm"/>
+                        <field name="enquiryPrintOrigination" attrs="{'invisible':[('enquiryType','!=','Print Estimate')]}"/>
+                    </group>
+                </page>
+            </xpath>            
 		</field>
-	 </record>	 -->
+	 </record>	
       
 
       

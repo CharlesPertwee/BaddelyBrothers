@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','web','bb_crm','crm','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock'],
+    'depends': ['base','web','website_crm','bb_crm','crm','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock'],
 
     # always loaded
     'data': [
@@ -28,6 +28,7 @@
         'data/Stages.xml',
         'data/Estimate.xml',
         'data/Manufacturing.xml',
+        'data/WebToLead.xml',
         'reports/views/EstimateLetter.xml',
         'reports/views/JobTicket.xml',
         'reports/views/BoxLabel.xml',
@@ -64,7 +65,8 @@
         'wizards/views/Packing.xml',
         'wizards/views/Invoice.xml',
         'wizards/views/PriceAdjustment.xml',
-        'wizards/views/SalesAdjustment.xml'
+        'wizards/views/SalesAdjustment.xml',
+        'wizards/views/AmmendQty.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
