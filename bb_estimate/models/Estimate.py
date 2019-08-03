@@ -167,8 +167,9 @@ class Estimate(models.Model):
     #Fields For BOM and Invoice Computation
     selectedQuantity = fields.Selection([('1','1'),('2','2'),('3','3'),('4','4')],string="Selected Quantity",default="1",copy=False)
     selectedRunOn = fields.Integer('Selected Run On',default=0,copy=False)
-    selectedPrice = fields.Float('Total Price Selected',default=0,digits=(10,2),copy=False)
-    selectedRatio = fields.Float('Ratio Selected',default=0,digits=(10,2),copy=False)
+    selectedPrice = fields.Float('Total Price Selected',default=0,copy=False)
+    selectedRatio = fields.Float('Ratio Selected',default=0,copy=False)
+    SelectedQtyRatio = fields.Float('Ratio Selected',default=1,copy=False)
     
     duplicateProcess = fields.Boolean('Process Duplicate')
     
@@ -320,7 +321,16 @@ class Estimate(models.Model):
                 'context' : "{'default_EstimateId' : active_id}",
                 'target' : 'new',
             }
-
+    def AmmendQty(self):
+        return {
+                'view_type' : 'form',
+                'view_mode' : 'form',
+                'name': 'Ammend Qty',
+                'res_model' : 'bb_estimate.wizard_amend_qty',
+                'type' : 'ir.actions.act_window',
+                'context' : "{'default_EstimateId' : active_id}",
+                'target' : 'new',
+            }
     def AddLineItem(self):
         return {
                 'view_type' : 'form',

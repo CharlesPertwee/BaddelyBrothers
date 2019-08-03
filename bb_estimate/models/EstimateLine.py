@@ -35,7 +35,7 @@ class EstimateLine(models.Model):
     
     workcenterId = fields.Many2one('mrp.workcenter', string="Process")
     material = fields.Many2one('product.product', string="Materials")
-    estimate_id = fields.Many2one('bb_estimate.estimate','Estimate', copy = False)
+    estimate_id = fields.Many2one('bb_estimate.estimate','Estimate')
     isEnvelope = fields.Boolean('Is Envelope',related="estimate_id.product_type.isEnvelope")
     
     isExtra = fields.Boolean('Extra')
@@ -210,14 +210,15 @@ class EstimateLine(models.Model):
     SheetSize = fields.Many2one('bb_products.material_size',string="Sheet Size")
     PurchaseUnit = fields.Many2one('uom.uom',string="Purchase Unit")
     Supplier = fields.Many2one('res.partner',string="Supplier",domain="[('supplier','=',True)]")
-    CostRate = fields.Float('Cost Rate',digits=(16,2))
-    CharegeRate = fields.Float('Charge Rate',digits=(16,2))
-    Margin = fields.Float('Margin',digits=(10,2))
+    CostRate = fields.Float('Cost Rate')
+    CharegeRate = fields.Float('Charge Rate')
+    Margin = fields.Float('Margin')
     isLocked = fields.Boolean('Is Locked',related="estimate_id.isLocked")
     Sequence = fields.Integer('Sequence', default=1, help='Gives the sequence order when displaying a product list')
     staticPrice = fields.Boolean('Static Price', related="estimate_id.product_type.staticPrice")
     hasComputed = fields.Boolean('Has Computed in Total')
     reSync = fields.Boolean('ReSync')
+    generatesPO = fields.Boolean('Generates PO',default=False)
     
     #General Parameters
     param_supplier = fields.Many2one('res.partner','Supplier',domain="[('supplier','=',True)]")
@@ -253,7 +254,7 @@ class EstimateLine(models.Model):
     param_misc_charge_per_cm2 = fields.Float('Misc. Material Charge (Per cm2)',digits=(10,6))
     req_param_misc_charge_per_cm2 = fields.Boolean('Misc. Material Charge (Per cm2)')
     
-    param_misc_charge_per_cm2_area = fields.Float('Misc. Mat. Charge Area (cm2)')
+    param_misc_charge_per_cm2_area = fields.Float('Misc. Mat. Charge Area (cm2)',digits=(10,6))
     req_param_misc_charge_per_cm2_area = fields.Boolean('Misc. Material Charge Area (Per cm2)')
     
     param_die_size = fields.Selection(DIE_SIZES,string="Size of Die")
@@ -271,7 +272,7 @@ class EstimateLine(models.Model):
     param_sheets_per_box = fields.Integer('Sheets per Box')
     req_param_sheets_per_box = fields.Boolean('Req. Sheets per Box')
     
-    param_time_per_box = fields.Float('Time per Box(Hours)',digits=(10,2))
+    param_time_per_box = fields.Float('Time per Box(Hours)')
     req_param_time_per_box =fields.Boolean('Req. Time per Box (Hours)')
     
     param_number_of_cuts = fields.Integer('Number of cuts')
@@ -280,7 +281,7 @@ class EstimateLine(models.Model):
     param_sheets_per_pile = fields.Integer('Sheets per pile')
     req_param_sheets_per_pile = fields.Boolean('Sheets per pile')
     
-    param_time_per_pile = fields.Float('Time per pile',digits=(10,2))
+    param_time_per_pile = fields.Float('Time per pile')
     req_param_time_per_pile = fields.Boolean('Time per pile')
     
     param_env_windowpatching = fields.Boolean('Window Patching')
@@ -380,6 +381,7 @@ class EstimateLine(models.Model):
                         record.req_param_material_vendor = False
                         if len(record.material.seller_ids) > 1:
                             record.req_param_material_vendor = True
+                            record.generatesPO = True
                     else:
                         raise ValidationError("There is no vendor associated to the product %s. Please define a vendor for this product."%(record.material.name))
                     
@@ -469,7 +471,7 @@ class EstimateLine(models.Model):
         self.onChangeEventTrigger('param_additional_charge')
         
     @api.onchange('param_misc_charge_per_cm2')
-    def calc_param_misc_charge_per_cm2(self):
+    def calc_param_misc_charge_per_cm2_area(self):
         self.onChangeEventTrigger('param_misc_charge_per_cm2')
         
     @api.onchange('param_misc_charge_per_cm2_area')
@@ -673,12 +675,9 @@ class EstimateLine(models.Model):
             #packs
             if cost_param['quantity_required'] > 0 and self.param_material_vendor:
                 multiplier = self.param_material_vendor.multiplier if self.param_material_vendor.multiplier > 0 else 1
-                if self.param_material_vendor.minQuantity > cost_param['quantity_required']:
-                    cost_param['quantity_required'] = self.param_material_vendor.minQuantity - cost_param['quantity_required']
-                else:
-                    cost_param['quantity_required'] -= self.param_material_vendor.minQuantity
-                cost_param['quantity_required'] = self.param_material_vendor.minQuantity + (math.ceil(cost_param['quantity_required']/multiplier) * multiplier)
-            
+                cost_param['quantity_required'] =  math.ceil(cost_param['quantity_required']/multiplier) * multiplier
+                cost_param['quantity_required'] = cost_param['quantity_required'] if cost_param['quantity_required'] > self.param_material_vendor.minQuantity else self.param_material_vendor.minQuantity
+                
             if 'material_ids' not in qty_param and old_value != new_value:
                 message = "Qty %s from %s to %s" % (qty, old_value, new_value)
                 
@@ -871,10 +870,11 @@ class EstimateLine(models.Model):
                     qty_params['quantity_required_4'] = cost_params['quantity_required']
 
         if fieldUpdated == 'cost_per_unit':
-            if cost_params['price_per_unit'] and cost_params['cost_per_unit']:
-                cost_params['margin'] = (((cost_params['price_per_unit']/cost_params['cost_per_unit'])-1)*100)
-            elif cost_params['margin']:
+            if cost_params['margin']:
                 cost_params['price_per_unit'] = ((cost_params['margin']/100)+1)*cost_params['cost_per_unit']
+            elif cost_params['price_per_unit'] and cost_params['cost_per_unit']:
+                cost_params['margin'] = (((cost_params['price_per_unit']/cost_params['cost_per_unit'])-1)*100)
+            
             if qty=='1' and qty_params['static_price']:
                 cost_params['price_per_unit'] = cost_params['cost_per_unit'] * 2
                 cost_params['margin'] = (((cost_params['price_per_unit'] / cost_params['cost_per_unit']) - 1) * 100) if cost_params['cost_per_unit'] else 0
@@ -965,7 +965,8 @@ class EstimateLine(models.Model):
             record['param_number_of_cuts'] = qty_params['param_number_of_cuts']
             record['process_working_sheets_quantity_'+qty] = qty_params['params_working_sheets_needed'] if 'params_working_sheets_needed' in qty_params else 0
             record['process_overs_quantity_'+qty] = qty_params['params_overs_needed'] if 'params_working_sheets_needed' in qty_params else 0
-            
+            record['param_misc_charge_per_cm2'] = qty_params['param_misc_charge_per_cm2']
+    
     def UpdateRequiredFields(self):
         for record in self:
             if record.workcenterId:
@@ -984,7 +985,7 @@ class EstimateLine(models.Model):
     
     def CreateLink(self,line,work_twist):
         link = self.env['bb_estimate.material_link'].sudo()
-        processes = line.estimate_id.estimate_line.search([('estimate_id','=',line.estimate_id.id),('option_type','=','process')])
+        processes = line.estimate_id.estimate_line.search([('estimate_id','=',line.estimate_id.id),('option_type','=','process'),('isExtra','=',False)])
         added_working_sheets = False
         for process in processes:
             if process.workcenterId and process.workcenterId.process_type:
@@ -1001,30 +1002,31 @@ class EstimateLine(models.Model):
                         added_working_sheets = True
                     else:
                         newLink['overs_only'] = True
-                    
+                        
                     link.create(newLink)
         
     def CreateMaterialLink(self,process,work_twist):
         link = self.env['bb_estimate.material_link'].sudo()
         materials = process.estimate_id.estimate_line.search([('estimate_id','=',process.estimate_id.id),('option_type','=','material'),('documentCatergory','=','Material')])
         added_working_sheets = False
-        for material in materials:
-            if process.workcenterId and process.workcenterId.process_type:
-                if process.work_twist:
-                    work_twist = True
-                if process.workcenterId.process_type.MapMaterials:
-                    newLink = {
-                        'materialLine' : material.id,
-                        'processLine' : process.id,
-                        'estimate': process.estimate_id.id,
-                    }
-                    if not added_working_sheets and process.workcenterId.process_type.OversOnly:
-                        newLink['overs_only'] = False
-                        added_working_sheets = True
-                    else:
-                        newLink['overs_only'] = True
-                    
-                    link.create(newLink)
+        if not process.isExtra:
+            for material in materials:
+                if process.workcenterId and process.workcenterId.process_type:
+                    if process.work_twist:
+                        work_twist = True
+                    if process.workcenterId.process_type.MapMaterials:
+                        newLink = {
+                            'materialLine' : material.id,
+                            'processLine' : process.id,
+                            'estimate': process.estimate_id.id,
+                        }
+                        if not added_working_sheets and process.workcenterId.process_type.OversOnly:
+                            newLink['overs_only'] = False
+                            added_working_sheets = True
+                        else:
+                            newLink['overs_only'] = True
+
+                        link.create(newLink)
     
     def RecalculatePrices(self,line,work_twist):
         if line.option_type and line.option_type == "material":
@@ -1232,9 +1234,8 @@ class EstimateLine(models.Model):
                             'customerDescription': lineId.customer_description,
                             'jobTicketDescription': lineId.JobTicketText,
                             'margin': lineId.Margin,
-                            'purchase_ok':False
                         }
-                        if mto and lineId.NonStockMaterialType == 'Bespoke Material':
+                        if mto and buy and lineId.NonStockMaterialType == 'Bespoke Material':
                             newProduct['route_ids'] = [(4,mto.id)]
                             newProduct['route_ids'] = [(4,buy.id)]
                         if lineId.PurchaseUnit:
@@ -1244,7 +1245,6 @@ class EstimateLine(models.Model):
                         productId = product.create(newProduct)
                         
                         if productId and lineId.Supplier:
-                            newProduct['purchase_ok'] = True
                             newSeller = {
                                 'product_id' : productId.id,
                                 'product_tmpl_id' : productId.product_tmpl_id.id,
@@ -1269,8 +1269,7 @@ class EstimateLine(models.Model):
                     if lineId.documentCatergory not in ['Packing','Despatch']:   
                         work_twist = False
                         self.CreateLink(lineId,work_twist)
-                    
-                    
+                        
                     if not lineId.estimate_id.duplicateProcess:
                         if lineId.WhiteCutting:
                             newProcess = {
@@ -1299,8 +1298,6 @@ class EstimateLine(models.Model):
                             dictProcess.pop('hasComputed')
                             process.write(dictProcess)
                     lineId.estimate_id.write({'duplicateProcess':False})
-                            
-                    
             
             if not lineId.hasComputed:
                 lineId.write({'hasComputed': True,

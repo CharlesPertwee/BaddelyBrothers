@@ -112,8 +112,26 @@
                                                       <t t-else="">
                                                          <br/>
                                                       </t>
+                                                  </t><t t-foreach="o.Estimate.estimate_line" t-as="line">
+                                                      <t t-if="line.option_type and line.option_type == 'material' and line.material.categ_id.name != 'Box'">
+                                                          <t t-if="line.Supplier">
+                                                              <span t-esc="line.Supplier.name" /><br/>
+                                                          </t>
+                                                          <t t-else="">
+                                                             <br/>
+                                                          </t>
+                                                      </t>                                                      
                                                   </t>
-                                                  
+                                                  <t t-foreach="o.Estimate.estimate_line" t-as="line">
+                                                      <t t-if="line.option_type and line.option_type == 'process'">
+                                                          <t t-if="line.Supplier">
+                                                              <span t-esc="line.Supplier.name" /><br/>
+                                                          </t>
+                                                          <t t-else="">
+                                                             <br/>
+                                                          </t>
+                                                      </t>                                                      
+                                                  </t>                                                        
                                               </td>
                                               <td style="border-top: none;">
                                                   <!-- Purchase -->

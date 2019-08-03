@@ -33,16 +33,20 @@ class Manufacture(models.Model):
     JobType = fields.Selection(GetJob,string="Job Type")
     DieType = fields.Selection(GetDie,string="Return Die / Block To :")
     
-#     customerRef = fields.Char('Customer Reference')
+    customerRef = fields.Char('Customer Reference')
     Purchases = fields.Many2many('purchase.order',string='Purchase')   
     
-#     def write(self,vals):
-#         if 'customerRef' in vals.keys():
-#             if self.Estimate:
-#                 sale_order = self.Estimate.salesOrder
-#                 sale_order.write({'client_order_ref':vals['customerRef']})
+    def write(self,vals):
+        if 'customerRef' in vals.keys():
+            if self.Estimate:
+                sale_order = self.Estimate.salesOrder
+                delivery = self.env['stock.picking'].sudo().search([('origin','=',sale_order.name)])
+                sale_order.write({'client_order_ref':vals['customerRef']})
+                delivery.write({'customerRef':vals['customerRef']})
                 
-#         return super(Manufacture,self).write(vals)
+        return super(Manufacture,self).write(vals)
+    
+
         
   
     def ConfirmOrder(self):
@@ -83,7 +87,7 @@ class Manufacture(models.Model):
             for x in estimate_materials:
                 materials.append((0,0,{
                     'EstimateLineId': x.id,
-                    'MaterialAllocated' : x['quantity_required_'+estimate.selectedQuantity] + (x.quantity_required_run_on * estimate.selectedRatio)
+                    'MaterialAllocated' : (x['quantity_required_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (x.quantity_required_run_on * estimate.selectedRatio)
                 }))
         for operation in bom.routing_id.operation_ids:
             # create workorder
@@ -93,7 +97,7 @@ class Manufacture(models.Model):
                 if estimate_line:
                     estimate_line = estimate_line[0]
                 computedOperations.append(estimate_line.id)
-                duration_expected = estimate_line['quantity_required_'+estimate.selectedQuantity] + (estimate_line.quantity_required_run_on * estimate.selectedRatio)
+                duration_expected = (estimate_line['quantity_required_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate_line.quantity_required_run_on * estimate.selectedRatio)
             else:
                 duration_expected = (operation.workcenter_id.time_start +
                                  operation.workcenter_id.time_stop +

@@ -53,10 +53,10 @@ class BomStructure(models.AbstractModel):
         total = 0
         for line in bom.bom_line_ids:
             if line.EstimateLineId:
-                line_quantity = line.EstimateLineId['quantity_required_'+line.EstimateLineId.estimate_id.selectedQuantity] + (line.EstimateLineId.quantity_required_run_on * line.EstimateLineId.estimate_id.selectedRatio)
+                line_quantity = (line.EstimateLineId['quantity_required_'+line.EstimateLineId.estimate_id.selectedQuantity] * line.EstimateLineId.estimate_id.SelectedQtyRatio) + (line.EstimateLineId.quantity_required_run_on * line.EstimateLineId.estimate_id.selectedRatio)
                 if line._skip_bom_line(product):
                     continue
-                price = line.EstimateLineId['total_price_'+line.EstimateLineId.estimate_id.selectedQuantity] + (line.EstimateLineId.total_price_run_on * line.EstimateLineId.estimate_id.selectedRatio)
+                price = (line.EstimateLineId['total_price_'+line.EstimateLineId.estimate_id.selectedQuantity] * line.EstimateLineId.estimate_id.SelectedQtyRatio) + (line.EstimateLineId.total_price_run_on * line.EstimateLineId.estimate_id.selectedRatio)
 
                 if line.child_bom_id:
                     factor = line.product_uom_id._compute_quantity(line_quantity, line.child_bom_id.product_uom_id) * line.child_bom_id.product_qty
@@ -90,8 +90,8 @@ class BomStructure(models.AbstractModel):
         if estimate:
             estimate = estimate[0]
         
-        bom_quantity = estimate.selectedRunOn + estimate['quantity_'+estimate.selectedQuantity]
-        price = sum([x['total_price_'+estimate.selectedQuantity] for x in estimate.estimate_line.search([('estimate_id','=',estimate.id),('option_type','=','material')])])
+        bom_quantity = estimate.selectedRunOn + (estimate['quantity_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio)
+        price = sum([x['total_price_'+estimate.selectedQuantity] for x in estimate.estimate_line.search([('estimate_id','=',estimate.id),('option_type','=','material')])]) * estimate.SelectedQtyRatio
         # Display bom components for current selected product variant
         if product_id:
             product = self.env['product.product'].browse(int(product_id))
@@ -131,8 +131,8 @@ class BomStructure(models.AbstractModel):
         total = 0.0
         for operation in routing.operation_ids:
             if operation.EstimateLineId:
-                duration_expected = operation.EstimateLineId['quantity_required_'+operation.EstimateLineId.estimate_id.selectedQuantity] + (operation.EstimateLineId['quantity_required_run_on'] * operation.EstimateLineId.estimate_id.selectedRatio)
-                total = operation.EstimateLineId['total_price_'+operation.EstimateLineId.estimate_id.selectedQuantity] + (operation.EstimateLineId['total_price_run_on'] * operation.EstimateLineId.estimate_id.selectedRatio)
+                duration_expected = (operation.EstimateLineId['quantity_required_'+operation.EstimateLineId.estimate_id.selectedQuantity] * operation.EstimateLineId.estimate_id.SelectedQtyRatio) + (operation.EstimateLineId['quantity_required_run_on'] * operation.EstimateLineId.estimate_id.selectedRatio)
+                total = (operation.EstimateLineId['total_price_'+operation.EstimateLineId.estimate_id.selectedQuantity] * operation.EstimateLineId.estimate_id.SelectedQtyRatio) + (operation.EstimateLineId['total_price_run_on'] * operation.EstimateLineId.estimate_id.selectedRatio)
 
                 operations.append({
                     'level': level or 0,

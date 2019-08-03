@@ -10,7 +10,7 @@
                         <h5>Process</h5>
                         <hr/>
                         <field name="WorkOrders">
-                            <tree editable="top">
+                            <tree editable="top" create="0" delete="0">
                                 <field name="WorkOrder" invisible="1"/>
                                 <field name="name" readonly="1" />
                                 <field name="Confirmation" invisible="1"/>
@@ -21,7 +21,7 @@
                         <h5>Materials</h5>
                         <hr/>
                         <field name="MaterialLines">
-                            <tree editable="top">
+                            <tree editable="top" create="0" delete="0">
                                 <field name="Material" invisible="1"/>
                                 <field name="name" readonly="1" />
                                 <field name="Confirmation" invisible="1"/>

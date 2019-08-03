@@ -107,6 +107,9 @@ class BbEstimate(http.Controller):
         para = table.cell(x,2).add_paragraph("Estimate no: %s"%(str(Estimate.estimate_number)))
         para.alignment=WD_ALIGN_PARAGRAPH.RIGHT
         
+#         table.cell(x,2).paragraphs[0].text = "Estimate no: %s"%(str(Estimate.estimate_number))
+#         table.cell(x,2).paragraphs[0].text = WD_ALIGN_PARAGRAPH.RIGHT
+        
         for row in table.rows:
             for cell in row.cells:
                 paragraphs = cell.paragraphs
@@ -259,12 +262,16 @@ class BbEstimate(http.Controller):
         #run = document.add_paragraph().add_run()
         #run.add_break() 
         
-        line = False
+        line = ""
         for condition in Estimate.estimateConditions:
             line = document.add_paragraph(condition.description,style=paragraph_format)
             line.style.font.size = Pt(9)
         
         if line:
+            run = line.add_run()
+            run.add_break() 
+        else:
+            line = document.add_paragraph("\n")
             run = line.add_run()
             run.add_break() 
         
@@ -303,12 +310,22 @@ class BbEstimate(http.Controller):
                 if extra.isExtra and extra.extraDescription:
                     extra_table.cell(z,0).text = "Extras"
                     extra_table.cell(z,1).text = extra.extraDescription
-                    extra_table.cell(z+1,1).text = "%s    @    £%s"%(str(extra.quantity_1).encode("utf-8").decode("utf-8"),str(extra.total_price_1).encode("utf-8").decode("utf-8"))
-                    extra_table.cell(z+2,1).text = "%s    @    £%s"%(str(extra.quantity_2).encode("utf-8").decode("utf-8"),str(extra.total_price_2).encode("utf-8").decode("utf-8"))
-                    extra_table.cell(z+3,1).text = "%s    @    £%s"%(str(extra.quantity_3).encode("utf-8").decode("utf-8"),str(extra.total_price_3).encode("utf-8").decode("utf-8"))
-                    extra_table.cell(z+4,1).text = "%s    @    £%s"%(str(extra.quantity_4).encode("utf-8").decode("utf-8"),str(extra.total_price_4).encode("utf-8").decode("utf-8"))
-                    extra_table.cell(z+5,1).text = "Run on: £ %s per %s"%(str(extra.total_price_run_on).encode("utf-8").decode("utf-8"),str(extra.run_on).encode("utf-8").decode("utf-8"))
-                    z += 6
+                    if extra.quantity_1:
+                        z += 1
+                        extra_table.cell(z,1).text = "%s    @    £%s"%(str(extra.quantity_1).encode("utf-8").decode("utf-8"),str(extra.total_price_1).encode("utf-8").decode("utf-8"))
+                    if extra.quantity_2:
+                        z += 1
+                        extra_table.cell(z,1).text = "%s    @    £%s"%(str(extra.quantity_2).encode("utf-8").decode("utf-8"),str(extra.total_price_2).encode("utf-8").decode("utf-8"))
+                    if extra.quantity_3:
+                        z += 1
+                        extra_table.cell(z,1).text = "%s    @    £%s"%(str(extra.quantity_3).encode("utf-8").decode("utf-8"),str(extra.total_price_3).encode("utf-8").decode("utf-8"))
+                    if extra.quantity_4:
+                        z += 1
+                        extra_table.cell(z,1).text = "%s    @    £%s"%(str(extra.quantity_4).encode("utf-8").decode("utf-8"),str(extra.total_price_4).encode("utf-8").decode("utf-8"))
+                    if extra.run_on:
+                        z += 1
+                        extra_table.cell(z,1).text = "Run on: £ %s per %s"%(str(extra.total_price_run_on).encode("utf-8").decode("utf-8"),str(extra.run_on).encode("utf-8").decode("utf-8"))
+                    z += 1
                     
             for row in extra_table.rows:
                 for cell in row.cells:

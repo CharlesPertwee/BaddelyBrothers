@@ -82,7 +82,7 @@
                         <field name="req_param_material_vendor" invisible="1" />
                         <field name="isEnvelope" invisible="1" />
                         <field name="reSync" invisible="1" />
-                        
+                        <field name="generatesPO" invisible="1"/>
                         <div class="container">
                             <div class="row">
                                 <div class="col-md-4 oe-title pull-left">
