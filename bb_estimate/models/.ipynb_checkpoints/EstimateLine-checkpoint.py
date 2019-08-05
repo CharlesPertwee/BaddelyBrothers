@@ -210,6 +210,8 @@ class EstimateLine(models.Model):
     SheetSize = fields.Many2one('bb_products.material_size',string="Sheet Size")
     PurchaseUnit = fields.Many2one('uom.uom',string="Purchase Unit")
     Supplier = fields.Many2one('res.partner',string="Supplier",domain="[('supplier','=',True)]")
+    MinimumQty = fields.Integer('Min. Quantity')
+    PackSize = fields.Integer('Multiple Of')
     CostRate = fields.Float('Cost Rate')
     CharegeRate = fields.Float('Charge Rate')
     Margin = fields.Float('Margin')
@@ -1236,8 +1238,8 @@ class EstimateLine(models.Model):
                             'margin': lineId.Margin,
                         }
                         if mto and buy and lineId.NonStockMaterialType == 'Bespoke Material':
-                            newProduct['route_ids'] = [(4,mto.id)]
-                            newProduct['route_ids'] = [(4,buy.id)]
+                            newProduct['route_ids'] = [(4,mto.id),(4,buy.id)]
+                            newProduct['generatesPO'] = True
                         if lineId.PurchaseUnit:
                             newProduct['uom_id'] = lineId.PurchaseUnit.id
                             newProduct['uom_po_id'] = lineId.PurchaseUnit.id
@@ -1250,11 +1252,13 @@ class EstimateLine(models.Model):
                                 'product_tmpl_id' : productId.product_tmpl_id.id,
                                 'product_name' : lineId.MaterialName,
                                 'price': lineId.CharegeRate,
-                                'name' : lineId.Supplier.id
+                                'name' : lineId.Supplier.id,
+                                'minQuantity' : lineId.MinimumQty,
+                                'multiplier' : lineId.PackSize
                             }
                             seller.create(newSeller)
 
-                            lineId.write({'material':productId.id})
+                            lineId.write({'material':productId.id,'generatesPO':True})
                             lineId.calc_material_change()
                             lineId._onChangeNumberOut()
                             dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}
@@ -1266,7 +1270,7 @@ class EstimateLine(models.Model):
                             dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}
                             lineId.write(dictLine)
                     
-                    if lineId.documentCatergory not in ['Packing','Despatch']:   
+                    if (not lineId.isExtra) and lineId.documentCatergory not in ['Packing','Despatch']:   
                         work_twist = False
                         self.CreateLink(lineId,work_twist)
                         
@@ -1277,6 +1281,7 @@ class EstimateLine(models.Model):
                                 'workcenterId' : lineId.WhiteCutting.id,
                                 'param_material_line_id' : lineId.id,
                                 'estimate_id' : lineId.estimate_id.id,
+                                'isExtra': lineId.isExtra
                                 #'param_number_of_cuts' : lineId.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
                             }
                             process = self.create(newProcess)
@@ -1291,6 +1296,7 @@ class EstimateLine(models.Model):
                                 'workcenterId' : lineId.PrintedCutting.id,
                                 'param_material_line_id' : lineId.id,
                                 'estimate_id' : lineId.estimate_id.id,
+                                'isExtra': lineId.isExtra
                             }
                             process = self.create(newProcess)
                             process.calc_workcenterId_change()
