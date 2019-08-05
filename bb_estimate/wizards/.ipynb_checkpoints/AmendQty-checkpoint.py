@@ -181,6 +181,7 @@ class AmmendQty(models.TransientModel):
             production._update_raw_move(line, line_data)
         
         computed = []
+        raise Exception(documents)
         for key in documents.keys():
             for x in documents[key]:
                 for line in x[0].keys():
