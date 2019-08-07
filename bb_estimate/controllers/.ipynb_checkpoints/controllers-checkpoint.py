@@ -104,8 +104,10 @@ class BbEstimate(http.Controller):
           
         table.cell(x,0).text = "Attn: %s"%(Estimate.contact.name)
         
-        para = table.cell(x,2).add_paragraph("Estimate no: %s"%(str(Estimate.estimate_number)))
-        para.alignment=WD_ALIGN_PARAGRAPH.RIGHT
+        table.cell(x,2).paragraphs[0].text = "Estimate no: %s"%(str(Estimate.estimate_number))
+        table.cell(x,2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+#         para = table.cell(x,2).add_paragraph("Estimate no: %s"%(str(Estimate.estimate_number)))
+#         para.alignment=WD_ALIGN_PARAGRAPH.RIGHT
         
 #         table.cell(x,2).paragraphs[0].text = "Estimate no: %s"%(str(Estimate.estimate_number))
 #         table.cell(x,2).paragraphs[0].text = WD_ALIGN_PARAGRAPH.RIGHT
@@ -171,23 +173,39 @@ class BbEstimate(http.Controller):
        
         y = 2
         for estimate_line_material in Estimate.estimate_line:
+            if estimate_line_material.option_type == 'material' and not estimate_line_material.customer_description:
+                row = data_table.rows[y]
+                tbl = data_table._tbl
+                tr = row._tr
+                tbl.remove(tr)
+                
+                
             if estimate_line_material.option_type == 'material' and estimate_line_material.customer_description and not estimate_line_material.isExtra:
                 data_table.cell(y,0).text = "Material: "
                 #data_table.cell(y,0).width = Inches(inches)
                 data_table.cell(y,1).text = estimate_line_material.customer_description
                 y += 1
         
-        if Estimate.isEnvelope:
-            envDet = document.add_paragraph("")
-            envDetail = envDet.add_run(Estimate.GenerateEnvelopeDetails(Estimate))
-            envDetail.font.name = "Tahoma"
         
         for estimate_line_process in Estimate.estimate_line:
+            if estimate_line_process.option_type == 'process' and not estimate_line_process.customer_description:
+                row = data_table.rows[y]
+                tbl = data_table._tbl
+                tr = row._tr
+                tbl.remove(tr)
+            
             if estimate_line_process.option_type == 'process' and estimate_line_process.customer_description and not estimate_line_process.isExtra:
                 data_table.cell(y,0).text = "Process: "
                 #data_table.cell(y,0).width = Inches(inches)
                 data_table.cell(y,1).text = estimate_line_process.customer_description
                 y += 1
+        
+#         if Estimate.isEnvelope:
+#             line1 = ""
+#             line1 = document.add_paragraph("")
+#             envDet = document.add_paragraph("")
+#             envDetail = envDet.add_run(Estimate.GenerateEnvelopeDetails(Estimate))
+#             envDetail.font.name = "Tahoma"
         
         if Estimate.quantity_1:
             data_table.cell(y,0).text="Qty/Price"
@@ -243,7 +261,9 @@ class BbEstimate(http.Controller):
                                 
             data_table.cell(y,1).text="Run on: £%s per %.2f"%(Estimate.quantity_4,price)
             y+=1
-            
+        
+        
+        
         for row in data_table.rows:
             for cell in row.cells:
                 paragraphs = cell.paragraphs
@@ -263,21 +283,13 @@ class BbEstimate(http.Controller):
         #run.add_break() 
         
         line = ""
-        for condition in Estimate.estimateConditions:
-            line = document.add_paragraph(condition.description,style=paragraph_format)
-            line.style.font.size = Pt(9)
-        
-        if line:
-            run = line.add_run()
-            run.add_break() 
-        else:
-            line = document.add_paragraph("\n")
-            run = line.add_run()
-            run.add_break() 
+        line = document.add_paragraph("")
+#         run = line.add_run()
+#         run.add_break() 
         
         if Estimate.hasExtra:
-            extra_length = (len([x for x in Estimate.estimate_line if x.isExtra]))*6
-            extra_table = document.add_table(extra_length, 2)  
+            extra_length = (len([x for x in Estimate.estimate_line if (x.isExtra and x.extraDescription)]))
+            extra_table = document.add_table(extra_length+addtitional, 2)  
             extra_table.alignment = WD_TABLE_ALIGNMENT.CENTER
             extra_table.style = 'Table Grid'
             tblExtraData = extra_table._tbl # get xml element in table
@@ -337,7 +349,16 @@ class BbEstimate(http.Controller):
                             
             extra_table.columns[0].width = Inches(inches)
             extra_table.columns[1].width = Inches(5)
-                           
+         
+        line = ""
+        for condition in Estimate.estimateConditions:
+            line = document.add_paragraph(condition.description,style=paragraph_format)
+            line.style.font.size = Pt(9)
+        
+        if line:
+            run = line.add_run()
+            run.add_break() 
+        
         p = document.add_paragraph("")
         sen = p.add_run('Should you require any more information or wish to discuss your detailed requirements further, please contact us on 020 8986 2666.')
         sen.font.name = 'Tahoma'
@@ -349,8 +370,7 @@ class BbEstimate(http.Controller):
         sen2 = p1.add_run(Estimate.estimator.name)
         sen2.font.name = 'Tahoma'
         
-        
-        #url1 = 'https://charlespertwee-baddelybrothers-customization-dv-444705.dev.odoo.com/bb_estimate/static/src/img/BaddeleyFooter.png'
+
         url1 = request.httprequest.host_url+"bb_estimate/static/src/img/BaddeleyFooter.png"
         response1 = requests.get(url1, stream=True)
         footer = io.BytesIO(response1.content)
@@ -378,3 +398,7 @@ class BbEstimate(http.Controller):
         return request.make_response(docx_bytes, headers=pdfhttpheaders)
        
         
+        def remove_row(table, row):
+            tbl = table._tbl
+            tr = row._tr
+            tbl.remove(tr)
