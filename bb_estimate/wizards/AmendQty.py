@@ -138,13 +138,12 @@ class AmmendQty(models.TransientModel):
         done_moves = production.move_finished_ids.filtered(lambda x: x.state == 'done' and x.product_id == production.product_id)
         qty_produced = production.product_id.uom_id._compute_quantity(sum(done_moves.mapped('product_qty')), production.product_uom_id)
         factor = production.product_uom_id._compute_quantity(production.product_qty - qty_produced, production.bom_id.product_uom_id) / production.bom_id.product_qty
-        materials, process = ({x.EstimateLineId.id:x for x in self.ChangeLog if x.product_id},{x.EstimateLineId.id:x for x in self.ChangeLog if x.workcenter_id})
-        
+        materials, process = ({x.EstimateLineId.id:x for x in self.ChangeLog if (x.product_id and x.EstimateLineId.option_type == 'material')},{x.EstimateLineId.id:x for x in self.ChangeLog if (x.workcenter_id and x.EstimateLineId.option_type == 'process')})
         computed = []
         if production.bom_id:
             production.bom_id.write({'product_qty': (self.AmmendedQty + self.RunOn)})
             for bom_line in production.bom_id.bom_line_ids:
-                line = self.ChangeLog.search([('product_id','=',bom_line.product_id.id),('EstimateLineId.option_type','=','material'),('EstimateLineId.id','not in', computed)],limit=1)
+                line = self.ChangeLog.search([('EstimateLineId.estimate_id','=',self.EstimateId.id),('product_id','=',bom_line.product_id.id),('EstimateLineId.option_type','=','material'),('EstimateLineId.id','not in', computed)],limit=1)
                 bom_line.write({'product_qty':materials[line.EstimateLineId.id].NewRequired})
                 computed.append(line.EstimateLineId.id)
                 
@@ -152,7 +151,7 @@ class AmmendQty(models.TransientModel):
         computed = []
         if production.routing_id:
             for route in production.routing_id.operation_ids:
-                line = self.ChangeLog.search([('workcenter_id','=',route.workcenter_id.id),('EstimateLineId.option_type','=','process'),('EstimateLineId.id','not in', computed)],limit=1)
+                line = self.ChangeLog.search([('EstimateLineId.estimate_id','=',self.EstimateId.id),('workcenter_id','=',route.workcenter_id.id),('EstimateLineId.option_type','=','process'),('EstimateLineId.id','not in', computed)],limit=1)
                 route.write({'time_cycle_manual':process[line.EstimateLineId.id].NewRequired})
                 computed.append(line.EstimateLineId.id)
         
