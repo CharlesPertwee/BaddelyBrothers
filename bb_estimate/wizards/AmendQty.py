@@ -2,6 +2,8 @@
 import odoo, math
 from odoo import models, fields, api
 from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
+from odoo.tools import float_compare, float_round, float_is_zero
+
 class ChangeLog(models.TransientModel):
     _name = 'bb_estimate.change_log'
     
