@@ -13,12 +13,13 @@
                             <div class="container" style="padding:3em; font-size:14px;">
                                 <div class="row">
                                     <div class="col-7">
-                                        <p><span t-field="o.partner_id.name"/><br/>
-                                        <span t-field="o.partner_id.name"/><br/>
-                                        <span t-field="o.partner_id.street"/><br/>
-                                        <span t-field="o.partner_id.city"/><br/>
-                                        <span t-field="o.partner_id.zip"/><br/>
-                                        <span t-field="o.partner_id.country_id"/></p>
+                                        <p>
+                                            <span t-field="o.partner_id.name"/><br/>
+                                            <span t-field="o.partner_id.street"/><br/>
+                                            <span t-field="o.partner_id.city"/><br/>
+                                            <span t-field="o.partner_id.zip"/><br/>
+                                            <span t-field="o.partner_id.country_id"/>
+                                        </p>
                                     </div>
                                     <div class="col-5 pull-right">
                                         <div class="row">
@@ -37,14 +38,14 @@
                                                 <p class="pull-left"><span t-field="o.number"/></p>
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <!--div class="row">
                                             <div class="col-6">
                                                 <p class="pull-left">A/C Ref: </p>
                                             </div>
                                             <div class="col-6">
                                                 <p class="pull-left"><span t-field="o.partner_id.reference"/></p>
                                             </div>
-                                        </div>
+                                        </div-->
                                     </div>
                                 </div>
                             <div class="page">
