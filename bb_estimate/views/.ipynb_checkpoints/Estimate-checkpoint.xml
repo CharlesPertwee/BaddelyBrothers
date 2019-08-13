@@ -170,7 +170,7 @@
                             </group>
                         </page>
                         <page name="EstimateLines" string="Estimate Lines" attrs="{'invisible':[('id','=',False)]}">
-                            <field name="estimate_line" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                            <field name="estimate_line" />
                         </page>
                         <page string="Estimate Conditions" attrs="{'invisible':[('id','=',False)]}">
                             <field name="estimateConditions" attrs="{'readonly':[('isLocked','=',True)]}"/>

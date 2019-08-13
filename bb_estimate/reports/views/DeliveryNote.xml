@@ -85,7 +85,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <span t-esc="o.move_ids_without_packing[0].qty_done if not estimate else estimate.manufacturingOrder.product_qty"/>
+                                    <span t-esc="'%0.0f'%(o.move_ids_without_packing[0].qty_done) if not estimate else '%0.0f'%(estimate.manufacturingOrder.product_qty)"/>
                                 </td>
                                 <td>
                                     <t t-esc="o.move_ids_without_packing[0].product_id.name if not estimate else estimate.title"/>
