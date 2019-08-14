@@ -14,6 +14,7 @@ class AccountInvoiceBB(models.Model):
             sale_order = self.env['sale.order'].sudo().search([('name','=',vals['origin'])])
             if sale_order.Estimate:
                 vals['Project'] = sale_order.Estimate.project.id
+                vals['invoiceDescription'] = "<br/>".join([x.customer_description for x in sale_order.Estimate.estimate_line if isinstance(x.customer_description,str)])
         return super(AccountInvoiceBB,self).create(vals)
     
     @api.model
@@ -29,15 +30,6 @@ class AccountInvoiceBB(models.Model):
             sale_order_estimate = self.getEstimateData()
             mo = self.env['mrp.production'].sudo().search([('Estimate.id','=',sale_order_estimate.id)])
             return mo
-        
-    def create(self,val):
-        invoice = super(AccountInvoiceBB,self).create(val)
-        Estimate = invoice.getEstimateData()
-        Description = ""
-        if Estimate:
-            Description = "<br/>".join([x.customer_description for x in Estimate.estimate_line if isinstance(x.customer_description,str)])
-        invoice.write({'invoiceDescription':Description})
-        return invoice
                     
     def EditInvoiceLine(self):
         return {
