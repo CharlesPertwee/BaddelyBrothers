@@ -5,6 +5,7 @@ import math
 from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
 
 DIE_SIZES = [
+    ('none', ''),
     ('standard','No Die (No Charge)'),
     ('small','Crest Die'),
     ('medium','Heading Die'),
@@ -12,6 +13,7 @@ DIE_SIZES = [
 ]
 
 DUPLEX_OPTIONS = [
+    ('none', ''),
     ('two', '2 Sheets'),
     ('three', '3 Sheets'),
     ('four', '4 Sheets'),
@@ -19,6 +21,7 @@ DUPLEX_OPTIONS = [
 ]
 
 LINE_DOCUMENT_CATEGORIES = [
+    ('none', ''),
     ('Origination', 'Origination'),
     ('Material', 'Material'),
     ('Process','Process'),
@@ -1161,60 +1164,61 @@ class EstimateLine(models.Model):
                 if lineId.option_type == 'process':
                     work_twist = False
                     self.CreateMaterialLink(lineId,work_twist)
-                    if lineId.workcenterId.associatedBoxId:
-                        data = {}
-                        material = lineId.workcenterId.associatedBoxId
-                        estimate = lineId.estimate_id
-                        for qty in ['1','2','3','4','run_on']:
-                            if qty == 'run_on':
-                                quantity = 'run_on'
-                            else:
-                                quantity = 'quantity_'+qty
+                    if not lineId.estimate_id.duplicateProcess:
+                        if lineId.workcenterId.associatedBoxId:
+                            data = {}
+                            material = lineId.workcenterId.associatedBoxId
+                            estimate = lineId.estimate_id
+                            for qty in ['1','2','3','4','run_on']:
+                                if qty == 'run_on':
+                                    quantity = 'run_on'
+                                else:
+                                    quantity = 'quantity_'+qty
 
-                            if not estimate[quantity]:
-                                continue
+                                if not estimate[quantity]:
+                                    continue
 
-                            cost_params={
-                                'finished_quantity':estimate[quantity],
-                                'cost_per_unit':material.standard_price,
-                                'price_per_unit':material.list_price,
-                                'margin':material.margin,
+                                cost_params={
+                                    'finished_quantity':estimate[quantity],
+                                    'cost_per_unit':material.standard_price,
+                                    'price_per_unit':material.list_price,
+                                    'margin':material.margin,
+                                }
+
+                                qty_params={
+                                    'param_number_up':lineId.param_number_up
+                                }
+
+
+                                cost_params['quantity_required'] = math.ceil(cost_params['finished_quantity'] / float(lineId.param_sheets_per_box))
+
+                                self._calc_prices(qty_params, cost_params, 'None', qty)
+
+                                data.update({
+                                    'quantity_required_'+qty    : cost_params['quantity_required'],
+                                    'cost_per_unit_'+qty        : material.standard_price,
+                                    'price_per_unit_'+qty       : material.list_price,
+                                    'margin_'+qty               : material.margin,
+                                    'total_cost_'+qty           : cost_params['total_cost'],
+                                    'total_price_'+qty          : cost_params['total_price'],
+                                    'total_price_per_1000_'+qty : cost_params['total_price_per_1000']
+                                    })
+
+
+                            newRecord = {
+                                'estimate_id' : lineId.estimate_id.id,
+                                'MaterialTypes': 'Stock',
+                                'material': material.id,
+                                'option_type':'material',
+                                'documentCatergory' : 'Packing',
+                                'customer_description': material.customerDescription,
+                                'StandardJobDescription': material.jobTicketDescription,
+                                'StandardCustomerDescription' : material.customerDescription,
+                                'JobTicketText':material.jobTicketDescription,
+                                'lineName' : material.name
                             }
-                            
-                            qty_params={
-                                'param_number_up':lineId.param_number_up
-                            }
-
-
-                            cost_params['quantity_required'] = math.ceil(cost_params['finished_quantity'] / float(lineId.param_sheets_per_box))
-
-                            self._calc_prices(qty_params, cost_params, 'None', qty)
-
-                            data.update({
-                                'quantity_required_'+qty    : cost_params['quantity_required'],
-                                'cost_per_unit_'+qty        : material.standard_price,
-                                'price_per_unit_'+qty       : material.list_price,
-                                'margin_'+qty               : material.margin,
-                                'total_cost_'+qty           : cost_params['total_cost'],
-                                'total_price_'+qty          : cost_params['total_price'],
-                                'total_price_per_1000_'+qty : cost_params['total_price_per_1000']
-                                })
-
-
-                        newRecord = {
-                            'estimate_id' : lineId.estimate_id.id,
-                            'MaterialTypes': 'Stock',
-                            'material': material.id,
-                            'option_type':'material',
-                            'documentCatergory' : 'Packing',
-                            'customer_description': material.customerDescription,
-                            'StandardJobDescription': material.jobTicketDescription,
-                            'StandardCustomerDescription' : material.customerDescription,
-                            'JobTicketText':material.jobTicketDescription,
-                            'lineName' : material.name
-                        }
-                        newRecord.update(data)
-                        self.create(newRecord)
+                            newRecord.update(data)
+                            self.create(newRecord)
                         
                 elif lineId.option_type == 'material':
                     if lineId.MaterialTypes == 'Non-Stockable':
@@ -1303,7 +1307,6 @@ class EstimateLine(models.Model):
                             dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
                             dictProcess.pop('hasComputed')
                             process.write(dictProcess)
-                    lineId.estimate_id.write({'duplicateProcess':False})
             
             if not lineId.hasComputed:
                 lineId.write({'hasComputed': True,

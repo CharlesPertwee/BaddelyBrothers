@@ -4,7 +4,7 @@
             <t t-call="web.basic_layout">
                 <t t-call="web.html_container">
                         <div class="backgroundimage" style="position:absolute;z-index:-999;"> 
-                            <img class="img-responsive" src="/bb_estimate/static/src/img/Bb_invoice.jpg" width="900px" height="1335px"/>
+                            <img class="img-responsive" src="/bb_estimate/static/src/img/Bb_invoice.jpg" width="900px" height="1300px"/>
                         </div>
                         <div class="row" style="padding-top:18em; padding-left:2em; padding:right:2em;">
                             <div class="col-7">
@@ -35,7 +35,7 @@
                                 <div class="row">
                                     <div class="col-4">
                                         <p class="pull-left">
-                                            Fax:
+                                            E-mail:
                                         </p>
                                     </div>
                                     <div class="col-8">
@@ -46,7 +46,6 @@
                         </div>
                         <br/>
                         <div style="float:right">
-                            Suppliers Ac Code: <span t-field="o.partner_id.reference"/><br/>
                             Order Date: <span t-field="o.date_order" t-options='{"format": "dd/MM/yyyy"}'/> <br/>
                             Delivery Required By: <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/> <br/>
                         </div>
@@ -58,7 +57,7 @@
                         <table>
                             <t t-foreach="o.order_line" t-as="order">
                                 <tr>
-                                    <td  width="50%"><span t-field="order.product_qty"/></td>
+                                    <td  width="25%"><span t-esc="int(float(order.product_qty))"/></td>
                                     <td  width="70%"><span t-field="order.product_id.name"/></td>
                                     <td  width="20%"><span t-field="order.price_subtotal"/></td>
                                 </tr>

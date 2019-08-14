@@ -11,7 +11,6 @@
                                 <div class="row">
                                     <div class="col-7">
                                         <p><span t-field="o.partner_id.name"/><br/>
-                                        <span t-field="o.partner_id.name"/><br/>
                                         <span t-field="o.partner_id.street"/><br/>
                                         <span t-field="o.partner_id.city"/><br/>
                                         <span t-field="o.partner_id.zip"/><br/>
@@ -72,7 +71,7 @@
                                                 <t t-if="estimate">
                                                     <td name="account_invoice_line_name" >
                                                       <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/> <t t-if="o.name">Your Ref: <span t-field="o.name"/></t><br/>
-                                                          <span t-field="estimate.title"/><br/>
+                                                          Qty: <span t-field="o.invoice_line_ids[0].quantity"/> <span t-field="estimate.title"/><br/>
                                                           Size: <span t-field="estimate.finished_size.width"/> x <span t-field="estimate.finished_size.height"/>
                                                      </p>
                                                       <p>
@@ -101,6 +100,7 @@
                                 </table>
                             </div>
                             <div style="position: relative; left: 0; bottom: 0;width: 100%;padding-top:27em;">
+                                <t t-if="o.partner_id.vat"><p class="pull-left">VAT: <span t-field="o.partner_id.vat"/></p></t>
                                 <hr/>
                                 <div class="container">
                                     <div class="row">
