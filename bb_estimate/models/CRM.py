@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 DUPLEX_OPTIONS = [
+    ('none', ''),
     ('two', '2 Sheets'),
     ('three', '3 Sheets'),
     ('four', '4 Sheets'),
@@ -10,12 +11,14 @@ DUPLEX_OPTIONS = [
 ]
 
 EDGING = [
+    ('none', ''),
     ('Silver','Silver'),
     ('Gold','Gold'),
     ('Custom','Custom'),
 ]
 
 ORIGINATION = [
+    ('none', ''),
     ('Print Ready PDF','Print Ready PDF'),
     ('You to prepare file from copy supplied','You to prepare file from copy supplied'),
 ]
@@ -43,6 +46,7 @@ FLAP_GLUE_TYPES = [
 ]
 
 TISSUE_LINING_OPTIONS = [
+    ('none', ''),
     ('full', 'Yes - Fully'),
     ('half', 'Yes - Half'),
     ('unlined', 'Unlined'),
@@ -70,6 +74,8 @@ class Leads(models.Model):
     
     #Web Form Print Field
     enquiryPrintEdging = fields.Selection(EDGING,'Edging')
+    enquiryEdgeColor = fields.Char('Edge Color')
+    
     enquiryPrintDuplex = fields.Selection(DUPLEX_OPTIONS,'Duplex')
     enquiryEnvelopeWindow  = fields.Boolean('Windowed')
     
@@ -78,7 +84,15 @@ class Leads(models.Model):
     enquiryPrintOrigination = fields.Selection(ORIGINATION,'Print Origination')
     
     size = fields.Many2one('bb_products.material_size','Size')
-    
+    enquirySizeHeight = fields.Integer('Size Height')
+    enquirySizeWidth = fields.Integer('Size Width')
+        
     def _compute_estimates(self):
             for record in self:
                 self.Estimate_Count = len(record.Estimates)
+                
+    @api.onchange('size')
+    def calc_size_change_params(self):
+        if self.size:
+            self.enquirySizeHeight = self.size.width
+            self.enquirySizeWidth = self.size.height

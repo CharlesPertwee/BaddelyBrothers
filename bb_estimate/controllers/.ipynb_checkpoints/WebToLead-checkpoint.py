@@ -17,8 +17,8 @@ class WebToLead(WebsiteForm):
     @http.route('/contactus', type='http', auth='public', website='True')
     def contactData(self,**kw):
         countries = request.env['res.country'].sudo().search([])
-        envelopeSize = request.env['bb_products.material_size'].sudo().search([('isEnvelopeEstimate','=',True)])
-        printSize = request.env['bb_products.material_size'].sudo().search([('isPrintSize','=',True)])
+        envelopeSize = request.env['bb_products.material_size'].sudo().search([('isEnvelopeEstimate','=',True),('isEnquirySize','=',True)])
+        printSize = request.env['bb_products.material_size'].sudo().search([('isPrintSize','=',True),('isEnquirySize','=',True)])
         
         return request.render('bb_estimate.bb_contactus_form',{'countries':countries,'envelopeSize':envelopeSize,'printSize':printSize})
     
@@ -36,6 +36,8 @@ class WebToLead(WebsiteForm):
             if 'enquiryPrintSize' in values and values['enquiryPrintSize']:
                 values['size'] = values['enquiryPrintSize']
                 values.pop('enquiryPrintSize')
+                values.pop('enquirySize')
+                
         #Addition of custom fields
         values['contact_name'] = ("%s %s")%(values['enquiryFirstName'] if 'enquiryFirstName' in values.keys() else "",values['enquiryLastName'] if 'enquiryLastName' in values.keys() else "")
         if 'enquiryFirstName' in values.keys():
@@ -43,6 +45,11 @@ class WebToLead(WebsiteForm):
         if 'enquiryLastName' in values.keys():
             values.pop('enquiryLastName')
         values['typeOfLead'] = 'Bespoke'
+        
+        if values['size'] != "Custom":
+            sizeSel = request.env['bb_products.material_size'].sudo().search([('id','=',values['size'])])
+            values['enquirySizeWidth'] = sizeSel.width
+            values['enquirySizeHeight'] = sizeSel.height
         
         return super(WebToLead, self).extract_data(model,values)
 

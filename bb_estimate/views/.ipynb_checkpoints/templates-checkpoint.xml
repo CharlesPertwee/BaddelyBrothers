@@ -39,12 +39,14 @@
             <xpath expr="//*[@id='wrap']/div[2]/div/div[1]/div[2]/form" position="replace">
                 <div style="background: #F3F3F3;padding: 20px;">
                     <form action="/website_form/" method="post" data-model_name="crm.lead" data-success_page="/contactus-thank-you" class="s_website_form container-fluid mt32" enctype="multipart/form-data" data-editable-form="false">
-                        <div class="row" style="padding:15px;">
+                        <div class="row custom-radio text-center" style="padding:30px;font-size:17px;">
                             <div class="col-6">
-                                <input type="radio" name="enquiryType" value="Envelope Estimate" checked="checked" onchange="hidePrints()">Get Envelope Estimate</input>
+                                <input type="radio" id="envelopeEstimate" name="enquiryType" class="custom-control-input" value="Envelope Estimate" checked="checked" onchange="hidePrints()"/>
+                                <label class="custom-control-label" for="envelopeEstimate">Get Envelope Estimate</label>
                             </div>
                             <div class="col-6">
-                                <input type="radio" name="enquiryType" value="Print Estimate" onchange="hideEnvelopes()">Get Print Estimate</input>
+                                <input type="radio" id="printEstimate" class="custom-control-input" name="enquiryType" value="Print Estimate" onchange="hideEnvelopes()"/>
+                                <label class="custom-control-label" for="printEstimate">Get Print Estimate</label>                                
                             </div>
                         </div>
                         <div class="form-group row form-field o_website_form_required_custom">
@@ -150,14 +152,14 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group row form-field">
+                        <div class="form-group row form-field o_website_form_required_custom">
                             <label class="col-lg-3 col-md-4 col-form-label" id="Quantity1" for="Quantity1">Quantity 1</label>
                             <div class="col-lg-7 col-md-8">
-                                <input type="number" class="form-control o_website_form_input" name="Quantity1" t-att-value="request.params.get('Quantity1', '')"/>
+                                <input type="number" class="form-control o_website_form_input" name="Quantity1" t-att-value="request.params.get('Quantity1', '')" required=""/>
                             </div>
                             <label class="col-lg-3 col-md-4 col-form-label"></label>
                             <div class="col-lg-7 col-md-8">
-                                <p style="font-size:10px;">How many envelopes do you need?</p>
+                                <p id="moreEnv" style="font-size:10px;">How many envelopes do you need?</p>
                             </div>
                         </div>
                         <div class="extra form-group row form-field" style="display:none;">
@@ -180,13 +182,13 @@
                         </div> 
                         <div class="row">
                             <div class="col-12">
-                                <p class="text-danger"><a onClick="showMoreQuantities(); return false;" style="cursor:pointer">More Quantites? Click here if you would like prices for more than one lot.</a></p>
+                                <p id="morePara" class="text-danger"><a onClick="showMoreQuantities(); return false;" style="cursor:pointer">More Quantites? Click here if you would like prices for more than one lot.</a></p>
                             </div>
                         </div>
                         <div class="print form-group row form-field" style="display:none;">
                             <label class="col-lg-3 col-md-4 col-form-label" for="enquiryPrintSize">Print Size</label>
                             <div class="col-lg-7 col-md-8">
-                                <select class="form-control" name="enquiryPrintSize">
+                                <select id="printSize" class="form-control" name="enquiryPrintSize">
                                     <t t-foreach="printSize" t-as="size">
                                         <option t-attf-value="#{size.id}"><t t-esc="size.name"/></option>
                                     </t>
@@ -206,13 +208,25 @@
                         <div class="envelope form-group row form-field">
                             <label class="col-lg-3 col-md-4 col-form-label" for="enquirySize">Size</label>
                             <div class="col-lg-7 col-md-8">
-                                <select class="form-control" name="enquirySize">
+                                <select id="envelopeSize" class="form-control" name="enquirySize">
                                     <t t-foreach="envelopeSize" t-as="size">
                                         <option t-attf-value="#{size.id}"><t t-esc="size.name"/></option>
                                     </t>
                                 </select>
                             </div>
                         </div>
+                        <div class="form-group row form-field" style="display:none;" id="enquirySizeHeight">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquirySizeHeight">Height</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="enquirySizeHeight" t-att-value="request.params.get('enquirySizeHeight', '')"/>
+                            </div>
+                        </div> 
+                        <div class="form-group row form-field" style="display:none;" id="enquirySizeWidth">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquirySizeWidth">Width</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="enquirySizeWidth" t-att-value="request.params.get('enquirySizeWidth', '')"/>
+                            </div>
+                        </div> 
                         <div class="envelope form-group row form-field">
                             <label class="col-lg-3 col-md-4 col-form-label" for="enquiryEnvelopeType">Envelope Type</label>
                             <div class="col-lg-7 col-md-8">
@@ -257,7 +271,7 @@
                         <div class="print form-group row form-field">
                             <label class="col-lg-3 col-md-4 col-form-label" for="enquiryPrintEdging">Edging</label>
                             <div class="col-lg-7 col-md-8">
-                                <select class="form-control" name="enquiryPrintEdging">
+                                <select class="form-control" name="enquiryPrintEdging" id="enquiryPrintEdging">
                                     <option t-attf-value="none"></option>
                                     <option t-attf-value="Silver">Silver</option>
                                     <option t-attf-value="Gold">Gold</option>                                
@@ -269,6 +283,14 @@
                                 <p style="font-size:10px;">We can provide coloured(pantone),gold or silver,edges and either flator bevel edges, with square or rounded corners</p>
                             </div>
                         </div>
+                        
+                        <div class="form-group row form-field" style="display:none;" id="enquiryEdgeColor">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryEdgeColor">Color</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="enquiryEdgeColor" t-att-value="request.params.get('enquiryEdgeColor', '')"/>
+                            </div>
+                        </div> 
+                        
                          <div class="print form-group row form-field">
                             <label class="col-lg-3 col-md-4 col-form-label" for="enquiryPrintDuplex">Duplex</label>
                             <div class="col-lg-7 col-md-8">
