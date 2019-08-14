@@ -15,6 +15,12 @@ function hideEnvelopes(){
     for (j = 0; j<elemen.length;j++){
         elemen[j].style.display = "flex";
     }
+    
+    document.getElementById("morePara").style.display = "flex";
+    document.getElementById("moreEnv").style.display = "none";
+    document.getElementById("enquirySizeHeight").style.display = "none";
+    document.getElementById("enquirySizeWidth").style.display = "none";
+    document.getElementById("enquiryEdgeColor").style.display = "none";
 }
 
 function hidePrints(){
@@ -33,6 +39,12 @@ function hidePrints(){
     for (j = 0; j<ele.length;j++){
         ele[j].style.display = "flex";
     }
+    
+    document.getElementById("morePara").style.display = "flex";
+    document.getElementById("moreEnv").style.display = "flex";
+    document.getElementById("enquirySizeHeight").style.display = "none";
+    document.getElementById("enquirySizeWidth").style.display = "none";
+    document.getElementById("enquiryEdgeColor").style.display = "none";
 }
 
 function hideQuantities(){
@@ -48,8 +60,50 @@ function showMoreQuantities(){
             extraPrints[i].style.display = "flex";
         }
     
+    document.getElementById("morePara").style.display = "none";
 }
+
+// function sizeEntities(){
+//     alert(document.getElementById("envelopeSize").text)
+// }
 
 $(document).ready(function(){
     hidePrints()
+    
+    $("#envelopeSize").change(function(){
+        var selectedText = $("#envelopeSize option:selected").html();
+        if(selectedText == "Custom"){
+            document.getElementById("enquirySizeHeight").style.display = "flex";
+            document.getElementById("enquirySizeWidth").style.display = "flex";
+        }else{
+            document.getElementById("enquirySizeHeight").style.display = "none";
+            document.getElementById("enquirySizeWidth").style.display = "none";
+        }
+        
+    });
+    
+    $("#printSize").change(function(){
+        var selectedText = $("#printSize option:selected").html();
+        if(selectedText == "Custom"){
+            document.getElementById("enquirySizeHeight").style.display = "flex";
+            document.getElementById("enquirySizeWidth").style.display = "flex";
+        }else{
+            document.getElementById("enquirySizeHeight").style.display = "none";
+            document.getElementById("enquirySizeWidth").style.display = "none";
+        }
+        
+    });
+    
+    $("#enquiryPrintEdging").change(function(){
+       var selectedText = $("#enquiryPrintEdging option:selected").html()
+       if(selectedText == "Custom")
+       {
+           $("#enquiryEdgeColor").css('display','flex');
+       }
+       else
+       {
+           $("#enquiryEdgeColor").css('display','none');
+       } 
+    });
+    
 });

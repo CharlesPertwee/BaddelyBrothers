@@ -7,6 +7,7 @@ from odoo.addons import decimal_precision as dp
 from odoo.tools.safe_eval import safe_eval
 
 DIE_SIZES = [
+    ('none', ''),
     ('standard','No Die (No Charge)'),
     ('small','Crest Die'),
     ('medium','Heading Die'),
@@ -36,6 +37,7 @@ FLAP_GLUE_TYPES = [
 ]
 
 TISSUE_LINING_OPTIONS = [
+    ('none', ''),
     ('full', 'Yes - Fully'),
     ('half', 'Yes - Half'),
     ('unlined', 'Unlined'),
@@ -217,6 +219,7 @@ class Estimate(models.Model):
         record = super(Estimate,self).create(val)
         conditions = self.env['bb_estimate.conditions'].sudo().search([('isDefault','=',True)])
         record.estimateConditions = conditions
+        record.duplicateProcess = False
         return record
     
     @api.depends('hasExtra')
@@ -332,6 +335,7 @@ class Estimate(models.Model):
                 'target' : 'new',
             }
     def AddLineItem(self):
+        self.duplicateProcess = False
         return {
                 'view_type' : 'form',
                 'view_mode' : 'form',

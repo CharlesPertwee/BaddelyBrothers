@@ -40,7 +40,9 @@
                 'enquiryType',
                 'enquiryEnvelopeWindow',
                 'runOn',
-                         
+                'enquirySizeHeight',
+                'enquirySizeWidth',
+                'enquiryEdgeColor',                         
             ]"/>
         </function>
         
