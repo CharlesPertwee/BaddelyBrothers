@@ -36,7 +36,6 @@ class WebToLead(WebsiteForm):
             if 'enquiryPrintSize' in values and values['enquiryPrintSize']:
                 values['size'] = values['enquiryPrintSize']
                 values.pop('enquiryPrintSize')
-                values.pop('enquirySize')
                 
         #Addition of custom fields
         values['contact_name'] = ("%s %s")%(values['enquiryFirstName'] if 'enquiryFirstName' in values.keys() else "",values['enquiryLastName'] if 'enquiryLastName' in values.keys() else "")
@@ -45,11 +44,6 @@ class WebToLead(WebsiteForm):
         if 'enquiryLastName' in values.keys():
             values.pop('enquiryLastName')
         values['typeOfLead'] = 'Bespoke'
-        
-        if values['size'] != "Custom":
-            sizeSel = request.env['bb_products.material_size'].sudo().search([('id','=',values['size'])])
-            values['enquirySizeWidth'] = sizeSel.width
-            values['enquirySizeHeight'] = sizeSel.height
         
         return super(WebToLead, self).extract_data(model,values)
 
