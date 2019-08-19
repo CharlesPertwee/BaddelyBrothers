@@ -54,7 +54,7 @@
                                 <p t-field="o.notes"/>
                                 <hr/>
                                 <p>Regards,</p>
-                                
+                                <p><span t-field="o.user_id"/></p>                                
                             </div>
                         </t>
                     </t>
