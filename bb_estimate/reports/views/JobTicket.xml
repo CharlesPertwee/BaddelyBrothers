@@ -145,7 +145,7 @@
                                                    Special Instructions: <span t-field="o.Estimate.SpecialInstuction" />
                                                </td>
                                                <td colspan="5" style="border: 1px black solid;">
-                                                    Packing Instructions: <span t-field="o.Estimate.PackingInstruction" />
+                                                    Packing Instructions: 
                                                 </td>
                                               </tr>
                                             </tbody>

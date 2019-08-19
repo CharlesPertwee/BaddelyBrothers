@@ -1,16 +1,18 @@
 <odoo>
   <data>
-      <!--report
-        id="report_estimate"
-        model="bb_estimate.estimate"
-        string="Estimate Letter"
-        report_type="qweb-pdf"
-        name="bb_estimate.estimate_letter"
-        file="mrp_account.mrp_cost_structure"
-        paperformat="bb_estimate.paperformat_invoice"
-        attachment="((object.estimate_number or '').replace('/','')+'.pdf')"
-        print_report_name="(object.estimate_number or '')"
-      /-->
+      <record id="view_estimates_filter" model="ir.ui.view">
+            <field name="name">estimate.search.select</field>
+            <field name="model">bb_estimate.estimate</field>
+            <field name="priority" eval="15"/>
+            <field name="arch" type="xml">
+                <search string="Search Sales Order">
+                    <field name="title"/>
+                    <field name="estimate_number"/>
+                    <field name="partner_id"/>
+                    <field name="estimator"/>
+                </search>
+          </field>
+      </record>
           
     <record id="estimate_tree_view" model="ir.ui.view">
         <field name="name">estimate.tree</field>
@@ -261,8 +263,8 @@
                             <field name="EnquiryComments"/>
                         </group>
                         <group>
-                            <field name="SpecialInstuction" />
-                            <field name="PackingInstruction" />
+                            <field name="SpecialInstuction" rows="8"/>
+                            <!--field name="PackingInstruction" /-->
                         </group>
                     </group>
                     <group>

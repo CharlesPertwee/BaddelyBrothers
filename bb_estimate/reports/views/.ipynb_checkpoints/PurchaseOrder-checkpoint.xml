@@ -15,57 +15,58 @@
                             </div>
                             <div class="col-5">
                                 <div class="row">
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <p class="pull-left">Tel: </p>
                                     </div>
-                                    <div class="col-8">
+                                    <div class="col-7">
                                         <p class="pull-left"><span t-field="o.partner_id.phone"/></p>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-4">
-                                        <p class="pull-left">
-                                            Fax:
-                                        </p>
-                                    </div>
-                                    <div class="col-8">
-                                        <p class="pull-left"><span t-field="o.partner_id.faxNumber"/></p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <p class="pull-left">
                                             E-mail:
                                         </p>
                                     </div>
-                                    <div class="col-8">
+                                    <div class="col-7">
                                         <p ><span t-field="o.partner_id.email"/></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-5">
+                                        <p class="pull-left">
+                                            Order Date: <br/>
+                                            Delivery Req.: 
+                                        </p>
+                                    </div>
+                                    <div class="col-7">
+                                        <p ><span t-field="o.date_order" t-options='{"format": "dd/MM/yyyy"}'/><br/>
+                                            <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/></p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <br/>
+<!--                         <br/>
                         <div style="float:right">
                             Order Date: <span t-field="o.date_order" t-options='{"format": "dd/MM/yyyy"}'/> <br/>
                             Delivery Required By: <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/> <br/>
                         </div>
-                        <br/>
+                        <br/> -->
                         <h4 class="text-center" style="clear:both;"><b>Purchase Order No. <span t-field="o.name"/></b></h4>
                         <hr style="border:1px black solid"/>
-                        <p>Our purchase order and job numbers must be quoted on your invoice.</p>
-                        <p>Please supply the following : -</p>
-                        <table>
+                        <p style="margin-left: 19px;">Our purchase order and job numbers must be quoted on your invoice.</p>
+                        <p style="margin-left: 19px;">Please supply the following : -</p>
+                        <table style="margin-left: 19px;">
                             <t t-foreach="o.order_line" t-as="order">
                                 <tr>
                                     <td  width="25%"><span t-esc="int(float(order.product_qty))"/></td>
-                                    <td  width="70%"><span t-field="order.product_id.name"/></td>
-                                    <td  width="20%"><span t-field="order.price_subtotal"/></td>
+                                    <td  width="64%"><span t-field="order.product_id.name"/></td>
+                                    <td  width="28%" align="left"><span t-field="order.price_subtotal"/></td>
                                 </tr>
                             </t>
                         </table>
                         
-                        <div style="padding-top:25em;">
-                            <p> For and on behalf of Baddeley Brothers Ltd</p>
+                        <div style="padding-top:25em; margin-left: 19px;">
                             <div class="row">
                                 <div class="col-6">
                                     <span t-field="o.user_id"/>
@@ -76,11 +77,12 @@
                                             <p class="pull-left">Total Cost Ex VAT:  </p>
                                         </div>
                                         <div class="col-6">
-                                            <p class="pull-left"><span t-field="o.amount_total"/></p>
+                                            <p class="pull-left" style="margin-left: 19px;"><span t-field="o.amount_total"/></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <p> For and on behalf of Baddeley Brothers Ltd</p>
                         </div>
                     </t>
                 </t>

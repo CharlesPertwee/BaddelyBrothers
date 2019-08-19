@@ -161,7 +161,7 @@ class Estimate(models.Model):
     showMo = fields.Boolean('Show Mo Button',related="state.isOrder")
     EnquiryComments = fields.Text('Enquiry Comments')
     SpecialInstuction = fields.Text('Special Instructions')
-    PackingInstruction = fields.Text('Packing Instructions')
+    #PackingInstruction = fields.Text('Packing Instructions')
     isLocked = fields.Boolean('Locked',copy=False)
     hasDelivery = fields.Boolean('Delivery Added?',copy=False)
     priceHistory = fields.One2many('bb_estimate.price_history','Estimate','Price Adjustments',copy=False)
