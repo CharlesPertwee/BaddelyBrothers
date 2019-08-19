@@ -7,7 +7,6 @@
         """,
 
     'description': """
-    
     """,
 
     'author': "Squadsoft Tech",

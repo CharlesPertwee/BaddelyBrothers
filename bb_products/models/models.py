@@ -50,18 +50,18 @@ class ProductsTemplate(models.Model):
 class Products(models.Model):
     _inherit = 'product.product'
     
-    def _get_name(self):
-        product = self
-        name = product.name
-        if product.sheetSize:
-            name = "%s (%d X %d) - %s G.S.M"%(name,product.sheet_width,product.sheet_height,product.grammage)            
-            #name = name + "  " + product.sheetSize.name
-        return name
+#     def _get_name(self):
+#         product = self
+#         name = product.name
+#         if product.sheetSize:
+#             name = "%s (%d X %d) - %s G.S.M"%(name,product.sheet_width,product.sheet_height,product.grammage)            
+#             #name = name + "  " + product.sheetSize.name
+#         return name
     
-    @api.multi
-    def name_get(self):
-        res = []
-        for product in self:
-            name = product._get_name()
-            res.append((product.id, name))
-        return res
+#     @api.multi
+#     def name_get(self):
+#         res = []
+#         for product in self:
+#             name = product._get_name()
+#             res.append((product.id, name))
+#         return res

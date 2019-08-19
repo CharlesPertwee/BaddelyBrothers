@@ -48,7 +48,7 @@
                                         </div-->
                                     </div>
                                 </div>
-                            <div class="page">
+                            <div class="page" style="max-height:53em; height:53em;">
                                 <h4 class="text-center"><b>Invoice</b></h4>
                                 <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])" />
                                 <table class="table table-sm" name="p_forma_line_table">
@@ -104,7 +104,8 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div style="position: relative; left: 0; bottom: 0;width: 100%;padding-top:27em;">
+                            <footer style="position: relative; left: 0; bottom: 0;width: 100%;">
+                                <t t-if="o.partner_id.vat"><p class="pull-left">VAT: <span t-field="o.partner_id.vat"/></p></t>
                                 <hr/>
                                 <div class="container">
                                     <div class="row">
@@ -150,7 +151,7 @@
                                     </div>
                                 </div>                                    
                                 </div>
-                            </div>
+                            </footer>
                         </div>
                     </div>
                     </div>
