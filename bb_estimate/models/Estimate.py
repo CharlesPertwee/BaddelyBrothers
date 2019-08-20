@@ -161,7 +161,7 @@ class Estimate(models.Model):
     showMo = fields.Boolean('Show Mo Button',related="state.isOrder")
     EnquiryComments = fields.Text('Enquiry Comments')
     SpecialInstuction = fields.Text('Special Instructions')
-    PackingInstruction = fields.Text('Packing Instructions')
+    #PackingInstruction = fields.Text('Packing Instructions')
     isLocked = fields.Boolean('Locked',copy=False)
     hasDelivery = fields.Boolean('Delivery Added?',copy=False)
     priceHistory = fields.One2many('bb_estimate.price_history','Estimate','Price Adjustments',copy=False)
@@ -173,7 +173,7 @@ class Estimate(models.Model):
     selectedRatio = fields.Float('Ratio Selected',default=0,copy=False)
     SelectedQtyRatio = fields.Float('Ratio Selected',default=1,copy=False)
     
-    duplicateProcess = fields.Boolean('Process Duplicate')
+    duplicateProcess = fields.Boolean('Process Duplicate',default=False)
     
     Weight_1 = fields.Float('Weight 1',copy=False)
     Weight_2 = fields.Float('Weight 2',copy=False)
@@ -219,7 +219,6 @@ class Estimate(models.Model):
         record = super(Estimate,self).create(val)
         conditions = self.env['bb_estimate.conditions'].sudo().search([('isDefault','=',True)])
         record.estimateConditions = conditions
-        record.duplicateProcess = False
         return record
     
     @api.depends('hasExtra')

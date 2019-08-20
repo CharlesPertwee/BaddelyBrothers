@@ -990,7 +990,7 @@ class EstimateLine(models.Model):
     
     def CreateLink(self,line,work_twist):
         link = self.env['bb_estimate.material_link'].sudo()
-        processes = line.estimate_id.estimate_line.search([('estimate_id','=',line.estimate_id.id),('option_type','=','process'),('isExtra','=',False)])
+        processes = line.estimate_id.estimate_line.search([('estimate_id','=',line.estimate_id.id),('option_type','=','process')])
         added_working_sheets = False
         for process in processes:
             if process.workcenterId and process.workcenterId.process_type:
@@ -1007,31 +1007,31 @@ class EstimateLine(models.Model):
                         added_working_sheets = True
                     else:
                         newLink['overs_only'] = True
-                        
+                    newLink['overs_only'] = newLink['overs_only'] or (process.isExtra or line.isExtra)   
                     link.create(newLink)
         
     def CreateMaterialLink(self,process,work_twist):
         link = self.env['bb_estimate.material_link'].sudo()
         materials = process.estimate_id.estimate_line.search([('estimate_id','=',process.estimate_id.id),('option_type','=','material'),('documentCatergory','=','Material')])
         added_working_sheets = False
-        if not process.isExtra:
-            for material in materials:
-                if process.workcenterId and process.workcenterId.process_type:
-                    if process.work_twist:
-                        work_twist = True
-                    if process.workcenterId.process_type.MapMaterials:
-                        newLink = {
-                            'materialLine' : material.id,
-                            'processLine' : process.id,
-                            'estimate': process.estimate_id.id,
-                        }
-                        if not added_working_sheets and process.workcenterId.process_type.OversOnly:
-                            newLink['overs_only'] = False
-                            added_working_sheets = True
-                        else:
-                            newLink['overs_only'] = True
+        for material in materials:
+            if process.workcenterId and process.workcenterId.process_type:
+                if process.work_twist:
+                    work_twist = True
+                if process.workcenterId.process_type.MapMaterials:
+                    newLink = {
+                        'materialLine' : material.id,
+                        'processLine' : process.id,
+                        'estimate': process.estimate_id.id,
+                    }
+                    if not added_working_sheets and process.workcenterId.process_type.OversOnly:
+                        newLink['overs_only'] = False
+                        added_working_sheets = True
+                    else:
+                        newLink['overs_only'] = True
 
-                        link.create(newLink)
+                    newLink['overs_only'] = newLink['overs_only'] or (process.isExtra or material.isExtra) 
+                    link.create(newLink)
     
     def RecalculatePrices(self,line,work_twist):
         if line.option_type and line.option_type == "material":
@@ -1164,61 +1164,60 @@ class EstimateLine(models.Model):
                 if lineId.option_type == 'process':
                     work_twist = False
                     self.CreateMaterialLink(lineId,work_twist)
-                    if not lineId.estimate_id.duplicateProcess:
-                        if lineId.workcenterId.associatedBoxId:
-                            data = {}
-                            material = lineId.workcenterId.associatedBoxId
-                            estimate = lineId.estimate_id
-                            for qty in ['1','2','3','4','run_on']:
-                                if qty == 'run_on':
-                                    quantity = 'run_on'
-                                else:
-                                    quantity = 'quantity_'+qty
+                    if lineId.workcenterId.associatedBoxId and (not lineId.estimate_id.duplicateProcess):
+                        data = {}
+                        material = lineId.workcenterId.associatedBoxId
+                        estimate = lineId.estimate_id
+                        for qty in ['1','2','3','4','run_on']:
+                            if qty == 'run_on':
+                                quantity = 'run_on'
+                            else:
+                                quantity = 'quantity_'+qty
 
-                                if not estimate[quantity]:
-                                    continue
+                            if not estimate[quantity]:
+                                continue
 
-                                cost_params={
-                                    'finished_quantity':estimate[quantity],
-                                    'cost_per_unit':material.standard_price,
-                                    'price_per_unit':material.list_price,
-                                    'margin':material.margin,
-                                }
-
-                                qty_params={
-                                    'param_number_up':lineId.param_number_up
-                                }
-
-
-                                cost_params['quantity_required'] = math.ceil(cost_params['finished_quantity'] / float(lineId.param_sheets_per_box))
-
-                                self._calc_prices(qty_params, cost_params, 'None', qty)
-
-                                data.update({
-                                    'quantity_required_'+qty    : cost_params['quantity_required'],
-                                    'cost_per_unit_'+qty        : material.standard_price,
-                                    'price_per_unit_'+qty       : material.list_price,
-                                    'margin_'+qty               : material.margin,
-                                    'total_cost_'+qty           : cost_params['total_cost'],
-                                    'total_price_'+qty          : cost_params['total_price'],
-                                    'total_price_per_1000_'+qty : cost_params['total_price_per_1000']
-                                    })
-
-
-                            newRecord = {
-                                'estimate_id' : lineId.estimate_id.id,
-                                'MaterialTypes': 'Stock',
-                                'material': material.id,
-                                'option_type':'material',
-                                'documentCatergory' : 'Packing',
-                                'customer_description': material.customerDescription,
-                                'StandardJobDescription': material.jobTicketDescription,
-                                'StandardCustomerDescription' : material.customerDescription,
-                                'JobTicketText':material.jobTicketDescription,
-                                'lineName' : material.name
+                            cost_params={
+                                'finished_quantity':estimate[quantity],
+                                'cost_per_unit':material.standard_price,
+                                'price_per_unit':material.list_price,
+                                'margin':material.margin,
                             }
-                            newRecord.update(data)
-                            self.create(newRecord)
+
+                            qty_params={
+                                'param_number_up':lineId.param_number_up
+                            }
+
+
+                            cost_params['quantity_required'] = math.ceil(cost_params['finished_quantity'] / float(lineId.param_sheets_per_box))
+
+                            self._calc_prices(qty_params, cost_params, 'None', qty)
+
+                            data.update({
+                                'quantity_required_'+qty    : cost_params['quantity_required'],
+                                'cost_per_unit_'+qty        : material.standard_price,
+                                'price_per_unit_'+qty       : material.list_price,
+                                'margin_'+qty               : material.margin,
+                                'total_cost_'+qty           : cost_params['total_cost'],
+                                'total_price_'+qty          : cost_params['total_price'],
+                                'total_price_per_1000_'+qty : cost_params['total_price_per_1000']
+                                })
+
+
+                        newRecord = {
+                            'estimate_id' : lineId.estimate_id.id,
+                            'MaterialTypes': 'Stock',
+                            'material': material.id,
+                            'option_type':'material',
+                            'documentCatergory' : 'Packing',
+                            'customer_description': material.customerDescription,
+                            'StandardJobDescription': material.jobTicketDescription,
+                            'StandardCustomerDescription' : material.customerDescription,
+                            'JobTicketText':material.jobTicketDescription,
+                            'lineName' : material.name
+                        }
+                        newRecord.update(data)
+                        self.create(newRecord)
                         
                 elif lineId.option_type == 'material':
                     if lineId.MaterialTypes == 'Non-Stockable':
@@ -1274,7 +1273,7 @@ class EstimateLine(models.Model):
                             dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}
                             lineId.write(dictLine)
                     
-                    if (not lineId.isExtra) and lineId.documentCatergory not in ['Packing','Despatch']:   
+                    if lineId.documentCatergory not in ['Packing','Despatch']:   
                         work_twist = False
                         self.CreateLink(lineId,work_twist)
                         
