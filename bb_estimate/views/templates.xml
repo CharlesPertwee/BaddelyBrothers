@@ -7,6 +7,19 @@
             </xpath>
         </template>
         
+        <template id="assets_backend_delete_confirmation" name="Delete Confirmation" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="application/javascript" src="/bb_estimate/static/src/js/DeleteConfirmation.js"/>
+            </xpath>
+        </template>
+        
+        <template id="assets_backend" name="bb_estimate_style assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <!--These links will be called when loading your Odoo -->
+                <link rel="stylesheet" href="/bb_estimate/static/src/css/Estimate.css"/>
+            </xpath>
+        </template>
+        
         <template id="qty_amend">
             <div class="alert alert-warning" role="alert"> 
                 Quantity Ammended

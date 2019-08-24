@@ -1,0 +1,19 @@
+<odoo>
+    <record id="delete_unused_product" model="ir.ui.view">
+        <field name="name">Delete Unused Product</field>
+        <field name="model">product.delete_by_date</field>
+        <field name="arch" type="xml">
+            <form string="Delete Un-used Products">
+                <sheet>
+                    <group>
+                        <field name="deletionDate"/>
+                    </group>
+                    <footer>
+                        <button name="DeleteProducts" string="Delete Products" class="oe_right oe_highlight" type="object"/>
+                        <button string="Cancel" class="oe_right" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

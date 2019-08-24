@@ -3,7 +3,7 @@
         <t t-foreach="docs" t-as="o">
         <t t-call="web.basic_layout">
             <t t-call="web.html_container">
-                    <div>
+                    <div style="font-family: Georgia;">
                         <t t-set="estimate" t-value="o.getEstimateData()"/>
                         <div class="backgroundimage" style="position:absolute;z-index:-999;"> 
                             <img class="img-responsive" src="/bb_estimate/static/src/img/Bb_invoice.jpg" width="900px" height="1335px"/>
@@ -38,14 +38,6 @@
                                                 <p class="pull-left"><span t-field="o.number"/></p>
                                             </div>
                                         </div>
-                                        <!--div class="row">
-                                            <div class="col-6">
-                                                <p class="pull-left">A/C Ref: </p>
-                                            </div>
-                                            <div class="col-6">
-                                                <p class="pull-left"><span t-field="o.partner_id.reference"/></p>
-                                            </div>
-                                        </div-->
                                     </div>
                                 </div>
                             <div class="page" style="max-height:51em; height:51em;">

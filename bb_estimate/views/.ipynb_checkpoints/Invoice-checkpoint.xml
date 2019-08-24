@@ -3,7 +3,7 @@
         <report
             id="account_invoice_invoice"
             model="account.invoice"
-            string="Customer Invoice"
+            string="B.B Invoice"
             report_type="qweb-pdf"
             name="bb_estimate.report_invoice_document"
             file="bb_estimate.report_invoice_document"
@@ -16,7 +16,7 @@
         <report
             id="account_invoice_invoice_headed"
             model="account.invoice"
-            string="Invoice(Headed Paper)"
+            string="B.B Invoice(Headed Paper)"
             report_type="qweb-pdf"
             name="bb_estimate.report_inv_head_document"
             file="bb_estimate.report_inv_head_document"
@@ -29,7 +29,7 @@
         <report
             id="account_pro_forma"
             model="account.invoice"
-            string="Pro Forma"
+            string="B.B Pro Forma"
             report_type="qweb-pdf"
             name="bb_estimate.report_pro_forma_document"
             file="bb_estimate.report_pro_forma_document"
@@ -42,7 +42,7 @@
         <report
             id="account_pro_forma_headed"
             model="account.invoice"
-            string="Pro Forma(Headed Paper)"
+            string="B.B Pro Forma(Headed Paper)"
             report_type="qweb-pdf"
             name="bb_estimate.report_pro_forma_headed_document"
             file="bb_estimate.report_pro_forma_headed_document"
@@ -55,7 +55,7 @@
         <report
             id="account_invoice_credit_note"
             model="account.invoice"
-            string="Credit Note"
+            string="B.B Credit Note"
             report_type="qweb-pdf"
             name="bb_estimate.report_credit_note_document"
             file="bb_estimate.report_credit_note_document"
@@ -68,7 +68,7 @@
         <report
             id="account_invoice_credit_note_headed"
             model="account.invoice"
-            string="Credit Note(Headed Paper)"
+            string="B.B Credit Note(Headed Paper)"
             report_type="qweb-pdf"
             name="bb_estimate.report_credit_note_headed_document"
             file="bb_estimate.report_credit_note_headed_document"
@@ -76,6 +76,31 @@
             print_report_name="('Credit Note(Header)')"
             groups="account.group_account_invoice"
             paperformat="bb_estimate.paperformat_invoice"
+        />
+        
+        <report
+            id="account.account_invoices"
+            model="account.invoice"
+            string="Invoices"
+            report_type="qweb-pdf"
+            menu="False"
+            name="account.report_invoice_with_payments"
+            file="account.report_invoice_with_payments"
+            attachment="(object.state in ('open','in_payment','paid')) and ('INV'+(object.number or '').replace('/','')+'.pdf')"
+            print_report_name="(object._get_report_base_filename())"
+            groups="account.group_account_invoice"
+        />
+
+        <report
+            id="account.account_invoices_without_payment"
+            model="account.invoice"
+            string="Invoices without Payment"
+            report_type="qweb-pdf"
+            menu="False"
+            name="account.report_invoice"
+            file="account.report_invoice"
+            attachment="(object.state in ('open','in_payment','paid')) and ('INV'+(object.number or '').replace('/','')+'.pdf')"
+            print_report_name="(object._get_report_base_filename())"
         />
         
         <record id="account_invoice_inherited" model="ir.ui.view">

@@ -3,7 +3,7 @@
         <report
             id="purchase_order_report"
             model="purchase.order"
-            string="Purchase Order"
+            string="B.B Purchase Order"
             report_type="qweb-pdf"
             name="bb_estimate.custom_purchase_order"
             file="bb_estimate.custom_purchase_order"
@@ -18,13 +18,37 @@
         <report
             id="request_for_quotation"
             model="purchase.order"
-            string="R.F.Q"
+            string="B.B Request for Quotation"
             report_type="qweb-pdf"
             name="bb_estimate.request_for_quote_custom"
             file="bb_estimate.request_for_quote_custom"
             attachment="'Request for Quotation - %s' % (object.name)"
             print_report_name="'Request for Quotation - %s' % (object.name)"
             paperformat="bb_estimate.paperformat_invoice"
+        />
+        
+        <report 
+            string="Purchase Order" 
+            id="purchase.action_report_purchase_order" 
+            model="purchase.order" 
+            report_type="qweb-pdf"
+            name="purchase.report_purchaseorder" 
+            file="purchase.report_purchaseorder"
+            menu = "False"
+            print_report_name="
+                (object.state in ('draft', 'sent') and 'Request for Quotation - %s' % (object.name) or
+                'Purchase Order - %s' % (object.name))"
+        />
+        
+        <report 
+            string="Request for Quotation" 
+            id="purchase.report_purchase_quotation" 
+            model="purchase.order" 
+            report_type="qweb-pdf"
+            menu="False"
+            name="purchase.report_purchasequotation" 
+            file="purchase.report_purchasequotation"
+            print_report_name="'Request for Quotation - %s' % (object.name)"
         />
         
         <record id="product_supplierinfo_form_view_bb" model="ir.ui.view">

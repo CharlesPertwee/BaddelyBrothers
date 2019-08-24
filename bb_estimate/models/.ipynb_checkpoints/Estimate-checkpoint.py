@@ -184,6 +184,8 @@ class Estimate(models.Model):
     lead = fields.Many2one('crm.lead','Enquiry',copy=False)
     reSyncCount = fields.Integer('Re Sync Count',compute='_compute_reSync')
     
+    materialInfo = fields.Text('Changed Material Quantities')
+    
     def _compute_reSync(self):
         for record in self:
             record.reSyncCount = len([x for x in record.estimate_line if x.reSync])

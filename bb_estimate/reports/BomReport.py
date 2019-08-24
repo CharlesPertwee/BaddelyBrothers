@@ -124,6 +124,7 @@ class BomStructure(models.AbstractModel):
         components, total = self._get_bom_lines_computed(bom, bom_quantity, product, line_id, level, estimate)
         lines['components'] = components
         lines['total'] += total
+        raise Exception
         return lines
     
     def _get_operation_line_computed(self, routing, qty, level, Bom=False, MO=False,estimate=False):
