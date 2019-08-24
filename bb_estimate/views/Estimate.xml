@@ -266,7 +266,7 @@
                             <field name="EnquiryComments"/>
                         </group>
                         <group>
-                            <field name="SpecialInstuction" class="textarea"/>
+                            <field name="SpecialInstuction" class="textarea" string="Special Instruction"/>
                             <!--field name="PackingInstruction" /-->
                         </group>
                     </group>
