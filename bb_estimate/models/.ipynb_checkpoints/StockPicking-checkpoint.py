@@ -18,6 +18,7 @@ class PickingType(models.Model):
     
     Project = fields.Many2one('project.project','Project')
     customerRef = fields.Char('Customer Reference')
+    consignmentNumber = fields.Char('Consignment Number')
     
     @api.model
     def create(self,vals):
@@ -75,3 +76,9 @@ class PickingType(models.Model):
     def TotalBoxes(self):
         lines = self.GetProductData()
         return sum([int(x.split()[0]) for x in lines])
+    
+    def calculatePrice(self):
+        sale = self.env['sale.order'].sudo().search([('name','=',self.origin)])
+        estimate = sale.Estimate
+        price = (estimate['quantity_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate.run_on * estimate.selectedRatio)
+        return str(price)

@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 import math
+from datetime import datetime
 from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
 
 DIE_SIZES = [
@@ -405,6 +406,9 @@ class EstimateLine(models.Model):
                 record.SheetHeight = record.material.sheet_height
                 record.SheetWidth = record.material.sheet_width
                 record.SheetSize = record.material.sheetSize
+                
+                if record.MaterialTypes == "Non-Stockable":
+                    record.MaterialName = record.material.name
                 
                 if record.WhiteCutting:
                     record.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
@@ -1086,6 +1090,18 @@ class EstimateLine(models.Model):
         estimate = self.estimate_id
         optionType = self.option_type
         work_twist = False
+        materials = self.process_ids.mapped('materialLine')
+        
+        data = ''.join([x for x in map(lambda q: "%s  Quantities Changed  %s%s%s%s%s\n"%
+                                     (
+                                         q.lineName,
+                                         'Qty 1 %s to %s '%(q.quantity_required_1,'%s') if q.estimate_id.quantity_1 > 0 else '',
+                                         'Qty 2 %s to %s '%(q.quantity_required_2,'%s') if q.estimate_id.quantity_2 > 0 else '',
+                                         'Qty 3 %s to %s '%(q.quantity_required_3,'%s') if q.estimate_id.quantity_3 > 0 else '',
+                                         'Qty 4 %s to %s '%(q.quantity_required_4,'%s') if q.estimate_id.quantity_4 > 0 else '',
+                                         'Qty run on %s to %s '%(q.quantity_required_run_on,'%s') if q.estimate_id.run_on > 0 else ''
+                                     )
+                                     ,materials)])
         
         estimateData = {x : estimate[x] for x in estimate._fields if 'total_price_' in x}
         for qty in ['1','2','3','4','run_on']:
@@ -1104,8 +1120,31 @@ class EstimateLine(models.Model):
             for m in estimate.estimate_line:
                 if m.option_type == 'material' and m.documentCatergory not in ['Packing','Despatch']:
                     m.RecalculatePrices(m,work_twist)
-                   
+                    
+        if data:
+            data = data%(tuple((','.join([x for x in map(lambda q: ''.join([
+                                                             '%s'%(q.quantity_required_1) if q.estimate_id.quantity_1 > 0 else '',
+                                                             ',%s'%(q.quantity_required_2) if q.estimate_id.quantity_2 > 0 else '',
+                                                             ',%s'%(q.quantity_required_3) if q.estimate_id.quantity_3 > 0 else '',
+                                                             ',%s'%(q.quantity_required_4) if q.estimate_id.quantity_4 > 0 else '',
+                                                             ',%s'%(q.quantity_required_run_on) if q.estimate_id.run_on > 0 else ''
+                                                            ]), materials)])).split(",")))
+        if materials:
+            estimate.write({'materialInfo':data})            
         return rec
+    
+    @api.multi
+    def deleteLineInfo(self,data):
+        return {
+                'view_type' : 'form',
+                'view_mode' : 'form',
+                'name': 'Material Information',
+                'res_model' : 'estimate.delete_line_info',
+                'type' : 'ir.actions.act_window',
+                'context' : "{'default_info' : data}",
+                'target' : 'new',
+            }
+    
     def _checkResync(self,vals):
         resync = False
         recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
@@ -1220,7 +1259,7 @@ class EstimateLine(models.Model):
                         self.create(newRecord)
                         
                 elif lineId.option_type == 'material':
-                    if lineId.MaterialTypes == 'Non-Stockable':
+                    if lineId.MaterialTypes == 'Non-Stockable' and (not lineId.material):
                         product = self.env['product.product'].sudo()
                         seller = self.env['product.supplierinfo'].sudo()
                         mto =self.env['stock.location.route'].sudo().search([('name','=','Make To Order')],limit=1)
@@ -1235,9 +1274,11 @@ class EstimateLine(models.Model):
                             'sheet_height' : lineId.SheetHeight,
                             'standard_price': lineId.CostRate,
                             'list_price': lineId.CharegeRate,
-                            'productType': 'Non-Stock',
+                            'productType': 'Non-Stockable',
                             'customerDescription': lineId.customer_description,
                             'jobTicketDescription': lineId.JobTicketText,
+                            'lastUsedEstimateDate': str(datetime.now().date()),
+                            'lastUsedEstimateNumber': lineId.estimate_id.estimate_number,
                             'margin': lineId.Margin,
                         }
                         if mto and buy and lineId.NonStockMaterialType == 'Bespoke Material':
@@ -1306,7 +1347,10 @@ class EstimateLine(models.Model):
                             dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
                             dictProcess.pop('hasComputed')
                             process.write(dictProcess)
-            
+                            
+                    if lineId.material:
+                        lineId.material.write({'lastUsedEstimateDate':str(datetime.now().date()),'lastUsedEstimateNumber':lineId.estimate_id.estimate_number})
+                        
             if not lineId.hasComputed:
                 lineId.write({'hasComputed': True,
                               'total_price_1':lineId.total_price_1,

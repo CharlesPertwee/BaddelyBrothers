@@ -45,6 +45,7 @@
                 <field name="faxNumber"/>
 				<field name="sector" attrs="{'invisible': [('is_company', '=', False)]}"/>
 				<field name="source"/>
+                <field name="specialReport"/>
                 <field name="customerType"/>
            </xpath>
 			
