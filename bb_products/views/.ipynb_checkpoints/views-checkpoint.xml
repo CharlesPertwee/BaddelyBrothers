@@ -1,7 +1,5 @@
 <odoo>
   <data>
-      
-    
      <record id="product_template_form_view_bb" model="ir.ui.view">
 		<field name="name">product.template.common.form.bb</field>
 		<field name="model">product.template</field>
@@ -24,6 +22,11 @@
                 <field name="margin" />
             </xpath>
             
+            <xpath expr="//field[@name='uom_po_id']" position="after">
+                <field name="lastUsedEstimateDate" />
+                <field name="lastUsedEstimateNumber" />
+            </xpath>
+            
             <xpath expr="//field[@name='standard_price']/.." position="after">
                 <field name="sheet_width"/>
                 <field name="sheet_height"/>
@@ -33,6 +36,14 @@
      	</field>
 	 </record>
       
-      
+      <act_window name="Delete Unused"
+                  res_model="product.delete_by_date"
+                  src_model="product.template"
+                  multi="True"
+                  view_type="form" view_mode="form"
+                  key2="client_action_multi"
+                  target="new"
+                  id="product_delete_by_date"
+                  />
   </data>
 </odoo>

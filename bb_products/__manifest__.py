@@ -8,6 +8,7 @@
         """,
 
     'description': """
+    
     """,
 
     'author': "SquadsoftTech",
@@ -27,6 +28,7 @@
         'security/ir.model.access.csv',
         'views/MaterialSize.xml',
         'views/views.xml',
+        'wizards/views/ProductDeletion.xml',
         'views/templates.xml',
         'data/data.xml',
     ],

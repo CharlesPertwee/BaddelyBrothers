@@ -228,7 +228,7 @@
                                     </group>
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Non-Stockable')]}">
                                         <group>
-                                            <field name="NonStockMaterialType" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable')],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                            <field name="NonStockMaterialType" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable')],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>                                            
                                         </group>
                                         <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','=',False)]}">
                                             <group>
@@ -255,7 +255,9 @@
                                         </group>
                                         <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','=',False)]}">
                                             <group>
-                                                <field name="MaterialName" colspan="4" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Non-Stockable'}" domain="[('productType','=', MaterialTypes)]" string="Existing Material" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)],'invisible':[('NonStockMaterialType','!=','Customer Supplied Material')]}"/>
+                                                
+                                                <field name="MaterialName" colspan="4" string="New Material" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                             </group>
                                             <group>
                                                 <group>
@@ -743,6 +745,15 @@
                 <p class="oe_view_nocontent_create">Estimate Line</p>
             </field>
         </record>
+        
+        <act_window name="Deleted Info"
+                  res_model="estimate.delete_line_info"
+                  multi="True"
+                  view_type="form" view_mode="form"
+                  key2="client_action_multi"
+                  target="new"
+                  id="delete_data_infos"
+                  />
         
     </data>
 </odoo>

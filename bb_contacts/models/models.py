@@ -63,6 +63,8 @@ class Partner(models.Model):
     accountStatus = fields.Selection(ACCOUNT_STATUS, string="Account Status")
     onHold = fields.Boolean('On Hold')
     
+    specialReport = fields.Boolean('Custom Delivery Note')
+    
     def _compute_contact_history(self):
         self.contactHistory = self.history_id.contacts
     

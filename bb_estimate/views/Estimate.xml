@@ -259,11 +259,14 @@
                         <field name="total_price_run_on" nolabel="1" readonly="1"/>
                     </group>
                     <group>
+                        <field name="materialInfo" readonly="1" nolabel="1"/>
+                    </group>
+                    <group>
                         <group>
                             <field name="EnquiryComments"/>
                         </group>
                         <group>
-                            <field name="SpecialInstuction" rows="8"/>
+                            <field name="SpecialInstuction" class="textarea"/>
                             <!--field name="PackingInstruction" /-->
                         </group>
                     </group>
