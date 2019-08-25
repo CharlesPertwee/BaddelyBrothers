@@ -55,6 +55,7 @@ function hideQuantities(){
 }
 
 function showMoreQuantities(){
+    console.log('THS IS SPARTA')
     let extraPrints = document.getElementsByClassName('extra')
         for (i = 0; i<extraPrints.length;i++){
             extraPrints[i].style.display = "flex";

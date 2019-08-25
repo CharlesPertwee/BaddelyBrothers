@@ -1,6 +1,6 @@
 <odoo>
     <data>
-        <template id="assets_backend" name="static_resources_demo assets" inherit_id="web.assets_frontend">
+        <template id="assets_backend_contact_form" name="static_resources_demo assets" inherit_id="web.assets_frontend">
             <xpath expr="." position="inside">
                 <!--These links will be called when loading your Odoo -->
                 <script type="text/javascript" src="/bb_estimate/static/src/js/ContactForm.js"></script>
@@ -13,7 +13,7 @@
             </xpath>
         </template>
         
-        <template id="assets_backend" name="bb_estimate_style assets" inherit_id="web.assets_backend">
+        <template id="assets_backend_estimate_css" name="bb_estimate_style assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
                 <!--These links will be called when loading your Odoo -->
                 <link rel="stylesheet" href="/bb_estimate/static/src/css/Estimate.css"/>

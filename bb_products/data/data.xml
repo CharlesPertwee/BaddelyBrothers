@@ -1,6 +1,6 @@
 <odoo>
     <data noupdate="1">
-        <record id="product_uom_sheets_bigger" model="uom.uom">
+<!--         <record id="product_uom_sheets_bigger" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_unit"/>
             <field name="name">1000 Sheets</field>
             <field name="uom_type">bigger</field>
@@ -16,7 +16,7 @@
             <field name="factor" eval="1.00000"/>
             <field name="rounding" eval="0.001"/>
             <field name="rounding" eval="0.01000"/>
-        </record>
+        </record> -->
     </data>
 </odoo>
     
