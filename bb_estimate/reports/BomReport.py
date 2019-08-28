@@ -91,7 +91,7 @@ class BomStructure(models.AbstractModel):
             estimate = estimate[0]
         
         bom_quantity = estimate.selectedRunOn + (estimate['quantity_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio)
-        price = sum([x['total_price_'+estimate.selectedQuantity] for x in estimate.estimate_line.search([('estimate_id','=',estimate.id),('option_type','=','material')])]) * estimate.SelectedQtyRatio
+        price = sum([x['total_price_'+estimate.selectedQuantity] for x in estimate.estimate_line.search([('estimate_id','=',estimate.id),('option_type','=','material'),('isExtra','=',False)])]) * estimate.SelectedQtyRatio
         # Display bom components for current selected product variant
         if product_id:
             product = self.env['product.product'].browse(int(product_id))
@@ -124,7 +124,6 @@ class BomStructure(models.AbstractModel):
         components, total = self._get_bom_lines_computed(bom, bom_quantity, product, line_id, level, estimate)
         lines['components'] = components
         lines['total'] += total
-        raise Exception
         return lines
     
     def _get_operation_line_computed(self, routing, qty, level, Bom=False, MO=False,estimate=False):

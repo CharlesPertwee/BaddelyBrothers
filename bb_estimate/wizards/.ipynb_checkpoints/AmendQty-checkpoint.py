@@ -37,16 +37,17 @@ class AmmendQty(models.TransientModel):
             self.AmmendedQty = self.EstimateId['quantity_'+ self.EstimateId.selectedQuantity] * self.EstimateId.SelectedQtyRatio
             lines = []
             for x in self.EstimateId.estimate_line:
-                data = {
-                          'EstimateId': self.EstimateId.id,
-                          'EstimateLineId': x.id,
-                          'CurrentRequired': (x['quantity_required_%s'%(self.EstimateId.selectedQuantity)] * self.EstimateId.SelectedQtyRatio) + (x.quantity_required_run_on * self.EstimateId.selectedRatio),
-                          'NewRequired' : x['quantity_required_%s'%(self.EstimateId.selectedQuantity)] + (x.quantity_required_run_on * self.EstimateId.selectedRatio),
-                          'POQty' : 0
-                      }
-                if x.option_type == 'material':
-                    data['CurrentRequired'] = math.ceil(data['CurrentRequired'])
-                lines.append((0,0,data))
+                if not x.isExtra:
+                    data = {
+                              'EstimateId': self.EstimateId.id,
+                              'EstimateLineId': x.id,
+                              'CurrentRequired': (x['quantity_required_%s'%(self.EstimateId.selectedQuantity)] * self.EstimateId.SelectedQtyRatio) + (x.quantity_required_run_on * self.EstimateId.selectedRatio),
+                              'NewRequired' : x['quantity_required_%s'%(self.EstimateId.selectedQuantity)] + (x.quantity_required_run_on * self.EstimateId.selectedRatio),
+                              'POQty' : 0
+                          }
+                    if x.option_type == 'material':
+                        data['CurrentRequired'] = math.ceil(data['CurrentRequired'])
+                    lines.append((0,0,data))
             self.ChangeLog = lines
     
     @api.depends('EstimateId')
@@ -54,13 +55,13 @@ class AmmendQty(models.TransientModel):
         if self.EstimateId:
             self.Quantity = self.EstimateId['quantity_'+ self.EstimateId.selectedQuantity] * self.EstimateId.SelectedQtyRatio
             self.RunOn = self.EstimateId.selectedRunOn
-            self.TotalPrice = (self.EstimateId['total_price_%s'%(self.EstimateId.selectedQuantity)] * self.EstimateId.SelectedQtyRatio) + (self.EstimateId.total_price_run_on * self.EstimateId.selectedRatio)
+            self.TotalPrice = ((self.EstimateId['total_price_%s'%(self.EstimateId.selectedQuantity)] - self.EstimateId['total_price_extra_%s'%(self.EstimateId.selectedQuantity)]) * self.EstimateId.SelectedQtyRatio) + ((self.EstimateId.total_price_run_on - self.EstimateId.total_price_extra_run_on) * self.EstimateId.selectedRatio)
     
     @api.onchange('AmmendedQty','EstimateId')
     def _computeNewPrice(self):
         if self.EstimateId:
             ratio = self.AmmendedQty / (self.EstimateId['quantity_'+ self.EstimateId.selectedQuantity])
-            self.AmmendedPrice = (self.EstimateId['total_price_%s'%(self.EstimateId.selectedQuantity)] * ratio) + (self.EstimateId.total_price_run_on * self.EstimateId.selectedRatio)
+            self.AmmendedPrice = ((self.EstimateId['total_price_%s'%(self.EstimateId.selectedQuantity)] - self.EstimateId['total_price_extra_%s'%(self.EstimateId.selectedQuantity)]) * ratio) + ((self.EstimateId.total_price_run_on - self.EstimateId.total_price_extra_run_on) * self.EstimateId.selectedRatio)
             if len(self.ChangeLog) > 0:
                 for x in self.ChangeLog:
                     x.NewRequired = (x.EstimateLineId['quantity_required_%s'%(self.EstimateId.selectedQuantity)] * ratio) + (x.EstimateLineId.quantity_required_run_on * self.EstimateId.selectedRatio)
@@ -140,12 +141,12 @@ class AmmendQty(models.TransientModel):
         done_moves = production.move_finished_ids.filtered(lambda x: x.state == 'done' and x.product_id == production.product_id)
         qty_produced = production.product_id.uom_id._compute_quantity(sum(done_moves.mapped('product_qty')), production.product_uom_id)
         factor = production.product_uom_id._compute_quantity(production.product_qty - qty_produced, production.bom_id.product_uom_id) / production.bom_id.product_qty
-        materials, process = ({x.EstimateLineId.id:x for x in self.ChangeLog if (x.product_id and x.EstimateLineId.option_type == 'material')},{x.EstimateLineId.id:x for x in self.ChangeLog if (x.workcenter_id and x.EstimateLineId.option_type == 'process')})
+        materials, process = ({x.EstimateLineId.id:x for x in self.ChangeLog if (x.product_id and x.EstimateLineId.option_type == 'material' and (not x.EstimateLineId.isExtra))},{x.EstimateLineId.id:x for x in self.ChangeLog if (x.workcenter_id and x.EstimateLineId.option_type == 'process' and (not x.EstimateLineId.isExtra))})
         computed = []
         if production.bom_id:
             production.bom_id.write({'product_qty': (self.AmmendedQty + self.RunOn)})
             for bom_line in production.bom_id.bom_line_ids:
-                line = self.ChangeLog.search([('EstimateLineId.estimate_id','=',self.EstimateId.id),('product_id','=',bom_line.product_id.id),('EstimateLineId.option_type','=','material'),('EstimateLineId.id','not in', computed)],limit=1)
+                line = self.ChangeLog.search([('EstimateLineId.estimate_id','=',self.EstimateId.id),('product_id','=',bom_line.product_id.id),('EstimateLineId.option_type','=','material'),('EstimateLineId.isExtra','=',False),('EstimateLineId.id','not in', computed)],limit=1)
                 bom_line.write({'product_qty':materials[line.EstimateLineId.id].NewRequired})
                 computed.append(line.EstimateLineId.id)
                 
@@ -153,7 +154,7 @@ class AmmendQty(models.TransientModel):
         computed = []
         if production.routing_id:
             for route in production.routing_id.operation_ids:
-                line = self.ChangeLog.search([('EstimateLineId.estimate_id','=',self.EstimateId.id),('workcenter_id','=',route.workcenter_id.id),('EstimateLineId.option_type','=','process'),('EstimateLineId.id','not in', computed)],limit=1)
+                line = self.ChangeLog.search([('EstimateLineId.estimate_id','=',self.EstimateId.id),('workcenter_id','=',route.workcenter_id.id),('EstimateLineId.option_type','=','process'),('EstimateLineId.isExtra','=',False),('EstimateLineId.id','not in', computed)],limit=1)
                 route.write({'time_cycle_manual':process[line.EstimateLineId.id].NewRequired})
                 computed.append(line.EstimateLineId.id)
         
@@ -189,7 +190,7 @@ class AmmendQty(models.TransientModel):
                     move = x[0][line][0]
                     qtys = x[0][line][1]
                     
-                    log = [x for x in filter(lambda x: (move.product_id.id == x.product_id.id) and (x.EstimateLineId.option_type == 'material') and (x.EstimateLineId.id not in computed), self.ChangeLog)]
+                    log = [x for x in filter(lambda x: (move.product_id.id == x.product_id.id) and (x.EstimateLineId.option_type == 'material') and (not x.EstimateLineId.isExtra) and (x.EstimateLineId.id not in computed), self.ChangeLog)]
                     if len(log) > 0:
                         log = log[0]
                         if log.POQty > 0:

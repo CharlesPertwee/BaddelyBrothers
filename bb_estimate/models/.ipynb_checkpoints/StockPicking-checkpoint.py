@@ -80,5 +80,7 @@ class PickingType(models.Model):
     def calculatePrice(self):
         sale = self.env['sale.order'].sudo().search([('name','=',self.origin)])
         estimate = sale.Estimate
-        price = (estimate['quantity_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate.run_on * estimate.selectedRatio)
+        price = ((estimate['total_price_%s'%(estimate.selectedQuantity)] - estimate['total_price_extra_%s'%(estimate.selectedQuantity)]) * estimate.SelectedQtyRatio) + ((estimate.total_price_run_on - estimate.total_price_extra_run_on) * estimate.selectedRatio)
         return str(price)
+    
+    
