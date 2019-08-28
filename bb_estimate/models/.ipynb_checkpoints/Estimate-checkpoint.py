@@ -99,11 +99,11 @@ class Estimate(models.Model):
     total_price_4 = fields.Float('Total Price 4',digits=(10,2),store=True,copy=True)
     total_price_run_on = fields.Float('Run On',digits=(10,2),store=True,copy=True)
     
-    total_price_extra_1 = fields.Float('Total Price 1',digits=(10,2),store=True,compute="_get_estimate_line")
-    total_price_extra_2 = fields.Float('Total Price 2',digits=(10,2),store=True,compute="_get_estimate_line")
-    total_price_extra_3 = fields.Float('Total Price 3',digits=(10,2),store=True,compute="_get_estimate_line")
-    total_price_extra_4 = fields.Float('Total Price 4',digits=(10,2),store=True,compute="_get_estimate_line")
-    total_price_extra_run_on = fields.Float('Run On',digits=(10,2),store=True,compute="_get_estimate_line")
+    total_price_extra_1 = fields.Float('Total Extra Price 1',digits=(10,2),store=True,compute="_get_estimate_line")
+    total_price_extra_2 = fields.Float('Total Extra Price 2',digits=(10,2),store=True,compute="_get_estimate_line")
+    total_price_extra_3 = fields.Float('Total Extra Price 3',digits=(10,2),store=True,compute="_get_estimate_line")
+    total_price_extra_4 = fields.Float('Total Extra Price 4',digits=(10,2),store=True,compute="_get_estimate_line")
+    total_price_extra_run_on = fields.Float('Extra Run On',digits=(10,2),store=True,compute="_get_estimate_line")
     
     total_price_1000_1 = fields.Float('Total Price 1000 1',digits=(10,2),store=True,copy=False)
     total_price_1000_2 = fields.Float('Total Price 1000 2',digits=(10,2),store=True,copy=False)

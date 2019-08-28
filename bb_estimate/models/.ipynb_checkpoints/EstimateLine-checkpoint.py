@@ -385,9 +385,9 @@ class EstimateLine(models.Model):
                     if record.material.seller_ids:
                         record.param_material_vendor = record.material.seller_ids[0]
                         record.req_param_material_vendor = False
+                        record.generatesPO = True
                         if len(record.material.seller_ids) > 1:
                             record.req_param_material_vendor = True
-                            record.generatesPO = True
                     else:
                         raise ValidationError("There is no vendor associated to the product %s. Please define a vendor for this product."%(record.material.name))
                     
@@ -1253,13 +1253,14 @@ class EstimateLine(models.Model):
                             'StandardJobDescription': material.jobTicketDescription,
                             'StandardCustomerDescription' : material.customerDescription,
                             'JobTicketText':material.jobTicketDescription,
-                            'lineName' : material.name
+                            'lineName' : material.name,
+                            'isExtra' : True if lineId.isExtra else False
                         }
                         newRecord.update(data)
                         self.create(newRecord)
                         
                 elif lineId.option_type == 'material':
-                    if lineId.MaterialTypes == 'Non-Stockable' and (not lineId.material):
+                    if lineId.MaterialTypes == 'Non-Stockable':
                         product = self.env['product.product'].sudo()
                         seller = self.env['product.supplierinfo'].sudo()
                         mto =self.env['stock.location.route'].sudo().search([('name','=','Make To Order')],limit=1)
@@ -1288,8 +1289,10 @@ class EstimateLine(models.Model):
                             newProduct['uom_id'] = lineId.PurchaseUnit.id
                             newProduct['uom_po_id'] = lineId.PurchaseUnit.id
 
-                        productId = product.create(newProduct)
-                        
+                        if  (not lineId.material) or lineId.NonStockMaterialType == 'Bespoke Material':
+                            productId = product.create(newProduct)	             
+                        else:
+                            productId = lineId.material
                         if productId and lineId.Supplier:
                             newSeller = {
                                 'product_id' : productId.id,
@@ -1307,7 +1310,8 @@ class EstimateLine(models.Model):
                             lineId._onChangeNumberOut()
                             dictLine = {key:lineId[key] for key in lineId._fields if type(lineId[key]) in [int,str,bool,float]}
                             lineId.write(dictLine)
-                        elif productId:
+                            
+                        elif productId and (not lineId.material):
                             lineId.write({'material':productId.id})    
                             lineId.calc_material_change()
                             lineId._onChangeNumberOut()

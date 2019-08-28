@@ -94,7 +94,7 @@
                                   </td>
                                   <td>
                                       <t t-if="estimate">
-                                              Price:<t t-esc="o.calculatePrice()"/>
+                                              Price:<t t-esc="'%.2f'%(float(o.calculatePrice()))"/>
                                       </t>
                                       <t t-else="">
                                           <span t-field="o.origin"/><br/>
@@ -115,7 +115,7 @@
                   </div>
                 </t>
                 <t t-else="">
-                  <div class="page">
+                  <div class="page" style="font-family: Actor;">
                     <h2 class="text-center"><b>DELIVERY NOTE</b></h2>
                       <h2 class="text-center"><b><span t-field="o.name"/></b></h2>                   
                       

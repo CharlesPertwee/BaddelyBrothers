@@ -83,7 +83,7 @@ class Manufacture(models.Model):
         materials = []
             
         if estimate:
-            estimate_materials = estimate.estimate_line.search([('estimate_id','=',estimate.id),('option_type','=','material')])
+            estimate_materials = estimate.estimate_line.search([('estimate_id','=',estimate.id),('option_type','=','material'),('isExtra','=',False)])
             for x in estimate_materials:
                 materials.append((0,0,{
                     'EstimateLineId': x.id,
@@ -93,7 +93,7 @@ class Manufacture(models.Model):
             # create workorder
             cycle_number = float_round(bom_qty / operation.workcenter_id.capacity, precision_digits=0, rounding_method='UP')
             if estimate:
-                estimate_line = estimate.estimate_line.search([('estimate_id','=',estimate.id),('option_type','=','process'),('workcenterId','=',operation.workcenter_id.id),('id','not in',computedOperations)])
+                estimate_line = estimate.estimate_line.search([('estimate_id','=',estimate.id),('isExtra','=',False),('option_type','=','process'),('workcenterId','=',operation.workcenter_id.id),('id','not in',computedOperations)])
                 if estimate_line:
                     estimate_line = estimate_line[0]
                 computedOperations.append(estimate_line.id)

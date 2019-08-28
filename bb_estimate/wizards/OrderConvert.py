@@ -10,7 +10,7 @@ class OrderConvert(models.TransientModel):
         if 'default_EstimateId' in self._context.keys():
             estimate = self.env['bb_estimate.estimate'].browse(self._context['default_EstimateId'])
             if estimate:
-                values = [(str(x),'Quantity: %d, Price: %.2f'%(estimate['quantity_'+str(x)],estimate['total_price_'+str(x)])) for x in range(1,5) if estimate['quantity_'+str(x)] > 0]
+                values = [(str(x),'Quantity: %d, Price: %.2f'%(estimate['quantity_'+str(x)],estimate['total_price_'+str(x)]-estimate['total_price_extra_'+str(x)])) for x in range(1,5) if estimate['quantity_'+str(x)] > 0]
                 return values
         
     EstimateId = fields.Many2one('bb_estimate.estimate', string="Estimate")
@@ -20,7 +20,7 @@ class OrderConvert(models.TransientModel):
     TotalPrice = fields.Float('Total Price',compute="changeQuanitity")
     
     RunOnQuantity = fields.Integer('Run on Quantity',related="EstimateId.run_on")
-    RunOnPrice = fields.Float('Run on Price(GBP)',related="EstimateId.total_price_run_on")
+    RunOnPrice = fields.Float('Run on Price(GBP)')
     RunOnRequired = fields.Integer('Run on Quantity Required', required=True)
     
     ExtrasApplied = fields.Boolean('Extras Applied to the Estimate')
@@ -38,17 +38,18 @@ class OrderConvert(models.TransientModel):
         for record in self:
             if record.EstimateId and record.EstimateId['run_on'] > 0:
                 ratio = record.RunOnRequired / record.EstimateId['run_on']
+                record.RunOnPrice = record.EstimateId.total_price_run_on - record.EstimateId.total_price_extra_run_on
                 
             if record.QuantityRequired:
                 record.TotalQuantity = record.EstimateId['quantity_'+record.QuantityRequired] + record.RunOnRequired
-                record.TotalPrice = record.EstimateId['total_price_'+record.QuantityRequired] + (record.RunOnPrice * ratio)
+                record.TotalPrice = (record.EstimateId['total_price_'+record.QuantityRequired] - record.EstimateId['total_price_extra_'+record.QuantityRequired]) + ((record.RunOnPrice - record.EstimateId.total_price_extra_run_on) * ratio)
             elif record.RunOnRequired:
                 record.TotalQuantity = record.RunOnRequired
                 record.TotalPrice = record.RunOnPrice + (record.RunOnPrice * ratio)
             
     def CreateOrder(self):
-        processes = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','process')])
-        materials = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','material')])
+        processes = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','process'),('isExtra','=',False)])
+        materials = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','material'),('isExtra','=',False)])
         
         runOnRatio = 0.0
         
