@@ -20,6 +20,12 @@
             </xpath>
         </template>
         
+        <template id="assets_backend_estimate__font_css" name="BB Georgia Font" inherit_id="web.assets_common">
+            <xpath expr="//link[last()]" position="after">
+                <link rel="stylesheet" href="/bb_estimate/static/src/fonts/Georgia/style.css"/>
+            </xpath>
+        </template>
+        
         <template id="qty_amend">
             <div class="alert alert-warning" role="alert"> 
                 Quantity Ammended

@@ -7,7 +7,7 @@
                             <div class="backgroundimage" style="position:absolute;z-index:-999;"> 
                                 <img class="img-responsive" src="/bb_estimate/static/src/img/Bb_invoice.jpg" width="900px" height="1335px"/>
                             </div> 
-                            <div class="page" style="padding-top:17em; padding-left:2em; padding-right:2em;">
+                            <div class="page" style="padding-top:17em; font-family: Georgia; padding-left:2em; padding-right:2em;"> 
                                 <div class="container">
                                     <div class="row">
                                         <p><span t-field="o.company_id.name"/><br/>

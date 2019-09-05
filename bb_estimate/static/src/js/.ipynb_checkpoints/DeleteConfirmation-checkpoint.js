@@ -10,15 +10,13 @@ ListRenderer.include({
     }),
     
     _onTrashClick: function (event) {
-        console.log("THIS IS SPARTA")
         event.stopPropagation();
         var result = confirm("Are you sure you want to delete this record?");
-        console.log(result)
-        if (result){
-        var id = $(event.target).closest('tr').data('id');
-        $(event.target).closest('tr').hide()
-        this.trigger_up('list_record_remove', {id: id});
-            
+        if (result)
+        {
+            var id = $(event.target).closest('tr').data('id');
+            $(event.target).closest('tr').hide()
+            this.trigger_up('list_record_remove', {id: id});
         }
     }
 });

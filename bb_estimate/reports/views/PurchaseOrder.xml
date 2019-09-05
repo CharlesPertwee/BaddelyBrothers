@@ -3,6 +3,7 @@
             <t t-foreach="docs" t-as="o">
             <t t-call="web.basic_layout">
                 <t t-call="web.html_container">
+                    <div style="font-family: Georgia;">
                         <div class="backgroundimage" style="position:absolute;z-index:-999;"> 
                             <img class="img-responsive" src="/bb_estimate/static/src/img/Bb_invoice.jpg" width="900px" height="1300px"/>
                         </div>
@@ -15,20 +16,20 @@
                             </div>
                             <div class="col-5">
                                 <div class="row">
-                                    <div class="col-5">
+                                    <div class="col-4">
                                         <p class="pull-left">Tel: </p>
                                     </div>
-                                    <div class="col-7">
+                                    <div class="col-8">
                                         <p class="pull-left"><span t-field="o.partner_id.phone"/></p>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-5">
+                                    <div class="col-4">
                                         <p class="pull-left">
                                             E-mail:
                                         </p>
                                     </div>
-                                    <div class="col-7">
+                                    <div class="col-8">
                                         <p ><span t-field="o.partner_id.email"/></p>
                                     </div>
                                 </div>
@@ -46,12 +47,6 @@
                                 </div>
                             </div>
                         </div>
-<!--                         <br/>
-                        <div style="float:right">
-                            Order Date: <span t-field="o.date_order" t-options='{"format": "dd/MM/yyyy"}'/> <br/>
-                            Delivery Required By: <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/> <br/>
-                        </div>
-                        <br/> -->
                         <h4 class="text-center" style="clear:both;"><b>Purchase Order No. <span t-field="o.name"/></b></h4>
                         <hr style="border:1px black solid"/>
                         <p style="margin-left: 19px;">Our purchase order and job numbers must be quoted on your invoice.</p>
@@ -61,7 +56,7 @@
                                 <tr>
                                     <td  width="25%"><span t-esc="int(float(order.product_qty))"/></td>
                                     <td  width="64%"><span t-field="order.product_id.name"/></td>
-                                    <td  width="28%" align="left"><span t-field="order.price_subtotal"/></td>
+                                    <td  width="32%" align="left"><span t-field="order.price_subtotal"/></td>
                                 </tr>
                             </t>
                         </table>
@@ -84,6 +79,7 @@
                             </div>
                             <p> For and on behalf of Baddeley Brothers Ltd</p>
                         </div>
+                    </div>
                     </t>
                 </t>
             </t>

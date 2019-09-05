@@ -184,7 +184,7 @@ class Estimate(models.Model):
     lead = fields.Many2one('crm.lead','Enquiry',copy=False)
     reSyncCount = fields.Integer('Re Sync Count',compute='_compute_reSync')
     
-    materialInfo = fields.Text('Changed Material Quantities')
+    AuditLog = fields.One2many('bb_estimate.audit_log','estimate','Audit Log',copy=False)
     
     def _compute_reSync(self):
         for record in self:
@@ -246,6 +246,9 @@ class Estimate(models.Model):
                     
             record.hasDelivery = len(record.estimate_line.filtered(lambda x: x.documentCatergory == 'Despatch')) > 0
     
+    @api.onchange('materialInfo')
+    def ShowChangedLines(self):
+        pass
     
     @api.onchange('finished_size')
     def finished_size_change(self):
@@ -357,7 +360,7 @@ class Estimate(models.Model):
                 'context' : "{'default_Estimate' : active_id}",
                 'target' : 'new',
             }
-    
+  
     def _match_address(self,carrier, partner):
         self.ensure_one()
         if carrier.country_ids and partner.country_id not in carrier.country_ids:

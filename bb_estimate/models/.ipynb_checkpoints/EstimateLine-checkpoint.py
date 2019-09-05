@@ -1069,7 +1069,7 @@ class EstimateLine(models.Model):
                     'margin'                    : line['margin_'+qty],
                     'work_twist'                : work_twist,
                 }
-                
+               
                 line.update_field_values(line.material,gen_params,qty_params,'param_finished_quantity',qty)
                 
                 line._calc_prices(gen_params, qty_params, 'material', qty)
@@ -1084,25 +1084,13 @@ class EstimateLine(models.Model):
                     'total_price_per_1000_'+qty : qty_params['total_price_per_1000'],
                 })
             line.write(write_vals)
-    
+            
     @api.multi
     def unlink(self):
         estimate = self.estimate_id
         optionType = self.option_type
         work_twist = False
         materials = self.process_ids.mapped('materialLine')
-        
-        data = ''.join([x for x in map(lambda q: "%s  Quantities Changed  %s%s%s%s%s\n"%
-                                     (
-                                         q.lineName,
-                                         'Qty 1 %s to %s '%(q.quantity_required_1,'%s') if q.estimate_id.quantity_1 > 0 else '',
-                                         'Qty 2 %s to %s '%(q.quantity_required_2,'%s') if q.estimate_id.quantity_2 > 0 else '',
-                                         'Qty 3 %s to %s '%(q.quantity_required_3,'%s') if q.estimate_id.quantity_3 > 0 else '',
-                                         'Qty 4 %s to %s '%(q.quantity_required_4,'%s') if q.estimate_id.quantity_4 > 0 else '',
-                                         'Qty run on %s to %s '%(q.quantity_required_run_on,'%s') if q.estimate_id.run_on > 0 else ''
-                                     )
-                                     ,materials)])
-        
         estimateData = {x : estimate[x] for x in estimate._fields if 'total_price_' in x}
         for qty in ['1','2','3','4','run_on']:
             estimateData['total_price_'+qty] -= self['total_price_'+qty]
@@ -1113,44 +1101,22 @@ class EstimateLine(models.Model):
             recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
             for process in recs:
                 process.unlink()
-        
+                
         rec = super(EstimateLine, self).unlink()
         
         if optionType == 'process':
             for m in estimate.estimate_line:
                 if m.option_type == 'material' and m.documentCatergory not in ['Packing','Despatch']:
                     m.RecalculatePrices(m,work_twist)
-                    
-        if data:
-            data = data%(tuple((','.join([x for x in map(lambda q: ''.join([
-                                                             '%s'%(q.quantity_required_1) if q.estimate_id.quantity_1 > 0 else '',
-                                                             ',%s'%(q.quantity_required_2) if q.estimate_id.quantity_2 > 0 else '',
-                                                             ',%s'%(q.quantity_required_3) if q.estimate_id.quantity_3 > 0 else '',
-                                                             ',%s'%(q.quantity_required_4) if q.estimate_id.quantity_4 > 0 else '',
-                                                             ',%s'%(q.quantity_required_run_on) if q.estimate_id.run_on > 0 else ''
-                                                            ]), materials)])).split(",")))
-        if materials:
-            estimate.write({'materialInfo':data})            
         return rec
-    
-    @api.multi
-    def deleteLineInfo(self,data):
-        return {
-                'view_type' : 'form',
-                'view_mode' : 'form',
-                'name': 'Material Information',
-                'res_model' : 'estimate.delete_line_info',
-                'type' : 'ir.actions.act_window',
-                'context' : "{'default_info' : data}",
-                'target' : 'new',
-            }
     
     def _checkResync(self,vals):
         resync = False
         recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
         if (len(recs) > 0) and self.option_type == 'material':
             for field in vals.keys():
-                if (self[field] != vals[field]) and field != 'reSync':
+                if (self[field] != vals[field]
+                   ) and field != 'reSync':
                     resync = True
                     break
         elif self.option_type == 'process':
@@ -1180,6 +1146,17 @@ class EstimateLine(models.Model):
         vals['hasComputed'] = True
         self.estimate_id.write(estimateData)
         
+        audit_data = {
+            'estimate':self.estimate_id.id,
+            'estimateLine':self.lineName,
+            'quantity_1':self.quantity_required_1,
+            'quantity_2':self.quantity_required_2,
+            'quantity_3':self.quantity_required_3,
+            'quantity_4':self.quantity_required_4,
+            'quantity_run_on':self.quantity_required_run_on,
+            'Action':'Modify'
+        }
+        
         currentRecord = super(EstimateLine, self).write(vals)
         
         if self.option_type == 'process':
@@ -1192,6 +1169,20 @@ class EstimateLine(models.Model):
                 dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
                 dictProcess.pop('hasComputed')
                 process.write(dictProcess)
+                
+            audit_data.update({
+                'changed_quantity_1':self.quantity_required_1,
+                'changed_quantity_2':self.quantity_required_2,
+                'changed_quantity_3':self.quantity_required_3,
+                'changed_quantity_4':self.quantity_required_4,
+                'changed_quantity_run_on':self.quantity_required_run_on
+                
+            })
+            
+            if any(filter(lambda x: x.startswith('quantity_required_'), vals.keys())):
+                self.env['bb_estimate.audit_log'].create(audit_data)
+                
+            
         return currentRecord
         
     
