@@ -1,11 +1,11 @@
 <odoo>
     <template id="report_delivery_note">
         <t t-foreach="docs" t-as="o">
-            <t t-call="web.html_container">
             <t t-call="web.basic_layout">
+            <t t-call="web.html_container">
                 <t t-set="estimate" t-value="o.getEstimateData()"/>
                 <t t-if="o.partner_id.specialReport">
-                  <div class="page">
+                  <div class="page" style="font-family: Georgia !important;">
                       <h2 class="text-center"><b>BATCH DELIVERY NOTIFICATION</b></h2>              
                       
                       <!-- <span style="text-decoration: underline;">Delivery Address</span><br/> -->        
@@ -115,7 +115,7 @@
                   </div>
                 </t>
                 <t t-else="">
-                  <div class="page" style="font-family: Actor;">
+                  <div class="page" style="font-family: Georgia !important;">
                     <h2 class="text-center"><b>DELIVERY NOTE</b></h2>
                       <h2 class="text-center"><b><span t-field="o.name"/></b></h2>                   
                       
@@ -168,16 +168,6 @@
                                               <p class="pull-left"><span t-field="o.carrier_id"/></p>
                                           </div>
                                       </div>
-                                      <t t-if="o.consignmentNumber">
-                                          <div class="row">
-                                              <div class="col-7">
-                                                  <p class="pull-left">Consignment No: </p>
-                                              </div>
-                                              <div class="col-5">
-                                                  <p class="pull-left"><span t-field="o.consignmentNumber"/></p>
-                                              </div>
-                                          </div>
-                                      </t>
                                   </div>
                               </div>
                           </div>
@@ -210,7 +200,7 @@
                               </tr>
                               <tr>
                                   <td>
-                                      <span t-esc="'%0.0f'%(o.move_ids_without_package[0].quantity_done) if not estimate else '%0.0f'%(estimate.manufacturingOrder.product_qty)"/>
+                                      <span t-esc="'%0.0f'%(o.move_ids_without_package[0].quantity_done)"/>
                                   </td>
                                   <td>
                                       <t t-esc="o.move_ids_without_package[0].product_id.name if not estimate else estimate.title"/>

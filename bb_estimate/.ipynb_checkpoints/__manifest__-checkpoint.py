@@ -69,6 +69,7 @@
         'wizards/views/PriceAdjustment.xml',
         'wizards/views/SalesAdjustment.xml',
         'wizards/views/AmmendQty.xml',
+        #'wizards/views/ConfirmationBox.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
