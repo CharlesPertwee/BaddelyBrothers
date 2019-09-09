@@ -4,6 +4,20 @@ from odoo import models, fields, api
 from docx import Document
 import datetime
 
+
+ACCOUNT_STATUS = [
+    ('open','Open'),
+    ('newCustomer','New Customer - Awaiting Credit Approval'),
+    ('newAccount','New Account'),
+    ('cashChq','Cash/chq on delievery only'),
+    ('settleAccount','Settle a/c prior to ordering'),
+    ('onStop','On stop - see DP or CP'),
+    ('inCourt','In court - on stop'),
+    ('liquidation','In liquidation on stop'),
+    ('closed','Closed'),
+    ('deleteAccount','Delete Account')
+]
+
 class HistoryGroup(models.Model):
     _name = 'bb_contacts.history'
     _rec_name = 'name'
@@ -45,6 +59,11 @@ class Partner(models.Model):
     #Compute Fields only, doesn't store any data.
     contact_id = fields.Many2one('res.partner',store=False)
     contactHistory = fields.One2many('res.partner','history_id',string='Contact Links', compute="_compute_contact_history",store=False)
+    
+    accountStatus = fields.Selection(ACCOUNT_STATUS, string="Account Status")
+    onHold = fields.Boolean('On Hold')
+    
+    specialReport = fields.Boolean('Custom Delivery Note')
     
     def _compute_contact_history(self):
         self.contactHistory = self.history_id.contacts

@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+    <record id="prepress" model="bb_process.process">
+        <field name="name">Prepress</field>
+        <field name="estimate">
+	
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+
+if estimate.fieldUpdated in ['workcenterId']:
+    qty_break = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)])
+    cost_params['param_make_ready_time'] = round(float(qty_break.make_ready_time),2)
+    cost_params['cost_per_unit'] = qty_break.standard_price
+    cost_params['price_per_unit'] = qty_break.list_price
+    cost_params['margin'] = qty_break.margin_percent
+    if qty != 'run_on':
+        cost_params['quantity_required'] = cost_params['param_make_ready_time']
+    else:
+        cost_params['quantity_required'] = 0.00
+
+cost_params['params_working_sheets_needed'] = 0
+qty_params['params_working_sheets_needed'] = 0
+qty_params['params_overs_needed'] = 0
+estimate.update(qty_params,cost_params,qty)
+
+
+        </field>
+    </record>
+    
+    <record id="blank_cutting" model="bb_process.process">
+        <field name="name">Blank Cutting</field>
+        <field name="estimate">
+def calculate_working_sheets_needed( qty_params, cost_params):
+    running_sheets = cost_params['finished_quantity']
+    return running_sheets
+
+def load_qty_break_params(workcenter_Id, qty_params, cost_params, qty):
+    if qty == 'run_on':
+        high_qty = 0
+        if qty_params['quantity_1'] > high_qty:
+            high_qty = qty_params['quantity_1']
+        if qty_params['quantity_2'] > high_qty:
+            high_qty = qty_params['quantity_2']
+        if qty_params['quantity_3'] > high_qty:
+            high_qty = qty_params['quantity_3']
+        if qty_params['quantity_4'] > high_qty:
+            high_qty = qty_params['quantity_4']
+        quantity_to_process = high_qty 
+    else:
+        quantity_to_process = cost_params['finished_quantity']
+
+    material_weight = qty_params['param_grammage']
+
+    qty_break_ids = workcenter_Id.qty_break_params.search([('process_id','=',workcenter_Id.id),('qty_greater_than','&lt;',quantity_to_process),('weight_greater_than','&lt;',material_weight),('isDefault','=',False)], order='qty_greater_than desc, weight_greater_than desc')
+    qty_break = workcenter_Id.qty_break_params.search([('process_id','=',workcenter_Id.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+
+    if (qty_break_ids):
+        qty_break = qty_break_ids[0]
+        cost_params['param_make_ready_time'] = qty_break.make_ready_time if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = qty_break.machine_speed
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        qty_params['param_minimum_price'] = qty_break.minimum_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = qty_break.margin_percent
+    elif qty_break:
+        cost_params['param_make_ready_time'] = qty_break.make_ready_time if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = qty_break.machine_speed
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = qty_break.margin_percent
+        qty_params['param_minimum_price'] = qty_break.minimum_price
+
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+
+#defaults
+qty_params['param_number_up'] = 1
+
+if estimate.fieldUpdated in ['workcenterId','param_grammage']:
+   load_qty_break_params(workcenter,qty_params,cost_params,qty)
+
+elif estimate.fieldUpdated == 'param_printed_material':
+    load_qty_break_params(workcenter,qty_params,cost_params,qty)
+    if qty_params['param_printed_material']:
+        cost_params['param_machine_speed'] = float(cost_params['param_machine_speed']) * 0.75
+    else:
+        cost_params['param_machine_speed'] = int(cost_params['param_machine_speed']) * (1.00 / 0.75)
+
+cost_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params)
+sheets_to_process = int(cost_params['finished_quantity']) / int(qty_params['param_number_out'])
+
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params)
+qty_params['params_overs_needed'] = 0
+
+if cost_params['param_machine_speed'] :
+    cost_params['param_running_time'] = sheets_to_process / int(cost_params['param_machine_speed'])
+else :
+    cost_params['param_running_time'] = 0.0
+
+total_hours = float(cost_params['param_make_ready_time']) + float(cost_params['param_running_time'])
+
+cost_params['quantity_required'] = round(total_hours, 2)
+
+estimate.update(qty_params,cost_params,qty)
+
+        </field>
+    </record>
+    
+    <record id="print_emboss" model="bb_process.process">
+        <field name="name">Print/Emboss</field>
+        <field name="estimate">
+	
+def calculate_working_sheets_needed(qty_params, cost_params, qty):
+    running_sheets = int(cost_params['finished_quantity']) / qty_params['param_number_up'] if qty_params['param_number_up'] > 0 else int(cost_params['finished_quantity'])
+    return running_sheets
+
+def calculate_overs_needed(qty_params, cost_params, qty):
+    running_sheets = int(cost_params['finished_quantity']) / qty_params['param_number_up'] if qty_params['param_number_up'] > 0 else int(cost_params['finished_quantity'])
+    running_overs = running_sheets * (cost_params['param_running_overs_percent'] / 100.0)
+    return running_overs + cost_params['param_make_ready_overs']
+
+def load_qty_break_params(workcenter_Id,qty_params,cost_params,qty):
+    qty_params['param_additional_charge'] = workcenter_Id.additional_charge
+    qty_params['param_misc_charge_per_cm2'] = workcenter_Id.misc_charge_per_cm2
+    if qty == 'run_on':
+        highest_quantity = 0       
+        if qty_params['quantity_1'] > highest_quantity:
+            highest_quantity = qty_params['quantity_1']
+        if qty_params['quantity_2'] > highest_quantity:
+            highest_quantity = qty_params['quantity_2']
+        if qty_params['quantity_3'] > highest_quantity:
+            highest_quantity = qty_params['quantity_3']
+        if qty_params['quantity_4'] > highest_quantity:
+            highest_quantity = qty_params['quantity_4']
+        quantity_to_process = highest_quantity/qty_params['param_number_up'] if qty_params['param_number_up'] > 0 else highest_quantity            
+    else:
+        quantity_to_process = int(cost_params['finished_quantity'])/qty_params['param_number_up'] if qty_params['param_number_up'] > 0 else int(cost_params['finished_quantity'])
+
+    material_weight = qty_params['param_grammage']
+        
+    qty_break_params = workcenter_Id.qty_break_params.search([('process_id','=',workcenter.id),('qty_greater_than','&lt;',quantity_to_process),('weight_greater_than','&lt;',material_weight),('isDefault','=',False)], order='qty_greater_than desc, weight_greater_than desc')
+    qty_break = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+
+    if (qty_break_params):
+        qty_break = qty_break_params[0]
+        cost_params['param_make_ready_time'] = (qty_break.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = qty_break.machine_speed
+        cost_params['param_wash_up_time'] = (qty_break.wash_up_time * qty_params['param_number_of_colors']) if qty != 'run_on' else 0.0
+        cost_params['param_make_ready_overs'] = qty_break.make_ready_overs if qty != 'run_on' else 0.0
+        cost_params['param_running_overs_percent'] = qty_break.running_overs_percent
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = qty_break.margin_percent
+    elif qty_break:
+        cost_params['param_make_ready_time'] = (qty_break.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = qty_break.machine_speed
+        cost_params['param_wash_up_time'] = (qty_break.wash_up_time * qty_params['param_number_of_colors']) if qty != 'run_on' else 0.0
+        cost_params['param_make_ready_overs'] = qty_break.make_ready_overs if qty != 'run_on' else 0.0
+        cost_params['param_running_overs_percent'] = qty_break.running_overs_percent
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = workcenter_Id.margin_percent
+
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+
+fields = ['workcenterId','material','grammage','param_number_up','param_number_of_colors','param_number_of_colors_rev','param_no_of_ink_mixes','param_die_size']
+if estimate.fieldUpdated in fields:
+    load_qty_break_params(workcenter,qty_params,cost_params,qty)
+    
+    number_of_colors = qty_params['param_number_of_colors'] + qty_params['param_number_of_colors_rev']
+                    
+    cost_params['param_make_ready_time'] = round(float(cost_params['param_make_ready_time']),2)
+    cost_params['param_make_ready_time'] = cost_params['param_make_ready_time'] * number_of_colors
+    cost_params['param_machine_speed'] = cost_params['param_machine_speed'] / number_of_colors
+    cost_params['param_make_ready_overs'] = cost_params['param_make_ready_overs'] * number_of_colors
+    
+    if qty_params['param_die_size'] == 'small':
+        cost_params['param_make_ready_time'] += 0.29
+        cost_params['param_machine_speed'] = cost_params['param_machine_speed'] * 0.8                    
+    if qty_params['param_die_size'] == 'medium':
+        cost_params['param_make_ready_time'] += 0.57
+        cost_params['param_machine_speed'] = cost_params['param_machine_speed'] * 0.75                    
+    if qty_params['param_die_size'] == 'large':
+        cost_params['param_make_ready_time'] += 1.0
+        cost_params['param_machine_speed'] = cost_params['param_machine_speed'] * 0.5
+        
+    ink_mix_time = workcenter.ink_mix_time * qty_params['param_no_of_ink_mixes']
+    if ink_mix_time:
+         cost_params['param_make_ready_time'] += ink_mix_time
+    
+sheets_to_process = calculate_working_sheets_needed(qty_params,cost_params, qty) + calculate_overs_needed(qty_params,cost_params, qty)
+
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
+
+if cost_params['param_machine_speed'] :
+    cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
+else :
+    cost_params['param_running_time'] = 0.0
+
+total_hours = cost_params['param_make_ready_time'] + cost_params['param_running_time'] + cost_params['param_wash_up_time']
+
+cost_params['quantity_required'] = round(total_hours, 2)
+estimate.update(qty_params,cost_params,qty)
+        </field>
+    </record>
+   
+    <record id="guillotine" model="bb_process.process">
+        <field name="name">Guillotine</field>
+        <field name="estimate">
+def load_qty_break_params(workcenter, qty_params, cost_params, qty,material_line=None):
+    # Set default general parameters
+    material_weight = material_line.material.grammage
+    
+    qty_break_ids = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('weight_greater_than','&lt;',material_weight),('isDefault','=',False)], order='qty_greater_than desc, weight_greater_than desc')
+    process = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+    
+    if (qty_break_ids):
+        qty_break = qty_break_ids[0]
+        qty_params['param_sheets_per_pile'] = qty_break.sheets_per_pile
+        qty_params['param_time_per_pile'] = qty_break.time_per_pile
+        cost_params['param_make_ready_time'] = qty_break.make_ready_time if qty != 'run_on' else 0.0
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = qty_break.margin_percent
+
+    elif process:
+        qty_params['param_sheets_per_pile'] = process.sheets_per_pile
+        qty_params['param_time_per_pile'] = process.time_per_pile
+        cost_params['param_make_ready_time'] = process.make_ready_time if qty != 'run_on' else 0.0
+        cost_params['cost_per_unit'] = process.standard_price
+        cost_params['price_per_unit'] = process.list_price
+        cost_params['margin'] = process.margin_percent
+
+def get_white_cuts_for_number_out(number_out):
+    number_out_to_cuts = {
+        1:2, 2:2, 3:3, 4:4, 5:5, 6:5,
+        7:6, 8:6, 9:8, 10:8, 11:10, 12:10, 
+        13:12, 14:12, 15:14, 16:14, 17:16, 
+        18:16, 19:18, 20:18, 21:19, 22:20,
+        23:20, 24:20, 25:20
+    }
+    if number_out in number_out_to_cuts:
+        return number_out_to_cuts[number_out]
+    else:
+        return 2
+
+def get_printed_cuts_for_number_up(number_up):
+    number_up_to_cuts = {
+        1:4, 2:6, 3:8, 4:8, 5:10, 6:10, 
+        7:10, 8:10, 9:12, 10:12, 11:14, 12:14,
+    }
+    number_up = int(float(number_up))
+    if number_up in number_up_to_cuts:
+        return number_up_to_cuts[number_up]
+    else:
+        return 0
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+
+qty_params['param_minimum_price'] = process = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)]).minimum_price
+
+if qty_params['param_material_line_id']:
+    material_line = qty_params['param_material_line_id']
+
+    if estimate.fieldUpdated  in ['workcenterId','param_material_line_id']:
+        load_qty_break_params(workcenter, qty_params, cost_params, qty,material_line)
+        if not qty_params['param_number_of_cuts'] or estimate.fieldUpdated == 'param_material_line_id':
+            if workcenter.paper_type == 'white':
+                qty_params['param_number_of_cuts'] = get_white_cuts_for_number_out(material_line.param_number_out)
+            else:
+                qty_params['param_number_of_cuts'] = get_printed_cuts_for_number_up(qty_params['param_number_up'])
+
+    paper_type = workcenter.paper_type
+
+    if paper_type == 'white':
+        time_per_cut = 10.0/360.0 # 10 seconds per cut for white paper
+    else:
+        time_per_cut = 15.0/360.0 # 15 seconds per cut for printed paper
+
+    sheets_to_process = 0
+    piles_to_process = 0
+    total_hours = 0
+
+    if paper_type == 'white':
+        sheets_to_process = material_line['quantity_required_'+qty] / float(material_line['param_number_out'])
+        #Round up to whole number
+        if sheets_to_process:
+            piles_to_process = math.ceil(sheets_to_process / float(qty_params['param_sheets_per_pile'])) 
+        cutting_time_per_pile = (10 * qty_params['param_number_of_cuts']) * 0.00027778 #0.00027778 hours in a second
+        total_hours = cost_params['param_make_ready_time'] + ( piles_to_process * qty_params['param_time_per_pile'])  + (piles_to_process * cutting_time_per_pile)
+        
+    else:
+        sheets_to_process = math.ceil( material_line['quantity_required_'+qty] * float(material_line['param_number_out']) )
+        if sheets_to_process:
+            piles_to_process = math.ceil(sheets_to_process / float(qty_params['param_sheets_per_pile'])) if sheets_to_process is not None else 0
+        cutting_time_per_pile = (15 * qty_params['param_number_of_cuts']) * 0.00027778 #0.00027778 hours in a second
+        total_hours = ((qty_params['param_time_per_pile'] + cutting_time_per_pile) * piles_to_process) + cost_params['param_make_ready_time']
+
+    cost_params['quantity_required'] = round(total_hours, 2)
+
+cost_params['params_working_sheets_needed'] = 0
+qty_params['params_working_sheets_needed'] = 0
+qty_params['params_overs_needed'] = 0
+
+estimate.update(qty_params,cost_params,qty)
+        </field>
+    </record>
+   
+    <record id="outwork" model="bb_process.process">
+        <field name="name">Outwork</field>
+        <field name="estimate">
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+
+if estimate.fieldUpdated in ['workcenterId']:
+    #if process.seller_ids:
+    #    gen_params['param_supplier_id'] = process.seller_ids[0].name.id
+    cost_params['cost_per_unit'] = workcenter.standard_price
+    cost_params['price_per_unit'] = workcenter.list_price
+    cost_params['margin'] = workcenter.margin_percent
+    cost_params['quantity_required'] = 1.0
+
+cost_params['params_working_sheets_needed'] = 0
+qty_params['params_working_sheets_needed'] = 0
+qty_params['params_overs_needed'] = 0
+
+#defaults
+qty_params['param_number_up'] = 1
+
+estimate.update(qty_params,cost_params,qty)
+        </field>
+    </record>
+   
+    <record id="envelope" model="bb_process.process">
+        <field name="name">Envelope</field>
+        <field name="estimate">
+def calculate_working_sheets_needed(qty_params, cost_params, qty):
+    running_sheets = float(cost_params['finished_quantity'])
+    return running_sheets
+
+def calculate_overs_needed(qty_params, cost_params, qty):
+    running_sheets = cost_params['finished_quantity']
+    running_overs = float(running_sheets) * (cost_params['param_running_overs_percent'] / 100.0)
+    return running_overs + cost_params['param_make_ready_overs']
+
+def load_qty_break_params(workcenter, qty_params, cost_params, qty):
+    
+    # Set default general parameters
+    qty_params['param_additional_charge'] = workcenter.additional_charge
+
+    # Re-load params based on material and qty-break data
+    if qty == 'run_on':
+        high_qty = 0
+        if qty_params['quantity_1'] > high_qty:
+            high_qty = qty_params['quantity_1']
+        if qty_params['quantity_2'] > high_qty:
+            high_qty = qty_params['quantity_2']
+        if qty_params['quantity_3'] > high_qty:
+            high_qty = qty_params['quantity_3']
+        if qty_params['quantity_4'] > high_qty:
+            high_qty = qty_params['quantity_4']
+        quantity_to_process = high_qty 
+    else:
+        quantity_to_process = cost_params['finished_quantity']
+    
+    material_weight = qty_params['param_grammage']
+    
+    qty_break_ids = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('qty_greater_than','&lt;',quantity_to_process),('weight_greater_than','&lt;',material_weight),('isDefault','=',False)], order='qty_greater_than desc, weight_greater_than desc')
+    qty_break = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+
+    if (qty_break_ids):
+        qty_break = qty_break_ids[0]
+        cost_params['param_make_ready_time'] = (qty_break.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = qty_break.machine_speed
+        cost_params['param_make_ready_overs'] = qty_break.make_ready_overs if qty != 'run_on' else 0.0
+        cost_params['param_running_overs_percent'] = qty_break.running_overs_percent
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = qty_break.margin_percent
+    elif qty_break:
+        cost_params['param_make_ready_time'] = (qty_break.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = qty_break.machine_speed
+        cost_params['param_make_ready_overs'] = qty_break.make_ready_overs if qty != 'run_on' else 0.0
+        cost_params['param_running_overs_percent'] = qty_break.running_overs_percent
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = qty_break.margin_percent
+
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+
+#defaults
+qty_params['param_number_up'] = 1
+
+if estimate.fieldUpdated in ['workcenterId','param_grammage','param_env_windowpatching','param_env_peelandstick','param_env_inlineemboss','param_env_gumming']:
+    load_qty_break_params(workcenter, qty_params, cost_params, qty)
+    
+    if qty_params['param_env_windowpatching']:
+        cost_params['param_make_ready_time'] += 0.75
+        cost_params['param_make_ready_overs'] += 50.0
+        qty_params['param_additional_charge'] += 4.0
+    if qty_params['param_env_peelandstick']:
+        cost_params['param_make_ready_time'] += 1.5
+        cost_params['param_make_ready_overs'] += 20.0
+        qty_params['param_additional_charge'] += 2.0
+    if qty_params['param_env_inlineemboss']:
+        cost_params['param_make_ready_time'] += 0.5
+        cost_params['param_make_ready_overs'] += 25.0
+    if qty_params['param_env_gumming']:
+        cost_params['param_make_ready_time'] += 0.5
+        cost_params['param_make_ready_overs'] += 25.0
+
+
+if estimate.fieldUpdated == 'workcenterId':
+    qty_params['req_param_env_windowpatching'] = workcenter.windowPatchingAvailable
+    qty_params['req_param_env_peelandstick'] = workcenter.peelStickAvailable
+    qty_params['req_param_env_inlineemboss'] = workcenter.inlineEmbossAvailable
+    qty_params['req_param_env_gumming'] = workcenter.gummingAvailable
+
+sheets_to_process = calculate_working_sheets_needed(qty_params, cost_params, qty) + calculate_overs_needed(qty_params, cost_params, qty)
+
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
+
+if cost_params['param_machine_speed'] :
+    cost_params['param_running_time'] = sheets_to_process / int(cost_params['param_machine_speed'])
+else :
+    cost_params['param_running_time'] = 0.0
+
+
+total_hours = cost_params['param_make_ready_time'] + cost_params['param_running_time']
+
+cost_params['quantity_required'] = round(total_hours, 2)
+
+estimate.update(qty_params,cost_params,qty)    
+        </field>
+    </record>
+   
+    <record id="gilding" model="bb_process.process">
+        <field name="name">Gilding</field>
+        <field name="estimate">
+def load_qty_break_params(workcenter,qty_params, cost_params,qty):
+    if qty == 'run_on':
+        high_qty = 0
+        if qty_params['quantity_1'] > high_qty:
+            high_qty = qty_params['quantity_1']
+        if qty_params['quantity_2'] > high_qty:
+            high_qty = qty_params['quantity_2']
+        if qty_params['quantity_3'] > high_qty:
+            high_qty = qty_params['quantity_3']
+        if qty_params['quantity_4'] > high_qty:
+            high_qty = qty_params['quantity_4']
+        quantity_to_process = high_qty
+    else:
+        quantity_to_process = cost_params['finished_quantity']
+    
+    material_weight = qty_params['param_grammage']
+    
+    qty_break_ids = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('qty_greater_than','&lt;',quantity_to_process),('weight_greater_than','&lt;',material_weight),('isDefault','=',False)], order='qty_greater_than desc, weight_greater_than desc')
+    
+    process = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+    
+    if (qty_break_ids):
+        qty_break = qty_break_ids[0]
+        cost_params['param_make_ready_time'] = (qty_break.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = qty_break.machine_speed
+        cost_params['param_make_ready_overs'] = qty_break.make_ready_overs if qty != 'run_on' else 0.0
+        cost_params['param_running_overs_percent'] = qty_break.running_overs_percent
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = qty_break.margin_percent
+    elif process:
+        cost_params['param_make_ready_time'] = (process.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = process.machine_speed
+        cost_params['param_make_ready_overs'] = process.make_ready_overs if qty != 'run_on' else 0.0
+        cost_params['param_running_overs_percent'] = process.running_overs_percent
+        cost_params['cost_per_unit'] = process.standard_price
+        cost_params['price_per_unit'] = process.list_price
+        cost_params['margin'] = process.margin_percent
+
+def calculate_working_sheets_needed(qty_params, cost_params, qty):
+    running_sheets = cost_params['finished_quantity']
+    return running_sheets
+
+def calculate_overs_needed(qty_params, cost_params, qty):
+    running_sheets = int(cost_params['finished_quantity'])
+    running_overs = running_sheets * (float(cost_params['param_running_overs_percent']) / 100.0)
+    return running_overs + int(cost_params['param_make_ready_overs'])
+
+
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+
+qty_params['param_number_up'] = 1
+
+if estimate.fieldUpdated in ['workcenterId','param_grammage']:
+    load_qty_break_params(workcenter, qty_params, cost_params, qty)
+
+sheets_to_process = int(calculate_working_sheets_needed(qty_params, cost_params, qty)) + calculate_overs_needed(qty_params, cost_params, qty)
+
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
+
+if cost_params['param_machine_speed'] :
+    cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
+else :
+    cost_params['param_running_time'] = 0.0
+
+total_hours = cost_params['param_make_ready_time'] + cost_params['param_running_time']
+
+cost_params['quantity_required'] = round(total_hours, 2)
+
+estimate.update(qty_params,cost_params,qty)
+        </field>
+    </record>
+   
+    <record id="duplex" model="bb_process.process">
+        <field name="name">Duplex</field>
+        <field name="estimate">
+	
+def load_qty_break_params(workcenter, qty_params, cost_params, qty):
+    # Set default general parameters
+    qty_params['param_additional_charge'] = workcenter.additional_charge
+
+    # Re-load params based on material and qty-break data
+    if qty == 'run_on':
+        high_qty = 0
+        if qty_params['quantity_1'] > high_qty:
+            high_qty = qty_params['quantity_1']
+        if qty_params['quantity_2'] > high_qty:
+            high_qty = qty_params['quantity_2']
+        if qty_params['quantity_3'] > high_qty:
+            high_qty = qty_params['quantity_3']
+        if qty_params['quantity_4'] > high_qty:
+            high_qty = qty_params['quantity_4']
+        quantity_to_process = high_qty / qty_params['param_number_up']
+    else:
+        quantity_to_process = cost_params['finished_quantity'] / qty_params['param_number_up']
+    qty_break_ids = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('qty_greater_than','&lt;',quantity_to_process),('isDefault','=',False)], order='qty_greater_than desc, weight_greater_than desc')
+    process = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+    
+    if (qty_break_ids):
+        qty_break = qty_break_ids[0]
+        cost_params['param_make_ready_time'] = (qty_break.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = qty_break.machine_speed
+        #if field_updated != 'param_make_ready_overs':
+        cost_params['param_make_ready_overs'] = qty_break.make_ready_overs if qty != 'run_on' else 0.0
+        #if field_updated != 'param_running_overs_percent':
+        cost_params['param_running_overs_percent'] = qty_break.running_overs_percent
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = qty_break.margin_percent
+    elif process:
+        cost_params['param_make_ready_time'] = (process.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = process.machine_speed
+        #if field_updated != 'param_make_ready_overs':
+        cost_params['param_make_ready_overs'] = process.make_ready_overs if qty != 'run_on' else 0.0
+        #if field_updated != 'param_running_overs_percent':
+        cost_params['param_running_overs_percent'] = process.running_overs_percent
+        cost_params['cost_per_unit'] = process.standard_price
+        cost_params['price_per_unit'] = process.list_price
+        cost_params['margin'] = process.margin_percent
+
+def calculate_working_sheets_needed(qty_params, cost_params, qty):
+    running_sheets = (int(cost_params['finished_quantity']) / int(qty_params['param_number_up']))
+    return running_sheets
+
+def calculate_overs_needed(qty_params, cost_params, qty):
+    running_sheets = (int(cost_params['finished_quantity']) / int(qty_params['param_number_up']))
+    running_overs = running_sheets * (float(cost_params['param_running_overs_percent']) / 100.0)
+    return running_overs + float(cost_params['param_make_ready_overs'])
+
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+if estimate.fieldUpdated in ['workcenterId', 'param_number_up', 'param_duplex_sheets', 'param_number_of_sheets']:
+    load_qty_break_params(workcenter, qty_params, cost_params, qty)
+    if qty_params['param_duplex_sheets'] == 'three':
+        cost_params['param_machine_speed'] = cost_params['param_machine_speed'] * 0.6
+    elif qty_params['param_duplex_sheets'] == 'four':
+        cost_params['param_machine_speed'] = cost_params['param_machine_speed'] * 0.4
+    elif qty_params['param_duplex_sheets'] == 'five':
+        cost_params['param_machine_speed'] = cost_params['param_machine_speed'] * 0.25
+
+working_sheets = (calculate_working_sheets_needed(qty_params, cost_params, qty) * qty_params['param_number_of_sheets'])
+
+sheets_to_process = working_sheets + calculate_overs_needed(qty_params, cost_params, qty)
+
+cost_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params, cost_params, qty) + calculate_overs_needed(qty_params, cost_params, qty)
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
+
+if cost_params['param_machine_speed'] :
+    cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
+else :
+    cost_params['param_running_time'] = 0.0
+
+total_hours = cost_params['param_make_ready_time'] + cost_params['param_running_time']
+
+cost_params['quantity_required'] = round(total_hours, 2)
+estimate.update(qty_params,cost_params,qty)
+        </field>
+    </record>
+   
+    <record id="window_patching" model="bb_process.process">
+        <field name="name">Window Patching</field>
+        <field name="estimate">
+def load_qty_break_params(workcenter, qty_params, cost_params, qty):
+    # Re-load params based on material and qty-break data
+    if qty == 'run_on':
+        high_qty = 0
+        if qty_params['quantity_1'] > high_qty:
+            high_qty = qty_params['quantity_1']
+        if qty_params['quantity_2'] > high_qty:
+            high_qty = qty_params['quantity_2']
+        if qty_params['quantity_3'] > high_qty:
+            high_qty = qty_params['quantity_3']
+        if qty_params['quantity_4'] > high_qty:
+            high_qty = qty_params['quantity_4']
+        quantity_to_process = high_qty
+    else:
+        quantity_to_process = cost_params['finished_quantity']
+    
+    qty_break_ids = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('qty_greater_than','&lt;',quantity_to_process),('isDefault','=',False)], order='qty_greater_than desc, weight_greater_than desc')
+    process = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+    
+    if (qty_break_ids):
+
+        qty_break = qty_break_ids[0]
+        cost_params['param_make_ready_time'] = (qty_break.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = qty_break.machine_speed
+        cost_params['param_make_ready_overs'] = qty_break.make_ready_overs if qty != 'run_on' else 0.0
+        cost_params['param_running_overs_percent'] = qty_break.running_overs_percent
+        cost_params['cost_per_unit'] = qty_break.standard_price
+        cost_params['price_per_unit'] = qty_break.list_price
+        cost_params['margin'] = qty_break.margin_percent
+    elif process:
+        cost_params['param_make_ready_time'] = (process.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = process.machine_speed
+        cost_params['param_make_ready_overs'] = process.make_ready_overs if qty != 'run_on' else 0.0
+        cost_params['param_running_overs_percent'] = process.running_overs_percent
+        cost_params['cost_per_unit'] = process.standard_price
+        cost_params['price_per_unit'] = process.list_price
+        cost_params['margin'] = process.margin_percent
+
+def calculate_working_sheets_needed(qty_params , cost_params, qty):
+    running_sheets = cost_params['finished_quantity']
+    return int(running_sheets)
+
+def calculate_overs_needed(qty_params, cost_params,  qty):
+    running_sheets = int(cost_params['finished_quantity'])
+    running_overs = running_sheets * (float(cost_params['param_running_overs_percent']) / 100.0)
+    return running_overs + int(cost_params['param_make_ready_overs'])
+
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+
+#default
+qty_params['param_number_up'] = 1
+
+if estimate.fieldUpdated in ['workcenterId']:
+    load_qty_break_params(workcenter, qty_params, cost_params, qty)
+
+sheets_to_process = calculate_working_sheets_needed( qty_params, cost_params, qty) + calculate_overs_needed(qty_params, cost_params, qty)
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = calculate_overs_needed(qty_params,cost_params, qty)
+
+if cost_params['param_machine_speed'] :
+    cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
+else :
+    cost_params['param_running_time'] = 0.0
+
+total_hours = cost_params['param_make_ready_time'] + cost_params['param_running_time']
+
+cost_params['quantity_required'] = round(total_hours, 2)
+estimate.update(qty_params,cost_params,qty)
+        
+        </field>
+    </record>
+    
+    <record id="finishing" model="bb_process.process">
+        <field name="name">Finishing</field>
+        <field name="estimate">
+def calculate_working_sheets_needed(qty_params, cost_params, qty):
+    running_sheets = int(cost_params['finished_quantity'])
+    return running_sheets
+
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+
+#default
+qty_params['param_number_up'] = 1
+
+if estimate.fieldUpdated in ['workcenterId']:
+    process = workcenter.qty_break_params.search([('process_id','=',workcenter.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+    if process:
+        cost_params['param_make_ready_time'] = (process.make_ready_time) if qty != 'run_on' else 0.0
+        qty_params['param_additional_charge'] = workcenter.additional_charge
+        cost_params['param_make_ready_time'] = (process.make_ready_time) if qty != 'run_on' else 0.0
+        cost_params['param_machine_speed'] = process.machine_speed
+        cost_params['cost_per_unit'] = process.standard_price
+        cost_params['price_per_unit'] = process.list_price
+        cost_params['margin'] = process.margin_percent
+
+sheets_to_process = calculate_working_sheets_needed(qty_params, cost_params, qty) 
+cost_params['params_working_sheets_needed'] = sheets_to_process
+qty_params['params_working_sheets_needed'] = calculate_working_sheets_needed(qty_params,cost_params, qty)
+qty_params['params_overs_needed'] = 0
+
+if cost_params['param_machine_speed'] :
+    cost_params['param_running_time'] = sheets_to_process / cost_params['param_machine_speed']
+else :
+    cost_params['param_running_time'] = 0.0
+    
+total_hours = cost_params['param_make_ready_time'] + cost_params['param_running_time']
+
+cost_params['quantity_required'] = round(total_hours, 2)
+
+estimate.update(qty_params,cost_params,qty)
+        </field>
+    </record>
+   
+    <record id="packing" model="bb_process.process">
+        <field name="name">Packing</field>
+        <field name="estimate">
+cost_params = estimate.cost_params
+qty_params = estimate.qty_params
+qty = estimate.qty
+if estimate.fieldUpdated in ['workcenterId']:
+    qty_params['param_sheets_per_box'] = workcenter.sheetsPerBox
+    qty_params['param_time_per_box'] = workcenter.timePerBox
+    cost_params ['cost_per_unit'] = workcenter.standard_price
+    cost_params ['price_per_unit'] = workcenter.list_price
+    cost_params ['margin'] = workcenter.margin_percent
+
+sheets_to_process = int(cost_params['finished_quantity'])
+
+#defaults
+qty_params['param_number_up'] = 1
+
+cost_params['params_working_sheets_needed'] = 0
+qty_params['params_working_sheets_needed'] = 0
+qty_params['params_overs_needed'] = 0
+
+cost_params['params_working_sheets_needed'] = 0
+
+number_of_boxes = sheets_to_process / float(qty_params['param_sheets_per_box'])
+
+total_hours = number_of_boxes * float(qty_params['param_time_per_box'])
+
+cost_params['quantity_required'] = round(total_hours, 2)
+estimate.update(qty_params,cost_params,qty)
+        </field>
+    </record>
+   
+    </data>
+</odoo> 

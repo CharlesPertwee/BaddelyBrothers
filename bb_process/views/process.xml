@@ -1,0 +1,58 @@
+<odoo>
+	<data>
+        <record model="ir.actions.act_window" id="bb_process.action_window_types">
+          <field name="name">Processes</field>
+          <field name="res_model">mrp.workcenter</field>
+          <field name="view_mode">tree,form</field>
+        </record>
+        
+        <record model="ir.ui.view" id="bb_process.process_list">
+          <field name="name">process.type.list</field>
+          <field name="model">bb_process.process</field>
+          <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+            </tree>
+          </field>
+        </record>
+        
+        <record model="ir.ui.view" id="bb_process.process_form">
+          <field name="name">process.type.form</field>
+          <field name="model">bb_process.process</field>
+          <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                      <button class="oe_stat_button" icon="fa-database" type="action" name="%(bb_process.action_window_types)d">
+                        <field name="process_count" string="Processes" widget="statinfo"/>
+                      </button>
+                    </div>
+                  
+                    <h2><field name="name"/></h2>
+                    <group>
+                        <field name="estimate" />
+                        <field name="requiredFields">
+                            <tree editable="top">
+                                <field name="name" />
+                            </tree>
+                        </field>
+                        <field name="MapMaterials" />
+                        <field name="OversOnly" />
+                    </group>
+                </sheet>
+            </form>
+          </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="bb_process.action_window_process">
+          <field name="name">Process Types</field>
+          <field name="res_model">bb_process.process</field>
+          <field name="view_mode">tree,form</field>
+        </record>
+        
+        
+        
+        <menuitem id="process_types" name="Process" sequence="75" action="bb_process.action_window_process"/>
+        
+   </data>
+</odoo>

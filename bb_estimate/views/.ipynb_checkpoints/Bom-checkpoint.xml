@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <record id="mrp_bom_line_view_form_bb" model="ir.ui.view">
+            <field name="name">mrp.bom.line.form.inherit</field>
+            <field name="model">mrp.bom.line</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_line_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='sequence']" position="after">
+                    <field name="EstimateLineId" invisible="1" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

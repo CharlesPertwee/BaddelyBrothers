@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Contacts Baddely Brothers",
+    'name': "Contacts Baddeley Brothers",
 
     'summary': """
         Contact customization for Baddely Brothers
         """,
 
     'description': """
-  
     """,
 
     'author': "Squadsoft Tech",
@@ -17,10 +16,10 @@
     # Check https://github.com/odoo/odoo/blob/12.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Baddely Brothers',
-    'version': '2.2',
+    'version': '1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base','account','account_accountant'],
 
     # always loaded
     'data': [

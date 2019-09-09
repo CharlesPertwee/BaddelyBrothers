@@ -1,0 +1,84 @@
+<odoo>
+    <data>
+        <report 
+            id="report_job_ticket"
+            model="mrp.production"
+            string="Job Ticket"
+            report_type="qweb-html"
+            name="bb_estimate.job_ticket"
+            file="bb_estimate.job_ticket"
+            attachment="((object.name or '').replace('/','')+'.pdf')"
+            print_report_name="((object.name or '').replace('/','')+'.pdf')"
+        />
+        
+        <report 
+                id="bb_box_label_report" 
+                string="Box Label" 
+                model="mrp.production" 
+                report_type="qweb-pdf" 
+                name="bb_estimate.box_label" 
+                file="bb_estimate.box_label" 
+                attachment="('Box Label-'+(object.name or '').replace('/','')+'.pdf')"
+                print_report_name="'Box Label - %s ' % object.name"
+                paperformat="bb_estimate.box_label_paper_format"
+        />      
+        
+        <report 
+                id="bb_as_before_label_report" 
+                string="As Before Label" 
+                model="mrp.production" 
+                report_type="qweb-pdf" 
+                name="bb_estimate.as_before_label" 
+                file="bb_estimate.as_before_label"
+                attachment="('As Before Label-'+(object.name or '').replace('/','')+'.pdf')"
+                print_report_name="'As Before Label - %s ' % object.name"
+                paperformat="bb_estimate.box_label_paper_format"
+        />
+        
+        <report 
+                id="bb_die_label_report" 
+                string="Die Label" 
+                model="mrp.production" 
+                report_type="qweb-pdf" 
+                name="bb_estimate.die_label" 
+                file="bb_estimate.die_label"
+                attachment="('Die Label-'+(object.name or '').replace('/','')+'.pdf')"
+                print_report_name="'Die Label - %s ' % object.name" 
+                paperformat="bb_estimate.box_label_paper_format"
+        />
+        
+        <record id="mrp_production_form_view_bb" model="ir.ui.view">
+            <field name="name">mrp.production.form.bb</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="ConfirmOrder" attrs="{'invisible':[('state','not in',['planned'])]}" string="Complete Order" class="btn btn-primary o_form_button_edit" type="object"/>
+                </xpath>
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="Estimate" readonly="1"/>
+                    <field name="Project" readonly="1"/>
+                    <field name="SpecifcationType" />
+                    <field name="JobType" />
+                </xpath>
+                <xpath expr="//field[@name='availability']" position="after">
+                    <field name="NoOfCopiesRequired"/>
+                    <field name="NoOfCustomerCopies"/>
+                    <field name="OversRequired"/>
+                    <field name="ChargeOvers"/>
+                    <field name="DieType" />
+                </xpath>
+                
+                <xpath expr="//field[@name='routing_id']" position="after">
+                    <field name="customerRef"/>
+                </xpath>
+                
+                <xpath expr="//notebook[1]/page[3]" position="after">
+                    <page name="Purchases" string="Purchase Orders">
+                        <field name="Purchases" readonly="1"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

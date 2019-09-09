@@ -1,0 +1,401 @@
+<odoo>
+    <data>
+        <template id="assets_backend_contact_form" name="static_resources_demo assets" inherit_id="web.assets_frontend">
+            <xpath expr="." position="inside">
+                <!--These links will be called when loading your Odoo -->
+                <script type="text/javascript" src="/bb_estimate/static/src/js/ContactForm.js"></script>
+            </xpath>
+        </template>
+        
+        <template id="assets_backend_delete_confirmation" name="Delete Confirmation" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="application/javascript" src="/bb_estimate/static/src/js/DeleteConfirmation.js"/>
+            </xpath>
+        </template>
+        
+        <template id="assets_backend_estimate_css" name="bb_estimate_style assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <!--These links will be called when loading your Odoo -->
+                <link rel="stylesheet" href="/bb_estimate/static/src/css/Estimate.css"/>
+            </xpath>
+        </template>
+        
+        <template id="assets_backend_estimate__font_css" name="BB Georgia Font" inherit_id="web.assets_common">
+            <xpath expr="//link[last()]" position="after">
+                <link rel="stylesheet" href="/bb_estimate/static/src/fonts/Georgia/style.css"/>
+            </xpath>
+        </template>
+        
+        <template id="qty_amend">
+            <div class="alert alert-warning" role="alert"> 
+                Quantity Ammended
+                <div class="mt16">
+                    <p>Old Qty: <t t-esc="data.Quantity + data.RunOn" /> | Old Price: <t t-esc="data.TotalPrice" /></p>
+                    <p>New Qty: <t t-esc="data.AmmendedQty + data.RunOn" /> | Old Price: <t t-esc="data.AmmendedPrice" /></p>
+                    <p>Changes(s):</p>
+                    <ul t-foreach="data.ChangeLog" t-as="line">
+                        <li><t t-if="line.product_id">
+                                <t t-esc="line.product_id.name" />
+                            </t>
+                            <t t-else="">
+                                <t t-esc="line.workcenter_id.name" />
+                            </t>
+                            Old: 
+                            <t t-esc="'%0.2f'%(line.CurrentRequired)" />
+                            New: 
+                            <t t-esc="'%0.2f'%(line.NewRequired)" />
+                            PO: 
+                            <t t-esc="'%0.2f'%(line.POQty)" />
+                            Comment: 
+                            <t t-esc="line.POComment" />
+                          </li>
+                    </ul>
+                </div>
+            </div>
+        </template>
+        
+        <template id="bb_contactus_form" name="BB Contact Form" inherit_id="website_crm.contactus_form" customize_show="True">
+            <xpath expr="//*[@id='wrap']/div[2]/div/div[1]/div[2]/form" position="replace">
+                <div style="background: #F3F3F3;padding: 20px;">
+                    <form action="/website_form/" method="post" data-model_name="crm.lead" data-success_page="/contactus-thank-you" class="s_website_form container-fluid mt32" enctype="multipart/form-data" data-editable-form="false">
+                        <div class="row custom-radio text-center" style="padding:30px;font-size:17px;">
+                            <div class="col-6">
+                                <input type="radio" id="envelopeEstimate" name="enquiryType" class="custom-control-input" value="Envelope Estimate" checked="checked" onchange="hidePrints()"/>
+                                <label class="custom-control-label" for="envelopeEstimate">Get Envelope Estimate</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="radio" id="printEstimate" class="custom-control-input" name="enquiryType" value="Print Estimate" onchange="hideEnvelopes()"/>
+                                <label class="custom-control-label" for="printEstimate">Get Print Estimate</label>                                
+                            </div>
+                        </div>
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="name">Your Question?</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="name" t-att-value="request.params.get('name', '')" required=""/>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="email_from">E-mail</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="email" class="form-control o_website_form_input" name="email_from" t-att-value="request.params.get('email_from', '')" required=""/>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryFirstName">First Name</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="enquiryFirstName" t-att-value="request.params.get('enquiryFirstName', '')" required=""/>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryLastName">Last Name</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="enquiryLastName" t-att-value="request.params.get('enquiryLastName', '')"/>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="partner_name">Company Name</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="partner_name" t-att-value="request.params.get('partner_name', '')" required=""/>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="phone">Phone Number</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="phone" t-att-value="request.params.get('phone', '')" required=""/>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group row form-field o_website_form_required_custom row">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col-3">
+                                    </div>
+                                    <div class="col-9">
+                                        <h4><i><b>Fast Address</b></i></h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">
+                                    </div>
+                                    <div class="col-9">
+                                        <p>1. Enter a postcode</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">
+                                    </div>
+                                    <div class="col-9">
+                                        <p>2. Click on the find button</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">
+                                    </div>
+                                    <div class="col-9">
+                                        <p>Postcode</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="number" class="form-control o_website_form_input" name="quickPOstCode" t-att-value="request.params.get('quickPOstCode', '')" required=""/>
+                                    </div>
+                                </div>
+                            </div>                        
+                        </div> -->
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="street">Address</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="street" t-att-value="request.params.get('street', '')" required=""/>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="street2"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="street2" t-att-value="request.params.get('street2', '')"/>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="city">City/Town</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="city" t-att-value="request.params.get('city', '')" required=""/>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="country_id">Country</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select class="form-control" name="country_id">
+                                    <t t-foreach="countries" t-as="country">
+                                        <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field o_website_form_required_custom">
+                            <label class="col-lg-3 col-md-4 col-form-label" id="Quantity1" for="Quantity1">Quantity 1</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="Quantity1" t-att-value="request.params.get('Quantity1', '')" required=""/>
+                            </div>
+                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <p id="moreEnv" style="font-size:10px;">How many envelopes do you need?</p>
+                            </div>
+                        </div>
+                        <div class="extra form-group row form-field" style="display:none;">
+                            <label class="col-lg-3 col-md-4 col-form-label" id="Quantity2" for="Quantity2">Quantity 2</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="Quantity2" t-att-value="request.params.get('Quantity2', '')"/>
+                            </div>
+                        </div>
+                        <div class="extra form-group row form-field" style="display:none;">
+                            <label class="col-lg-3 col-md-4 col-form-label" id="Quantity3" for="Quantity3">Quantity 3</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="Quantity3" t-att-value="request.params.get('Quantity3', '')"/>
+                            </div>
+                        </div>
+                        <div class="extra form-group row form-field" style="display:none;">
+                            <label class="col-lg-3 col-md-4 col-form-label" id="Quantity4" for="Quantity4">Quantity 4</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="Quantity4" t-att-value="request.params.get('Quantity4', '')"/>
+                            </div>
+                        </div> 
+                        <div class="row">
+                            <div class="col-12">
+                                <p id="morePara" class="text-danger"><a onClick="showMoreQuantities(); return false;" style="cursor:pointer">More Quantites? Click here if you would like prices for more than one lot.</a></p>
+                            </div>
+                        </div>
+                        <div class="print form-group row form-field" style="display:none;">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryPrintSize">Print Size</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select id="printSize" class="form-control" name="enquiryPrintSize">
+                                    <t t-foreach="printSize" t-as="size">
+                                        <option t-attf-value="#{size.id}"><t t-esc="size.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <p style="font-size:10px;">A4-210x297mm 8 1/4 x 11 3/4"<br/>
+                                A5-148x210mm 5 7/2 x 8 1/4"<br/>
+                                A6-105x148mm 5 7/2 x 4 1/2<br/>
+                                Bus Card-85x55mm<br/>
+                                A4 DL-This is a common envelope size.<br/>
+                                210x100mm-It's also exactly one third of the size of an A4 piece of paper<br/>
+                                Custom(non-standard size please choose)</p>
+                            </div>
+                        </div>
+                        <div class="envelope form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquirySize">Size</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select id="envelopeSize" class="form-control" name="enquirySize">
+                                    <t t-foreach="envelopeSize" t-as="size">
+                                        <option t-attf-value="#{size.id}"><t t-esc="size.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field" style="display:none;" id="enquirySizeHeight">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquirySizeHeight">Height</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="enquirySizeHeight" t-att-value="request.params.get('enquirySizeHeight', '')"/>
+                            </div>
+                        </div> 
+                        <div class="form-group row form-field" style="display:none;" id="enquirySizeWidth">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquirySizeWidth">Width</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="enquirySizeWidth" t-att-value="request.params.get('enquirySizeWidth', '')"/>
+                            </div>
+                        </div> 
+                        <div class="envelope form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryEnvelopeType">Envelope Type</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select class="form-control" name="enquiryEnvelopeType">
+                                    <option t-attf-value="none"></option>
+                                    <option t-attf-value="diamond">Diamond</option>
+                                    <option t-attf-value="highcutdiamond">High Cut Diamond</option>
+                                    <option t-attf-value="tuck">Tuck</option>
+                                    <option t-attf-value="pocket">Pocket</option>
+                                    <option t-attf-value="walletpocket">Walletstyle Pocket</option>
+                                    <option t-attf-value="wallet">Wallet</option>
+                                    <option t-attf-value="banker">Banker</option>
+                                    <option t-attf-value="tissuelined">Tissue Lined, Embossed &amp; Windowed</option>
+                                 </select>
+                            </div>
+                        </div>
+                        <div class="envelope envelope form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryEnvelopeWindow">Window?</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select class="form-control" name="enquiryEnvelopeWindow">
+                                    <option t-attf-value="none"></option>
+                                    <option t-attf-value="yes">Yes</option>
+                                    <option t-attf-value="no">No</option>
+                                 </select>
+                            </div>                        
+                        </div>
+    
+                     <div class="print form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryPrintOrigination">Print Origination</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select class="form-control" name="enquiryPrintOrigination">
+                                    <option t-attf-value="none"></option>
+                                    <option t-attf-value="Print Ready PDF">Print Ready PDF</option>
+                                    <option t-attf-value="You to prepare file from copy supplied">You to prepare file from copy supplied</option>
+                                 </select>
+                            </div>                        
+                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <p style="font-size:10px;">Do you have any artwork available, if so what type?</p>
+                            </div>
+                        </div>
+                        <div class="print form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryPrintEdging">Edging</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select class="form-control" name="enquiryPrintEdging" id="enquiryPrintEdging">
+                                    <option t-attf-value="none"></option>
+                                    <option t-attf-value="Silver">Silver</option>
+                                    <option t-attf-value="Gold">Gold</option>                                
+                                    <option t-attf-value="Custom">Custom</option>
+                                 </select>
+                            </div>
+                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <p style="font-size:10px;">We can provide coloured(pantone),gold or silver,edges and either flator bevel edges, with square or rounded corners</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row form-field" style="display:none;" id="enquiryEdgeColor">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryEdgeColor">Color</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="enquiryEdgeColor" t-att-value="request.params.get('enquiryEdgeColor', '')"/>
+                            </div>
+                        </div> 
+                        
+                         <div class="print form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryPrintDuplex">Duplex</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select class="form-control" name="enquiryPrintDuplex">
+                                    <option t-attf-value="none"></option>
+                                    <option t-attf-value="two">2 Sheets</option>
+                                    <option t-attf-value="three">3 Sheets</option>
+                                    <option t-attf-value="four">4 Sheet</option>
+                                    <option t-attf-value="five">5 Sheets</option>
+                                 </select>
+                            </div>
+                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <p style="font-size:10px;">Also known as pasting or laminating. It is when two or more printed sheets are pressed together, providing the options for different coloured materials, a heavy product or hides the emboss or deboss in the top sheet.</p>
+                            </div>
+                        </div> 
+                        <div class="form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryEnvelopeRunOn" id="runOn"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="runOn" t-att-value="request.params.get('runOn', '')"/>
+                            </div>
+                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <p id="runOnText" style="font-size:10px;"></p>
+                            </div>
+                        </div>
+                        <div class="envelope form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryEnvelopeFlaptype">Flap Type</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select class="form-control" name="enquiryEnvelopeFlaptype">
+                                    <option t-attf-value="none"></option>
+                                    <option t-attf-value="gummed">Gummed</option>
+                                    <option t-attf-value="doublegummed">Double Gummed</option>
+                                    <option t-attf-value="peel">Peel &amp; Stick</option>
+                                    <option t-attf-value="ungummed">Un-gummed</option>
+                                    <option t-attf-value="topless">Topless</option>
+                                    <option t-attf-value="stringwasher">String &amp; Washer</option>
+                                 </select>
+                            </div>
+                        </div>
+                        <div class="envelope form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryEnvelopeTissuelIne">Tissue Lined</label>
+                            <div class="col-lg-7 col-md-8">
+                                <select class="form-control" name="enquiryEnvelopeTissuelIne">
+                                    <option t-attf-value="unlined">Unlined</option>
+                                    <option t-attf-value="full">Yes - Fully</option>
+                                    <option t-attf-value="half">Yes - Half</option>
+                                 </select>
+                            </div>
+                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <p style="font-size:10px;">Your envelopes can be made unlined, fully-lined with tissue paper. We have a range of colors to choose from</p>
+                            </div>
+                        </div>
+                       <div class="form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryMaterial">Material</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="text" class="form-control o_website_form_input" name="enquiryMaterial" t-att-value="request.params.get('enquiryMaterial', '')"/>
+                            </div>
+                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <div class="col-lg-7 col-md-8">
+                                <p style="font-size:10px;">Do you have a paper/board preference: brand,colour, thickness</p>
+                            </div>
+                        </div> 
+                        <div class="form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="enquiryWeightGsm">Weight(g.s.m)</label>
+                            <div class="col-lg-7 col-md-8">
+                                <input type="number" class="form-control o_website_form_input" name="enquiryWeightGsm" t-att-value="request.params.get('enquiryWeightGsm', '')"/>
+                            </div>
+                        </div>
+                        <div class="form-group row form-field">
+                            <label class="col-lg-3 col-md-4 col-form-label" for="description">Comments</label>
+                            <div class="col-lg-7 col-md-8">
+                                <textarea type="text" class="form-control o_website_form_input" name="description" t-att-value="request.params.get('description', '')"/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="offset-lg-3 offset-md-4 col-md-8 col-lg-7">
+                                <a href="#" role="button" class="btn btn-primary btn-lg o_website_form_send">Send</a>
+                                <span id="o_website_form_result"></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </xpath>
+        </template>
+    </data>
+</odoo>

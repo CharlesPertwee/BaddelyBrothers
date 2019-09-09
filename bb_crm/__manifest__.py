@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "CRM Baddely Brothers",
+    'name': "CRM Baddeley Brothers",
 
     'summary': """
         CRM customization for Baddely Brothers
         """,
 
     'description': """
-        
     """,
 
     'author': "Squadsoft Tech",

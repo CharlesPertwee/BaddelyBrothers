@@ -1,0 +1,34 @@
+<odoo>
+    <data>
+        <record id="edit_project_bb" model="ir.ui.view">
+            <field name="name">project.project.form</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page name="Estimates" string="Estimates">
+                        <field name="Estimates" readonly="1"/>
+                    </page>
+                    <page name="Leads_Opportunity" string="Leads/Opportunity">
+                        <field name="Leads" readonly="1"/>
+                    </page>
+                    <page name="SalesOrders" string="Sales Orders">
+                        <field name="SalesOrder" readonly="1"/>
+                    </page>
+                    <page name="JobTicket" string="Job Ticket">
+                        <field name="Productions" readonly="1"/>
+                    </page>
+                    <page name="Invoice" string="Invoices">
+                        <field name="Invoices" readonly="1"/>
+                    </page>
+                    <page name="Purchases" string="Purchase Orders">
+                        <field name="Purchase" readonly="1"/>
+                    </page>
+                    <page name="Deliveries" string="Deliveries">
+                        <field name="Deliveries" readonly="1"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
