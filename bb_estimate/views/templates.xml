@@ -26,6 +26,51 @@
             </xpath>
         </template>
         
+        <template id="change_log">
+            <div class="col-sm-12">
+                <table class="table text-center table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th colspan="2">Qty 1</th>
+                            <th colspan="2">Qty 2</th>
+                            <th colspan="2">Qty 3</th>
+                            <th colspan="2">Qty 4</th>
+                            <th colspan="2">Run On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td>Old</td>
+                            <td>New</td>
+                            <td>Old</td>
+                            <td>New</td>
+                            <td>Old</td>
+                            <td>New</td>
+                            <td>Old</td>
+                            <td>New</td>
+                            <td>Old</td>
+                            <td>New</td>
+                        </tr>
+                        <tr t-foreach="lines" t-as="line">
+                            <td><t t-esc="line[0]"/></td>
+                            <td><t t-esc="line[1]"/></td>
+                            <td><t t-esc="line[2]"/></td>
+                            <td><t t-esc="line[3]"/></td>
+                            <td><t t-esc="line[4]"/></td>
+                            <td><t t-esc="line[5]"/></td>
+                            <td><t t-esc="line[6]"/></td>
+                            <td><t t-esc="line[7]"/></td>
+                            <td><t t-esc="line[8]"/></td>
+                            <td><t t-esc="line[9]"/></td>
+                            <td><t t-esc="line[10]"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+        
         <template id="qty_amend">
             <div class="alert alert-warning" role="alert"> 
                 Quantity Ammended

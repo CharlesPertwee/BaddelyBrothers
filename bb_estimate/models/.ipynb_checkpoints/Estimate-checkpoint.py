@@ -184,7 +184,7 @@ class Estimate(models.Model):
     lead = fields.Many2one('crm.lead','Enquiry',copy=False)
     reSyncCount = fields.Integer('Re Sync Count',compute='_compute_reSync')
     
-    AuditLog = fields.One2many('bb_estimate.audit_log','estimate','Audit Log',copy=False)
+    ChangeLog = fields.Html("Change Log")
     
     def _compute_reSync(self):
         for record in self:
@@ -222,6 +222,33 @@ class Estimate(models.Model):
         conditions = self.env['bb_estimate.conditions'].sudo().search([('isDefault','=',True)])
         record.estimateConditions = conditions
         return record
+    
+    @api.multi
+    def write(self,vals):
+        old = {x.id:[x['lineName'],x['quantity_required_1'],x['quantity_required_2'],x['quantity_required_3'],x['quantity_required_4'],x['quantity_required_run_on']] for x in self.estimate_line}
+        currentRecord = super(Estimate, self).write(vals)
+        new = {x.id:[x['lineName'],x['quantity_required_1'],x['quantity_required_2'],x['quantity_required_3'],x['quantity_required_4'],x['quantity_required_run_on']] for x in self.estimate_line}
+        
+        changedRecords = [[new[x][0],old[x][1],new[x][1],old[x][2],new[x][2],old[x][3],new[x][3],old[x][4],new[x][4],old[x][5],new[x][5]] for x in filter(lambda x: old[x] != new[x], new.keys())]
+#         changedRecords = ['%s - Qty1 %0.2f to %0.2f Qty2 %0.2f to %0.2f Qty3 %0.2f to %0.2f Qty4 %0.2f to %0.2f Qty Run On %0.2f to %0.2f'
+#                             %(new[x][0],old[x][1],new[x][1],old[x][2],new[x][2],old[x][3],new[x][3],old[x][4],new[x][4],old[x][5],new[x][5]) 
+#                             for x in filter(lambda x: old[x] != new[x], new.keys())]
+        #raise Exception(old,new,changedRecords)
+        
+        update_vals = {}
+        if 'estimate_line' in vals.keys():
+            values = {
+                'lines': changedRecords
+                }
+            body = self.env.ref('bb_estimate.change_log').render(values=values)
+            update_vals = { 'ChangeLog': body }
+        else:
+            update_vals = { 'ChangeLog': '' }
+        
+        currentRecord = super(Estimate, self).write(update_vals)
+        #raise Exception(old,new)
+        return currentRecord
+        
     
     @api.depends('hasExtra')
     def getExtras(self):
