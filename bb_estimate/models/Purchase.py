@@ -15,6 +15,11 @@ class Purchase(models.Model):
     _inherit = 'purchase.order'
     
     @api.multi
+    def print_quotation(self):
+        self.write({'state': "sent"})
+        return self.env.ref('bb_estimate.request_for_quotation').report_action(self)
+    
+    @api.multi
     def write(self,vals):
         if 'origin' in vals.keys():
             pos = vals['origin'].split(',')

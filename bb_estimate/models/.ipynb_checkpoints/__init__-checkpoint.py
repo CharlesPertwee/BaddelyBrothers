@@ -18,5 +18,4 @@ from . import PriceHistory
 from . import Project
 from . import CRM
 from . import Purchase
-from . import AuditLog
 #from . import StockRule

@@ -79,6 +79,9 @@
                             <field name="target_dispatch_date" attrs="{'readonly':[('isLocked','=',True)]}" required="1"/>
                         </group>
                     </group>
+                    <group>
+                        <field name="ChangeLog" readonly="1"/>
+                    </group>
                     <notebook>
                         <page name="EstimateDetails" string="Estimate Details">
                             <group>
@@ -174,26 +177,6 @@
                         <page string="Estimate Conditions" attrs="{'invisible':[('id','=',False)]}">
                             <field name="estimateConditions" attrs="{'readonly':[('isLocked','=',True)]}"/>
                         </page>
-                        <page name="AuditLog" string="Audit Log">
-                            <field name="AuditLog" readonly="1">
-                                <tree>
-                                    <field name="create_uid" string="By"/>
-                                    <field name="create_date" string="On" />
-                                    <field name="estimateLine"/>
-                                    <field name="quantity_1"/>
-                                    <field name="quantity_2"/>
-                                    <field name="quantity_3"/>
-                                    <field name="quantity_4"/>
-                                    <field name="quantity_run_on"/>
-                                    <field name="changed_quantity_1"/>
-                                    <field name="changed_quantity_2"/>
-                                    <field name="changed_quantity_3"/>
-                                    <field name="changed_quantity_4"/>
-                                    <field name="changed_quantity_run_on"/>
-                                    <field name="Action"/>
-                                </tree>
-                            </field>
-                        </page>
                         <page name="PriceAdjustments" string="Price Adjustments">
                             <field name="priceHistory" readonly="1">
                                 <tree>
@@ -267,6 +250,7 @@
                             </sheet>
                         </page>
                     </notebook>
+                    
                     <group col="15">
                         <label for="total_price_1" string="Prices" colspan="10"/>
                         <field name="total_price_1" nolabel="1" readonly="1"/>
@@ -275,6 +259,7 @@
                         <field name="total_price_4" nolabel="1" readonly="1"/>
                         <field name="total_price_run_on" nolabel="1" readonly="1"/>
                     </group>
+                    
                     <group>
                         <group>
                             <field name="EnquiryComments"/>
