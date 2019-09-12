@@ -221,7 +221,7 @@
                             <div class="col-lg-7 col-md-8">
                                 <input type="number" class="form-control o_website_form_input" name="Quantity1" t-att-value="request.params.get('Quantity1', '')" required=""/>
                             </div>
-                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <label class="col-lg-3 col-md-4"></label>
                             <div class="col-lg-7 col-md-8">
                                 <p id="moreEnv" style="font-size:10px;">How many envelopes do you need?</p>
                             </div>

@@ -6,8 +6,7 @@
         This module creates the estimate and job tickets.
         """,
 
-    'description': """ 
-    
+    'description': """
     """,
 
     'author': "Squadsoft Tech",
@@ -55,6 +54,7 @@
         'views/Routing.xml',
         'views/Bom.xml',
         'views/SalesOrder.xml',
+        'data/sale_order_mail_template.xml',
         'views/Invoice.xml',
         'data/invoice_mail_template.xml',
         'views/PurchaseOrder.xml',
