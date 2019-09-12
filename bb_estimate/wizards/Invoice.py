@@ -13,12 +13,25 @@ class ConfirmationLines(models.TransientModel):
             if invoice:
                 if invoice.invoiceDescription:
                     self.invoiceEditableLines = invoice.invoiceDescription
+                    
+    @api.onchange('SaleOrder')
+    def getSaleOrderEditableLines(self):
+        if 'default_SaleOrder' in self._context.keys():
+            saleOrder = self.env['sale.order'].sudo().browse(self._context['default_SaleOrder'])
+            if saleOrder:
+                if saleOrder.ProFormaLines:
+                    self.invoiceEditableLines = saleOrder.ProFormaLines
     
-    invoiceEditableLines = fields.Html('Invoice Line')
-    InvoiceId = fields.Many2one('account.invoice','Invoice')          
+    invoiceEditableLines = fields.Html('Editable Line')
+    InvoiceId = fields.Many2one('account.invoice','Invoice')  
+    SaleOrder = fields.Many2one('sale.order','Sale Order')
     
     def ChangeInvoiceLines(self):
         if self.invoiceEditableLines:
-            self.InvoiceId.write({'invoiceDescription':self.invoiceEditableLines})
+            if self.InvoiceId:
+                self.InvoiceId.write({'invoiceDescription':self.invoiceEditableLines})
+            if self.SaleOrder:
+                self.SaleOrder.write({'ProFormaLines':self.invoiceEditableLines})
+                
         elif not self.invoiceEditableLines:
-            raise ValidationError("Invoice description can't be left empty.")
+            raise ValidationError("Description can't be left empty.")

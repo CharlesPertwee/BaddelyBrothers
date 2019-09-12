@@ -71,7 +71,7 @@
                                                           Size: <span t-field="estimate.finished_size.width"/> x <span t-field="estimate.finished_size.height"/>
                                                      </p>
                                                       <p>
-                                                          <span t-field="in_line.name"/>
+                                                          <span t-field="o.ProFormaLines"/>
                                                       </p>
                                                     </td>
                                                 </t>

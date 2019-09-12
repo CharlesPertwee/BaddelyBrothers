@@ -27,44 +27,6 @@
         />
         
         <report
-            id="account_pro_forma"
-            model="sale.order"
-            string="B.B Pro Forma"
-            report_type="qweb-pdf"
-            name="bb_estimate.report_pro_forma_document"
-            file="bb_estimate.report_pro_forma_document"
-            attachment="(('Pro Forma').replace('/','')+'.pdf')"
-            print_report_name="('Pro Forma')"
-            groups="account.group_account_invoice"
-            paperformat="bb_estimate.paperformat_invoice"
-        />
-        
-        <report
-            id="account_pro_forma_headed"
-            model="sale.order"
-            string="B.B Pro Forma(Headed Paper)"
-            report_type="qweb-pdf"
-            name="bb_estimate.report_pro_forma_headed_document"
-            file="bb_estimate.report_pro_forma_headed_document"
-            attachment="(('Pro Forma(Headed)').replace('/','')+'.pdf')"
-            print_report_name="('Pro Forma(Headed)')"
-            groups="account.group_account_invoice"
-            paperformat="bb_estimate.paperformat_invoice"
-        />
-        
-        <report
-            id="sale.action_report_pro_forma_invoice"
-            string="PRO-FORMA Invoice"
-            model="sale.order"
-            report_type="qweb-pdf"
-            menu="False"
-            groups="sale.group_proforma_sales"
-            file="sale.report_saleorder_pro_forma"
-            name="sale.report_saleorder_pro_forma"
-            print_report_name="'PRO-FORMA - %s' % (object.name)"
-        />
-        
-        <report
             id="account_invoice_credit_note"
             model="account.invoice"
             string="B.B Credit Note"
