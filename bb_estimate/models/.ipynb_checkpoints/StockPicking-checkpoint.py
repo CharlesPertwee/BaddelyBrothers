@@ -20,6 +20,11 @@ class PickingType(models.Model):
     customerRef = fields.Char('Customer Reference')
     consignmentNumber = fields.Char('Consignment Number')
     
+    @api.multi
+    def do_print_picking(self):
+        self.write({'printed': True})
+        return self.env.ref('bb_estimate.delievery_note').report_action(self)
+    
     @api.model
     def create(self,vals):
         if vals['origin']:

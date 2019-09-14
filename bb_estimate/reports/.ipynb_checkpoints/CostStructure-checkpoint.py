@@ -86,7 +86,7 @@ class MrpCostStructure(models.AbstractModel):
                 
                 estimate_line = workorder.operation_id.EstimateLineId
                 
-                unitPrice = ((estimate_line['total_price_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate_line.total_price_run_on * estimate.selectedRatio)) / ((estimate_line['quantity_required_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate_line.quantity_required_run_on * estimate.selectedRatio))
+                unitPrice = ((estimate_line['total_price_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate_line.total_price_run_on * estimate.selectedRatio)) / ((estimate_line['quantity_required_'+estimate.selectedQuantity] * estimate.SelectedQtyRatio) + (estimate_line.quantity_required_run_on * estimate.selectedRatio)) if estimate_line['quantity_required_'+estimate.selectedQuantity] > 0 else 0
                 working_time = sum([x.duration for x in workorder.time_ids])
 
                 if working_time < workorder.ActualTime:

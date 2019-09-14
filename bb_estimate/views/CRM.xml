@@ -138,7 +138,7 @@
                             <field name="enquiryEnvelopeFlaptype" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
                             <field name="enquiryEnvelopeWindow" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
                             <field name="enquiryEdgeColor" attrs="{'invisible':['|',('enquiryType','!=','Print Estimate'),('enquiryPrintEdging','!=','Custom')]}"/>
-                            <field name="enquirySizeWidth"/>
+                             <field name="enquirySizeHeight"/>
                         </group>
                     </group>
                     <group>
