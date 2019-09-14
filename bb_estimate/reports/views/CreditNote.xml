@@ -133,7 +133,7 @@
                                                             </tr>
                                                             <tr>
                                                                 <td width="150">
-                                                                    Invoice Total
+                                                                    Total
                                                                 </td>
                                                                 <td class="text-right">
                                                                     <span t-field="o.amount_total" />

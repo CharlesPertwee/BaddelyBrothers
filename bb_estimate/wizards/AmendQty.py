@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import odoo, math
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
 from odoo.tools import float_compare, float_round, float_is_zero
 
@@ -112,7 +112,8 @@ class AmmendQty(models.TransientModel):
             
             record.write(
                 {
-                    'price_unit': (price / self.AmmendedQty)
+                    'price_unit': (price / self.AmmendedQty),
+                    'product_uom_qty':  self.AmmendedQty + self.RunOn
                 }
             )
     

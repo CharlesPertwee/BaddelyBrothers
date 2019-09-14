@@ -128,9 +128,10 @@ class BbEstimate(http.Controller):
         senten1 = parag1.add_run("Thank you for your enquiry, we have pleasure in submitting our estimate as follows:")
         senten1.font.name = "Tahoma"
         
-        record_length = len([x for x in Estimate.estimate_line if not x.isExtra])
+        record_length = len([x for x in Estimate.estimate_line if x.customer_description and (not x.isExtra)])
         addtitional = sum([1 for x in ['quantity_1','quantity_2','quantity_3','quantity_4','run_on'] if Estimate[x] > 0]) + 2
-        data_table = document.add_table(record_length + addtitional, 2) 
+        data_table = document.add_table((record_length + addtitional) , 2)  
+        #raise Exception((record_length + addtitional))
         data_table.alignment = WD_TABLE_ALIGNMENT.CENTER
         data_table.allow_autofit = True
         data_table.autofit = True
@@ -173,14 +174,7 @@ class BbEstimate(http.Controller):
        
         y = 2
         for estimate_line_material in Estimate.estimate_line:
-            if estimate_line_material.option_type == 'material' and not estimate_line_material.customer_description:
-                row = data_table.rows[y]
-                tbl = data_table._tbl
-                tr = row._tr
-                tbl.remove(tr)
-                
-                
-            if estimate_line_material.option_type == 'material' and estimate_line_material.customer_description and not estimate_line_material.isExtra:
+            if estimate_line_material.option_type == 'material' and estimate_line_material.customer_description and (not estimate_line_material.isExtra):
                 data_table.cell(y,0).text = "Material: "
                 #data_table.cell(y,0).width = Inches(inches)
                 data_table.cell(y,1).text = estimate_line_material.customer_description
@@ -188,24 +182,11 @@ class BbEstimate(http.Controller):
         
         
         for estimate_line_process in Estimate.estimate_line:
-            if estimate_line_process.option_type == 'process' and not estimate_line_process.customer_description:
-                row = data_table.rows[y]
-                tbl = data_table._tbl
-                tr = row._tr
-                tbl.remove(tr)
-            
-            if estimate_line_process.option_type == 'process' and estimate_line_process.customer_description and not estimate_line_process.isExtra:
+            if estimate_line_process.option_type == 'process' and estimate_line_process.customer_description and (not estimate_line_process.isExtra):
                 data_table.cell(y,0).text = "Process: "
                 #data_table.cell(y,0).width = Inches(inches)
                 data_table.cell(y,1).text = estimate_line_process.customer_description
                 y += 1
-        
-#         if Estimate.isEnvelope:
-#             line1 = ""
-#             line1 = document.add_paragraph("")
-#             envDet = document.add_paragraph("")
-#             envDetail = envDet.add_run(Estimate.GenerateEnvelopeDetails(Estimate))
-#             envDetail.font.name = "Tahoma"
         
         if Estimate.quantity_1:
             data_table.cell(y,0).text="Qty/Price"
@@ -289,7 +270,7 @@ class BbEstimate(http.Controller):
         
         if Estimate.hasExtra:
             extra_length = (len([x for x in Estimate.estimate_line if (x.isExtra and x.extraDescription)]))
-            extra_table = document.add_table(extra_length+addtitional, 2)  
+            extra_table = document.add_table(extra_length*(addtitional), 2)  
             extra_table.alignment = WD_TABLE_ALIGNMENT.CENTER
             extra_table.style = 'Table Grid'
             tblExtraData = extra_table._tbl # get xml element in table

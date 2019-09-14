@@ -15,9 +15,9 @@
                                 </div>
                                 
                                 <p>Inv: </p>                                
-                                <p>Customer: <b><span t-field="o.Estimate.partner_id"/></b></p>
-                                <p>Job Title: <b><span t-field="o.name"/></b></p>
-                                <p>Spec: <b><!--Add after adding spec field"/--></b></p>
+                                <p>Customer: <b><span t-field="o.Estimate.partner_id"/></b>
+                                <br/>Job Title: <b><span t-field="o.name"/></b>
+                                <br/>Spec: <b><!--Add after adding spec field"/--></b></p>
                                 
                                 <div class="row">
                                     <div class='col-6'>
