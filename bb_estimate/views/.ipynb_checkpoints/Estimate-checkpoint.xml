@@ -42,7 +42,7 @@
                 <header>
                     <button class="oe_stat_button" type="object" name="EstimateLetter" string="Print Letter" />
                     <button name="AdjustPrice" string="Adjust Prices" type="object" attrs="{'invisible':['|',('id','=',False),('isLocked','!=',False)]}"/>
-                    <button name="AmmendQty" string="Amend Qty" type="object" attrs="{'invisible':[('isLocked','=',False)]}"/>
+                    <button name="AmmendQty" string="Amend Qty" type="object" attrs="{'invisible':['|',('isLocked','=',False),('AppendLog','=',True)]}"/>
                     <field name="state" widget="statusbar" clickable="True" />
                 </header>
                 <sheet>
@@ -67,6 +67,7 @@
                             <field name="contact" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',partner_id)]" />
                             <field name="project" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('partner_id','=',partner_id)]"/>
                             <field name="invoice_account" options="{'no_create_edit': True}" required="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                            <field name="AppendLog" invisible="1"/>
                             <field name="lead" attrs="{'readonly':[('isLocked','=',True)]}" domain="[('typeOfLead','=','Bespoke')]" />
                         </group>
                         <group>
@@ -174,7 +175,7 @@
                         <page name="EstimateLines" string="Estimate Lines" attrs="{'invisible':[('id','=',False)]}">
                             <field name="estimate_line" />
                         </page>
-                        <page string="Estimate Conditions" attrs="{'invisible':[('id','=',False)]}">
+                        <page string="Estimate Conditions">
                             <field name="estimateConditions" attrs="{'readonly':[('isLocked','=',True)]}"/>
                         </page>
                         <page name="PriceAdjustments" string="Price Adjustments">

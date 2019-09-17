@@ -28,10 +28,10 @@
             string="Delivery Slip"
             id="stock.action_report_delivery"
             model="stock.picking"
-            menu="False"
             report_type="qweb-pdf"
-            name="bb_estimate.report_delivery_note"
-            file="bb_estimate.report_delivery_note"
+            menu="False"
+            name="bb_estimate.delievery_note"
+            file="bb_estimate.delievery_note"
             print_report_name="'Delivery Note - %s - %s' % (object.partner_id.name or '', object.name)"
         />
     </data>
