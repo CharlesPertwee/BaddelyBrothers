@@ -267,6 +267,15 @@ class BbEstimate(http.Controller):
         line = document.add_paragraph("")
 #         run = line.add_run()
 #         run.add_break() 
+
+        envelopeLine = ""
+        if Estimate.isEnvelope:
+            envelopeLine = document.add_paragraph(Estimate.GenerateEnvelopeDetails(Estimate),style=paragraph_format)
+            envelopeLine.style.font.size = Pt(8)
+            
+        if envelopeLine:
+            runEnv = envelopeLine.add_run()
+            runEnv.add_break()
         
         if Estimate.hasExtra:
             extra_length = (len([x for x in Estimate.estimate_line if (x.isExtra and x.extraDescription)]))
@@ -330,7 +339,10 @@ class BbEstimate(http.Controller):
                             
             extra_table.columns[0].width = Inches(inches)
             extra_table.columns[1].width = Inches(5)
-         
+            
+        
+        
+        
         line = ""
         for condition in Estimate.estimateConditions:
             line = document.add_paragraph(condition.description,style=paragraph_format)

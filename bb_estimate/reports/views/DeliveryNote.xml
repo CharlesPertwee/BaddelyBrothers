@@ -24,7 +24,7 @@
                                   </div>
                                   <div class="col-4 pull-right">
                                       <div class="row">
-                                          <div class="col-11">
+                                          <div class="col-sm-12">
                                               <t t-if="o.state == 'done'">
                                                   <p class="pull-left">Date:<span t-field="o.date_done"/></p>
                                               </t>

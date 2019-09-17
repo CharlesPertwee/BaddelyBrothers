@@ -233,7 +233,7 @@ class EstimateLine(models.Model):
     param_material_vendor = fields.Many2one('product.supplierinfo',string='Vendor',domain="[('product_id','=',True)]")
     req_param_material_vendor = fields.Boolean('Req Vendor')
     
-    param_number_up = fields.Integer('Number Up', related="estimate_id.number_up")
+    param_number_up = fields.Integer('Number Up')
     req_param_number_up = fields.Boolean('Req Number Up')
     
     param_number_out = fields.Integer('Number out')
@@ -1024,8 +1024,7 @@ class EstimateLine(models.Model):
         for material in materials:
             if process.workcenterId and process.workcenterId.process_type:
                 if material.material_ids:
-                    added_working_sheets = not any([(x.overs_only and x.processLine.workcenterId.process_type.OversOnly) for x in material.material_ids])
-                
+                    added_working_sheets = any([(x.overs_only ^ x.processLine.workcenterId.process_type.OversOnly) for x in material.material_ids])
                 if process.work_twist:
                     work_twist = True
                 if process.workcenterId.process_type.MapMaterials:

@@ -20,6 +20,26 @@ class PickingType(models.Model):
     customerRef = fields.Char('Customer Reference')
     consignmentNumber = fields.Char('Consignment Number')
     
+#     @api.model
+#     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+#         res = super(PickingType, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
+#         raise Exception(res)
+#         if res.get('picking_type_code'):
+#             raise Exception("THIS")
+#             if res.get('toolbar', False) and res.get('toolbar').get('print', False):
+#                 reports = res.get('toolbar').get('print')
+#                 type = self._context.get('type')
+#                 if type == 'in_invoice':
+#                     _reports = [x for x in reports if not x['report_name'].startswith('bb_estimate')]
+#                     res['toolbar']['print'] = _reports
+#                 elif type == 'out_invoice':
+#                     _reports = [x for x in reports if x['report_name'].startswith('bb_estimate')]
+#                     res['toolbar']['print'] = _reports
+#                 else:
+#                     pass
+                
+#         return res
+    
     @api.multi
     def do_print_picking(self):
         self.write({'printed': True})
