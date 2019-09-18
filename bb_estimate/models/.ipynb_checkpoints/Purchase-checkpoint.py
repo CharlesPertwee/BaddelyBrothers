@@ -39,7 +39,7 @@ class Purchase(models.Model):
     @api.model
     def create(self,vals):
         record = super(Purchase,self).create(vals)
-        if vals['origin']:
+        if 'origin' in vals.keys():
             pos = vals['origin'].split(',')
             for po in pos:
                 sq = self.env['ir.sequence'].search([('code','=','bb_estimate.jobticket')],limit=1)

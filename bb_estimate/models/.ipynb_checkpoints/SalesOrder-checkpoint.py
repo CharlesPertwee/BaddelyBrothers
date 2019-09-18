@@ -34,7 +34,7 @@ class Sales(models.Model):
     
     @api.model
     def create(self,vals):
-        if vals['Estimate']:
+        if 'Estimate' in vals.keys():
             Estimate = self.env['bb_estimate.estimate'].browse(vals['Estimate'])
             vals['ProFormaLines'] = "<br/>".join([x.customer_description for x in Estimate.estimate_line if isinstance(x.customer_description,str) and (not x.isExtra)])
             
