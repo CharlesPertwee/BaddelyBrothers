@@ -24,9 +24,9 @@ class ProductsTemplate(models.Model):
     
     @api.constrains('isEnvelope')
     def checkEnvelopeProductUse(self):
-        if any(self.env['bb_estimate.estimate'].sudo().browse([('product_type','=',self.id)])):
+        if any(self.env['bb_estimate.estimate'].sudo().search([('product_type','=',self.id)])):
             raise ValidationError("Cannot modify isEnvelope, its been used in Estimate")
-            
+
     
     @api.onchange('margin')
     def calcPriceChange(self):
