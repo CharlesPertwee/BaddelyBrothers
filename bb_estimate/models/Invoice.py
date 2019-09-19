@@ -26,11 +26,12 @@ class AccountInvoiceBB(models.Model):
           
     @api.model
     def create(self,vals):
-        if vals['origin']:
-            sale_order = self.env['sale.order'].sudo().search([('name','=',vals['origin'])])
-            if sale_order.Estimate:
-                vals['Project'] = sale_order.Estimate.project.id
-                vals['invoiceDescription'] = sale_order.ProFormaLines 
+        if 'origin' in vals.keys():
+            if vals['origin']:
+                sale_order = self.env['sale.order'].sudo().search([('name','=',vals['origin'])])
+                if sale_order.Estimate:
+                    vals['Project'] = sale_order.Estimate.project.id
+                    vals['invoiceDescription'] = sale_order.ProFormaLines 
         return super(AccountInvoiceBB,self).create(vals)
     
     @api.model

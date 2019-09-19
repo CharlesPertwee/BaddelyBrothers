@@ -27,7 +27,6 @@ class WebsiteSalesBB(WebsiteSale):
         """This route is called when changing quantity from the cart or adding
         a product from the wishlist."""
         
-        
         order = request.website.sale_get_order(force_create=1)
         if order.state != 'draft':
             request.website.sale_reset()
