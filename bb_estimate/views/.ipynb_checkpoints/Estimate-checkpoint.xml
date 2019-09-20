@@ -347,6 +347,6 @@
     </record>
       
     <menuitem name="Job Estimates" id="bb_estimate_estimates" action="bb_estimate.action_window_estimate"/>
-    <menuitem name="Configurations" id="bb_estimate_config" parent="bb_estimate_estimates"/>
+    <menuitem name="Configurations" id="bb_estimate_config" parent="bb_estimate_estimates" groups="bb_estimate.group_estimate_manager"/>
   </data>
 </odoo>

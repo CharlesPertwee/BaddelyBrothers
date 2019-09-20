@@ -7,6 +7,7 @@
         """,
 
     'description': """
+     
      """,
 
     'author': "Squadsoft Tech",
@@ -23,6 +24,7 @@
 
     # always loaded
     'data': [
+        'data/Groups.xml',
         'security/ir.model.access.csv',
         'views/process.xml',
         'views/QuantityBreaks.xml',
