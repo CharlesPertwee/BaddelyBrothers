@@ -24,6 +24,7 @@
 
     # always loaded
     'data': [
+        'data/Groups.xml',
         'security/ir.model.access.csv',
         'data/Stages.xml',
         'data/Estimate.xml',
