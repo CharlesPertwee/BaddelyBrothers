@@ -21,11 +21,6 @@ class ProductsTemplate(models.Model):
     staticPrice = fields.Boolean('Static Price')
     lastUsedEstimateDate = fields.Date(string="Last Used Estimate Date")
     lastUsedEstimateNumber = fields.Char(string="Last Used Estimate Number")
-    
-    @api.constrains('isEnvelope')
-    def checkEnvelopeProductUse(self):
-        if any(self.env['bb_estimate.estimate'].sudo().search([('product_type','=',self.id)])):
-            raise ValidationError("Cannot modify isEnvelope, its been used in Estimate")
 
     
     @api.onchange('margin')

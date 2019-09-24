@@ -18,7 +18,7 @@
                         <group>
                             <field name="RunOnQuantity" readonly="1"/>
                             <field name="RunOnPrice" readonly="1"/>
-                            <field name="RunOnRequired" attrs="{'readonly':[('RunOnQuantity','=',0)]}"/>
+                            <field name="RunOnRequired" attrs="{'readonly':[('RunOnQuantity','=',0)],'required':[('RunOnQuantity','>',0)]}"/>
                         </group>
                         <h5>Totals</h5>
                         <hr/>

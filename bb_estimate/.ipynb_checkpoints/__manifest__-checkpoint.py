@@ -65,6 +65,7 @@
         'views/StockPicking.xml',
         'views/Projects.xml',
         'views/CRM.xml',
+        'reports/views/ConversionAnalysis.xml',
         'wizards/views/OrderConvert.xml',
         'wizards/views/MoConfirmation.xml',
         'wizards/views/Packing.xml',
