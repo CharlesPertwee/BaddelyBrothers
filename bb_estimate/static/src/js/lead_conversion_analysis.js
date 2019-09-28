@@ -30,8 +30,6 @@ odoo.define('bb_estimate.lead_conversion_analysis',function(require){
 	            })
 	            .then(function (result) {
 	                self.data = result;
-                    console.log("Damn")
-                    console.log(result)
 	            });
 	    },
 
@@ -45,26 +43,49 @@ odoo.define('bb_estimate.lead_conversion_analysis',function(require){
         render_html: function(event, $el, result){
             $el.after(result);
             $(event.currentTarget).toggleClass('o_crm_analysis_foldable o_crm_analysis_unfoldable fa-caret-right fa-caret-down');
-            this._reload_report_type();
         },
         
         
-        get_leads: function(event) {
+        _get_leads_year: function(event) {
 	        var self = this;
             console.log("THIS IS SPARTAN 1")
             var $parent = $(event.currentTarget).closest('tr');
             var level = $parent.data('level') || 0;
+            var trId = $(this).closest('tr').eq(0).prop('id');
 	        var args = [
 	            this.given_context.active_id,
+                $parent.prop('id')
 	        ];
 	        return this._rpc({
 	                model: 'report.crm.conversion_analysis',
-	                method: 'get_leads',
+	                method: 'get_leads_year',
 	                args: args,
 	                context: this.given_context,
 	            })
 	            .then(function (result) {
 	                self.data = result;
+                    self.render_html(event, $parent, result);
+	            });
+	    },
+        
+        get_lead_type: function(event) {
+	        var self = this;
+            console.log("THIS IS SPARTAN 2")
+            var $parent = $(event.currentTarget).closest('tr');
+            var level = $parent.data('level') || 0;
+	        var args = [
+	            this.given_context.active_id,
+                $parent.prop('id')
+	        ];
+	        return this._rpc({
+	                model: 'report.crm.conversion_analysis',
+	                method: 'get_lead_type',
+	                args: args,
+	                context: this.given_context,
+	            })
+	            .then(function (result) {
+	                self.data = result;
+                    self.render_html(event, $parent, result);
 	            });
 	    },
         
@@ -73,6 +94,7 @@ odoo.define('bb_estimate.lead_conversion_analysis',function(require){
             this[redirect_function](ev);
         },
         _onClickFold: function (ev) {
+            console.log("I AM IN FOLD")
             this._removeLines($(ev.currentTarget).closest('tr'));
             $(ev.currentTarget).toggleClass('o_crm_analysis_foldable o_crm_analysis_unfoldable fa-caret-right fa-caret-down');
         },
@@ -86,6 +108,18 @@ odoo.define('bb_estimate.lead_conversion_analysis',function(require){
                 target: 'current'
             });
         },
+        _removeLines: function ($el) {
+        var self = this;
+        var activeID = $el.data('id');
+        _.each(this.$('tr[parent_id='+ activeID +']'), function (parent) {
+            var $parent = self.$(parent);
+            var $el = self.$('tr[parent_id='+ $parent.data('id') +']');
+            if ($el.length) {
+                self._removeLines($parent);
+            }
+            $parent.remove();
+        });
+    },
 	});
     
     

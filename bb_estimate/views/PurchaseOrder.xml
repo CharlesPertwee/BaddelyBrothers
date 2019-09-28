@@ -3,7 +3,7 @@
         <report
             id="purchase_order_report"
             model="purchase.order"
-            string="B.B Purchase Order"
+            string="BB Purchase Order"
             report_type="qweb-pdf"
             name="bb_estimate.custom_purchase_order"
             file="bb_estimate.custom_purchase_order"
@@ -18,7 +18,7 @@
         <report
             id="request_for_quotation"
             model="purchase.order"
-            string="B.B Request for Quotation"
+            string="BB Request for Quotation"
             report_type="qweb-pdf"
             name="bb_estimate.request_for_quote_custom"
             file="bb_estimate.request_for_quote_custom"

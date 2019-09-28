@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <template id="lead_conversion_analysis">
-        <t t-if="data[0].get('Leads')">
+        <t t-if="data[0]">
             <div class="container o_mrp_bom_report_page">
                 <div class="row">
                     <div class="col-lg-12">
@@ -14,15 +14,16 @@
                             <table width="100%" class="o_mrp_bom_expandable">
                                 <thead>
                                     <tr>
-                                        <th>Financial Year</th>
+                                        <th>Year</th>
+                                        <th>Month</th>
+                                        <th>Enquiry Type</th>
                                         <th>Total Enquiries</th>
-                                        <th class="text-right">Enquiry Type</th>
                                         <th class="text-right">Converted to Estimate</th>
                                         <th class="text-right">Converted to Orders</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <t t-if="data[0]['report_type'] == 'html'" t-call="bb_estimate.report_conversion_analysis_line"/>
+                                    <t t-call="bb_estimate.report_conversion_analysis_year"/>
                                 </tbody>
                             </table>
                         </div>
@@ -35,27 +36,99 @@
         </t>
     </template>
     
-    <template id="report_conversion_analysis_line">
-<!--         <t t-if="data[0].get('lead')">
-            <t t-set="space_td" t-value="'margin-left: '+ str(data['level'] * 20) + 'px;'"/>
-            <tr class="o_mrp_bom_report_line o_mrp_bom_cost">
-                <td>
-                    <span t-att-style="space_td"/>
-                    <span class="o_mrp_bom_unfoldable fa fa-fw fa-caret-right" t-att-data-function="'get_leads'" role="img" aria-label="Unfold" title="Unfold"/>
-                    Operations
-                </td>
-                <td/>
-                <td class="text-right">
-                    <span t-esc="data['operations_time']" t-options='{"widget": "float_time"}'/>
-                </td>
-                <td groups="uom.group_uom"><span>Minutes</span></td>
-                <td class="o_mrp_prod_cost">
-                </td>
-                <td class="o_mrp_bom_cost text-right">
-                    <span t-esc="data['operations_cost']" t-options='{"widget": "monetary", "display_currency": currency}'/>
-                </td>
-                <td/>
-            </tr>
-        </t> -->
+    <template id="report_conversion_analysis_year">
+        <t t-if="data[0]">
+            <t t-foreach="data[0].values()" t-as="lead_data">
+                <t t-set="space_td" t-value="'margin-left: 1' + 'px;'"/>
+                <tr class="o_mrp_bom_report_line o_mrp_bom_cost" t-attf-id="{{lead_data[0].get('leads')[0].create_date.strftime('%Y')}}">
+                    <td>
+                        <span t-att-style="space_td"/>
+                        <span class="o_crm_analysis_unfoldable fa fa-fw fa-caret-right" t-att-data-function="'_get_leads_year'" role="img" aria-label="Unfold" title="Unfold"/>
+                        <span t-esc="lead_data[0].get('leads')[0].create_date.strftime('%Y')"/>
+                    </td>
+                    <td/>
+                    <td/>
+                    <td>
+                      <t t-if="'total_enquiries' in lead_data[0]">
+                        <span t-esc="lead_data[0].get('total_enquiries')"/>
+                      </t>
+                    </td>
+                    <td class="text-right">
+                        <t t-if="'total_enquiries_to_estimate' in lead_data[0]">
+                            <span t-esc="lead_data[0].get('total_enquiries_to_estimate')"/>
+                        </t>
+                    </td>
+                    <td class="text-right">
+                        <t t-if="'total_enquiries_to_order' in lead_data[0]">
+                            <span t-esc="lead_data[0].get('total_enquiries_to_order')"/>
+                        </t>
+                    </td>
+                </tr>
+            </t>
+        </t>
+    </template>
+    
+    <template id="report_conversion_analysis_month">
+        <t t-if="data[0]">
+            <t t-foreach="data[0].values()" t-as="lead_data">
+              <t t-if="lead_data">
+                <tr t-attf-class="l" t-attf-id="{{lead_data[0].get('leads')[0].create_date.strftime('%m/%Y')}}">
+                    <td>
+                      <span class="o_crm_analysis_unfoldable fa fa-fw fa-caret-right" role="img" t-att-data-function="'get_lead_type'" aria-label="Unfold" title="Unfold"/>
+                    </td>
+                    <td>
+                        <span t-esc="lead_data[0].get('leads')[0].create_date.strftime('%m')"/>
+                    </td>
+                    <td/>
+                    <td>
+                      <t t-if="'total_enquiries' in lead_data[0]">
+                        <span t-esc="lead_data[0].get('total_enquiries')"/>
+                      </t>
+                    </td>
+                    <td class="text-right">
+                        <t t-if="'total_enquiries_to_estimate' in lead_data[0]">
+                            <span t-esc="lead_data[0].get('total_enquiries_to_estimate')"/>
+                        </t>
+                    </td>
+                    <td class="text-right">
+                        <t t-if="'total_enquiries_to_order' in lead_data[0]">
+                            <span t-esc="lead_data[0].get('total_enquiries_to_order')"/>
+                        </t>
+                    </td>
+                </tr>
+                </t>
+            </t>
+        </t>
+    </template>
+    
+    <template id="report_conversion_analysis_type">
+        <t t-if="data[0]">
+            <t t-foreach="data[0].values()" t-as="lead_data">
+              <t t-if="lead_data">
+                <tr t-attf-class="l">
+                    <td/>
+                    <td/>
+                    <td>
+                        <span t-esc="lead_data[0].get('leads')[0].typeOfLead"/>
+                    </td>
+                    <td>
+                      <t t-if="'total_enquiries' in lead_data[0]">
+                        <span t-esc="lead_data[0].get('total_enquiries')"/>
+                      </t>
+                    </td>
+                    <td class="text-right">
+                        <t t-if="'total_enquiries_to_estimate' in lead_data[0]">
+                            <span t-esc="lead_data[0].get('total_enquiries_to_estimate')"/>
+                        </t>
+                    </td>
+                    <td class="text-right">
+                        <t t-if="'total_enquiries_to_order' in lead_data[0]">
+                            <span t-esc="lead_data[0].get('total_enquiries_to_order')"/>
+                        </t>
+                    </td>
+                </tr>
+                </t>
+            </t>
+        </t>
     </template>
 </odoo>

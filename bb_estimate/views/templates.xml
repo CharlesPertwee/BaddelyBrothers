@@ -211,7 +211,7 @@
                             <div class="col-lg-7 col-md-8">
                                 <select class="form-control" name="country_id">
                                     <t t-foreach="countries" t-as="country">
-                                        <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
+                                        <option t-attf-value="#{country.id}" t-att-selected="country.code == 'GB'"><t t-esc="country.name"/></option>
                                     </t>
                                 </select>
                             </div>

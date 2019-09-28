@@ -16,20 +16,29 @@
                               </div>
                               <div class="row">
                                   <div class="col-8">
-                                      <p><span t-field="o.partner_id.name"/><br/>
-                                      <span t-field="o.partner_id.street"/><br/>
-                                      <span t-field="o.partner_id.city"/><br/>
-                                      <span t-field="o.partner_id.country_id"/></p>
-                                      <p><span t-field="o.partner_id.zip"/></p>
+                                      <t t-if="o.partner_id.parent_id">
+                                          <p><span t-field="o.partner_id.parent_id.name"/><br/>
+                                          <span t-field="o.partner_id.street"/><br/>
+                                          <span t-field="o.partner_id.city"/><br/>
+                                          <span t-field="o.partner_id.country_id"/></p>
+                                          <p><span t-field="o.partner_id.zip"/></p>
+                                      </t>
+                                      <t t-else="">
+                                          <p><span t-field="o.partner_id.name"/><br/>
+                                          <span t-field="o.partner_id.street"/><br/>
+                                          <span t-field="o.partner_id.city"/><br/>
+                                          <span t-field="o.partner_id.country_id"/></p>
+                                          <p><span t-field="o.partner_id.zip"/></p>
+                                      </t>                                      
                                   </div>
                                   <div class="col-4 pull-right">
                                       <div class="row">
                                           <div class="col-sm-12">
                                               <t t-if="o.state == 'done'">
-                                                  <p class="pull-left">Date:<span t-field="o.date_done"/></p>
+                                                  <p class="pull-left">Date:<span t-field="o.date_done" t-options="{'widget': 'date'}"/></p>
                                               </t>
                                               <t t-if="o.state != 'done'">
-                                                  <p class="pull-left">Date:<span t-field="o.scheduled_date"/></p>
+                                                  <p class="pull-left">Date:<span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/></p>
                                               </t>
                                           </div>
                                       </div>
@@ -54,13 +63,13 @@
                                                       <p class="pull-left"><span t-field="o.carrier_id"/></p>
                                                   </div>
                                               </div>
-                                              <t t-if="o.consignmentNumber">
+                                              <t t-if="o.carrier_tracking_ref">
                                                   <div class="row">
                                                       <div class="col-7">
                                                           <p class="pull-left">Consignment No: </p>
                                                       </div>
                                                       <div class="col-5">
-                                                          <p class="pull-left"><span t-field="o.consignmentNumber"/></p>
+                                                          <p class="pull-left"><span t-field="o.carrier_tracking_ref"/></p>
                                                       </div>
                                                   </div>
                                               </t>
@@ -106,12 +115,6 @@
                               </tr>
                           </tbody>
                       </table>
-<!--                      <div class="row" style="position: relative; left: 0; bottom: 0;padding-top:17em;">
-                         <p class="text-right" style="width:100%;">
-                             Total Boxes:          <t t-esc="o.TotalBoxes()"/>
-                         </p>
-                         
-                     </div> -->
                   </div>
                 </t>
                 <t t-else="">
@@ -122,11 +125,20 @@
                       <span style="text-decoration:underline;">Delivery Address</span><br/>                  
                       <div class="row" style="padding:4em; padding-top:0em; padding-bottom:0em;">
                           <div class="col-7">
-                              <p><span t-field="o.partner_id.name"/><br/>
-                              <span t-field="o.partner_id.street"/><br/>
-                              <span t-field="o.partner_id.city"/><br/>
-                              <span t-field="o.partner_id.country_id"/></p>
-                              <p><span t-field="o.partner_id.zip"/></p>
+                             <t t-if="o.partner_id.parent_id">
+                                  <p><span t-field="o.partner_id.parent_id.name"/><br/>
+                                  <span t-field="o.partner_id.street"/><br/>
+                                  <span t-field="o.partner_id.city"/><br/>
+                                  <span t-field="o.partner_id.country_id"/></p>
+                                  <p><span t-field="o.partner_id.zip"/></p>
+                              </t>
+                              <t t-else="">
+                                  <p><span t-field="o.partner_id.name"/><br/>
+                                  <span t-field="o.partner_id.street"/><br/>
+                                  <span t-field="o.partner_id.city"/><br/>
+                                  <span t-field="o.partner_id.country_id"/></p>
+                                  <p><span t-field="o.partner_id.zip"/></p>
+                              </t>
                           </div>
                           <div class="col-5 pull-right">
                               <div class="row">
@@ -135,10 +147,10 @@
                                   </div>
                                   <div class="col-8">
                                       <t t-if="o.state == 'done'">
-                                          <span t-field="o.date_done"/>
+                                          <span t-field="o.date_done" t-options="{'widget': 'date'}"/>
                                      </t>
                                      <t t-if="o.state != 'done'">
-                                          <span t-field="o.scheduled_date"/>
+                                          <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/>
                                      </t>
                                   </div>
                               </div>
@@ -214,8 +226,8 @@
                               </tr>
                           </tbody>
                       </table>
-                     <div class="row" style="position: relative; left: 0; bottom: 0;padding-top:17em;">
-                         <p class="text-right" style="width:100%;">
+                     <div class="row" style="position: relative; left: 0; bottom: 0;padding-top:25em;">
+                         <p class="text-right" style="width:84%;">
                              Total Boxes:          <t t-esc="o.TotalBoxes()"/>
                          </p>
                          

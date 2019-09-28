@@ -23,8 +23,7 @@ class BbEstimate(http.Controller):
         Estimate = request.env['bb_estimate.estimate'].sudo().search([('id','=',values['id'])])
         document = Document()
         paragraph_format = document.styles['No Spacing']
-        #url = 'https://charlespertwee-baddelybrothers-customization-dv-444705.dev.odoo.com/bb_estimate/static/src/img/BaddeleyNew.jpg'
-        url = request.httprequest.host_url+"bb_estimate/static/src/img/Header.png"
+        url = request.httprequest.host_url+"bb_estimate/static/src/img/HeaderNew.jpg"
         response = requests.get(url, stream=True)
         header = io.BytesIO(response.content)
         section = document.sections[0]   # Create a section
@@ -364,7 +363,7 @@ class BbEstimate(http.Controller):
         sen2.font.name = 'Tahoma'
         
 
-        url1 = request.httprequest.host_url+"bb_estimate/static/src/img/BaddeleyFooter.png"
+        url1 = request.httprequest.host_url+"bb_estimate/static/src/img/FooterNew.jpg"
         response1 = requests.get(url1, stream=True)
         footer = io.BytesIO(response1.content)
         section = document.sections[0]
