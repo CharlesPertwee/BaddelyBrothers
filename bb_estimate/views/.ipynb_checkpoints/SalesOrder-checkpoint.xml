@@ -4,7 +4,7 @@
       <report
             id="account_pro_forma"
             model="sale.order"
-            string="B.B Pro Forma"
+            string="BB Pro Forma"
             report_type="qweb-pdf"
             name="bb_estimate.report_pro_forma_document"
             file="bb_estimate.report_pro_forma_document"
@@ -17,7 +17,7 @@
         <report
             id="account_pro_forma_headed"
             model="sale.order"
-            string="B.B Pro Forma(Headed Paper)"
+            string="BB Pro Forma(Headed Paper)"
             report_type="qweb-pdf"
             name="bb_estimate.report_pro_forma_headed_document"
             file="bb_estimate.report_pro_forma_headed_document"

@@ -4,8 +4,8 @@
                 <t t-foreach="docs" t-as="o">
                     <t t-call="web.basic_layout">
                     <t t-call="web.html_container">
-                            <div class="backgroundimage" style="position:absolute;z-index:-999;"> 
-                                <img class="img-responsive" src="/bb_estimate/static/src/img/Bb_invoice.jpg" width="900px" height="1335px"/>
+                            <div class="backgroundimage" style="position:absolute;z-index:-999;padding-right:30px;"> 
+                                <img class="img-responsive" src="/bb_estimate/static/src/img/BB_invoice.jpg" width="950px" height="1429px"/>
                             </div> 
                             <div class="page" style="padding-top:17em; font-family: Georgia; padding-left:2em; padding-right:2em;"> 
                                 <div class="container">
@@ -16,10 +16,18 @@
                                             <span t-field="o.company_id.country_id.name"/><br/></p>
                                     </div>
                                     <div class="row pull-right">
-                                        <p><span t-field="o.partner_id.name"/><br/>
-                                            <span t-field="o.partner_id.street"/><br/>
-                                            <span t-field="o.partner_id.city"/> <span t-field="o.partner_id.state_id.code"/> <span t-field="o.partner_id.zip"/><br/>
-                                            <span t-field="o.partner_id.country_id.name"/><br/></p>
+                                        <t t-if="o.partner_id.parent_id">
+                                            <p><span t-field="o.partner_id.partner_id.name"/><br/>
+                                                <span t-field="o.partner_id.street"/><br/>
+                                                <span t-field="o.partner_id.city"/> <span t-field="o.partner_id.state_id.code"/> <span t-field="o.partner_id.zip"/><br/>
+                                                <span t-field="o.partner_id.country_id.name"/><br/></p>
+                                        </t>
+                                        <t t-else="">
+                                            <p><span t-field="o.partner_id.name"/><br/>
+                                                <span t-field="o.partner_id.street"/><br/>
+                                                <span t-field="o.partner_id.city"/> <span t-field="o.partner_id.state_id.code"/> <span t-field="o.partner_id.zip"/><br/>
+                                                <span t-field="o.partner_id.country_id.name"/><br/></p>
+                                        </t>
                                     </div>
                                 </div>
                                 

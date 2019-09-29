@@ -246,6 +246,10 @@ class Estimate(models.Model):
             update_vals = { 'ChangeLog': body }
         else:
             update_vals = { 'ChangeLog': '' }
+            
+        if 'total_price_1' in vals.keys():
+            self.lead.write({'planned_revenue':vals['total_price_1']})
+            
         
         currentRecord = super(Estimate, self).write(update_vals)
         #raise Exception(old,new)

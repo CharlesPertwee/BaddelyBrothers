@@ -7,12 +7,19 @@
         <field name="domain">[('lead', '=', active_id)]</field>
         <field name="context">{'default_lead': active_id}</field>
      </record>
+      
      <record id="bb_estimate_enquiry_list" model="ir.actions.act_window">
         <field name="name">Estimates</field>
         <field name="res_model">bb_estimate.estimate</field>
         <field name="domain">[('lead', '=', active_id)]</field>
         <field name="context">{'default_lead': active_id}</field>
     </record> 
+      
+    <record id="action_report_bb_conversion_analysis" model="ir.actions.client">
+       <field name="name">Lead Conversion Analysis</field>
+       <field name="tag">lead_conversion_analysis</field>
+       <field name="context" eval="{'model': 'report.crm.conversion_analysis'}" />
+    </record>
     
     <record id="crm_case_form_view_oppor_pro_estimate" model="ir.ui.view">
 		<field name="name">crm.lead.form.opportunity.estimate</field>
@@ -22,7 +29,7 @@
             <xpath expr="//header" position="inside">
                     <button string="New Estimate" name="%(bb_estimate_enquiry)d" type="action" class="oe_highlight"
                             attrs="{'invisible': ['|','&amp;',  ('probability', '=', 0), ('active', '=', False), ('typeOfLead','=','Trade Counter')]}"
-                            context="{'default_lead': active_id, 'default_project': Project, 'default_partner_id': partner_id,'default_quantity_1':Quantity1,'default_quantity_2':Quantity2,'default_quantity_3':Quantity3,'default_quantity_4':Quantity4, 'default_run_on':runOn, 'default_envelope_type':enquiryEnvelopeType, 'default_flap_glue_type':enquiryEnvelopeFlaptype, 'default_tissue_lined':enquiryEnvelopeTissuelIne, 'default_windowed':enquiryEnvelopeWindow, 'default_grammage':enquiryWeightGsm, 'default_finished_size':size, 'default_working_size':size, 'default_finished_height':enquirySizeHeight, 'default_working_height':enquirySizeHeight, 'default_finished_width':enquirySizeWidth, 'default_working_width':enquirySizeWidth }" />
+                            context="{'default_lead': active_id, 'default_project': Project, 'default_partner_id': partner_id,'default_quantity_1':Quantity1,'default_quantity_2':Quantity2,'default_quantity_3':Quantity3,'default_quantity_4':Quantity4, 'default_run_on':runOn, 'default_envelope_type':enquiryEnvelopeType, 'default_flap_glue_type':enquiryEnvelopeFlaptype, 'default_tissue_lined':enquiryEnvelopeTissuelIne, 'default_windowed':enquiryEnvelopeWindow, 'default_grammage':enquiryWeightGsm, 'default_finished_size':size, 'default_working_size':size, 'default_finished_height':enquirySizeHeight, 'default_working_height':enquirySizeHeight, 'default_finished_width':enquirySizeWidth,'default_EnquiryComments':description, 'default_working_width':enquirySizeWidth }" />
 
                 </xpath>
             <xpath expr="//field[@name='typeOfLead']" position="after">
@@ -151,7 +158,13 @@
 		</field>
 	 </record>	
       
-
+      <template id="assets_backend" name="mrp assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/bb_estimate/static/src/js/lead_conversion_analysis.js"></script>
+            </xpath>
+       </template>
+      
+    <menuitem id="bb_conversion_analysis_report" name="Conversion Analysis" parent="crm.crm_menu_report" action="action_report_bb_conversion_analysis"/>
       
   </data>
 </odoo>
