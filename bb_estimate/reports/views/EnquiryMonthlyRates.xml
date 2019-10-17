@@ -1,0 +1,27 @@
+<odoo>
+	<data>
+		<record id="enquiry_monthly_conversion_tree_view" model="ir.ui.view">
+	        <field name="name">monthly_conversion_rates</field>
+	        <field name="model">bb_estimate.conversion_rates_months</field>
+	        <field name="arch" type="xml">
+				<tree string="Conversion">
+	                <field name="Year" />
+	                <field name="Month" />
+	                <field name="TotalEnquiry" />
+	                <field name="ConvertedEnquriy" />
+	                <field name="ConvertedEnquriyPercent" />
+	                <field name="ConvertedOrder" />
+	                <field name="ConvertedOrderPercent" />
+	            </tree>
+	        </field>
+	    </record>
+
+	    <record id="enquiry_conversion_monthly" model="ir.actions.act_window">
+	        <field name="name">Enquiry Conversion Monthly Rates</field>
+	        <field name="res_model">bb_estimate.conversion_rates_months</field>
+	        <field name="view_mode">tree</field>
+		</record> 
+
+	    <menuitem id="conversion_analysis_report" name="Monthly Conversion Analysis" parent="crm.crm_menu_report" action="enquiry_conversion_monthly"/>
+	</data>
+</odoo>

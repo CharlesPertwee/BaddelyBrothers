@@ -5,7 +5,7 @@
                 <t t-call="web.html_container">
                     <div style="font-family: Georgia;">
                         <div class="backgroundimage" style="position:absolute;z-index:-999;padding-right:30px;"> 
-                            <img class="img-responsive" src="/bb_estimate/static/src/img/BB_invoice.jpg" width="950px" height="1429px"/>
+				<img class="img-responsive" src="/bb_estimate/static/src/img/BB_invoice.jpg" width="950px" height="1429px"/>
                         </div> 
                         <div class="row" style="padding-top:18em; padding-left:2em; padding:right:2em;">
                             <div class="col-7">
@@ -63,7 +63,14 @@
                             <t t-foreach="o.order_line" t-as="order">
                                 <tr>
                                     <td  width="25%"><span t-esc="int(float(order.product_qty))"/></td>
-                                    <td  width="64%"><span t-field="order.product_id.name"/></td>
+                                    <td  width="64%">
+                                        <t t-if="order.product_id.type == 'service'">
+                                            <span t-field="order.name"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span t-field="order.product_id.name"/>
+                                        </t>
+                                    </td>
                                     <td  width="32%" align="left"><span t-field="order.price_subtotal"/></td>
                                 </tr>
                             </t>

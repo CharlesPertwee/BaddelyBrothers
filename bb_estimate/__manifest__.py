@@ -43,7 +43,9 @@
         'reports/views/ProFormaHeaded.xml',
         'reports/views/InvoiceHeaded.xml',
         'reports/views/DeliveryNote.xml',
-        'wizards/views/DeletedLineInfo.xml',
+        'reports/views/EnquiryConversionReport.xml',
+        'reports/views/EnquiryMonthlyRates.xml',
+        'reports/views/EnquiryTimesReport.xml',
         'views/EstimateLines.xml',
         'views/Estimate.xml',
         'views/EstimateStages.xml',
@@ -64,7 +66,6 @@
         'views/StockPicking.xml',
         'views/Projects.xml',
         'views/CRM.xml',
-        'reports/views/ConversionAnalysis.xml',
         'wizards/views/OrderConvert.xml',
         'wizards/views/MoConfirmation.xml',
         'wizards/views/Packing.xml',
@@ -72,7 +73,10 @@
         'wizards/views/PriceAdjustment.xml',
         'wizards/views/SalesAdjustment.xml',
         'wizards/views/AmmendQty.xml',
-        #'wizards/views/ConfirmationBox.xml'
+        'reports/views/EstimateConversionReport.xml',
+        'reports/views/EstimateMonthlyRates.xml',
+        'reports/views/EstimateTimesReport.xml',
+        'reports/views/TicketTimesReport.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

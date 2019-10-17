@@ -35,7 +35,8 @@
                                     <field name="standard_price"/>
                                     <field name="list_price"/>
                                     <field name="margin_percent"/>
-                                    <field name="associatedBoxId" />
+                                    <field name="associatedBoxId" domain="[('productType','=','Package')]"/>
+                                    <field name="outworkProcessProduct" domain="[('type','=','service'),('productType','=','Outwork')]"/>
                                     <field name="sheetsPerBox" />
                                     <field name="timePerBox" widget="float_time" />
                                 </group>

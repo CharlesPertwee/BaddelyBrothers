@@ -34,6 +34,7 @@ class Manufacture(models.Model):
     DieType = fields.Selection(GetDie,string="Return Die / Block To :")
     
     customerRef = fields.Char('Customer Reference')
+    previousJobRef = fields.Char('Previous Job Ticket')
     Purchases = fields.Many2many('purchase.order',string='Purchase')   
     
     def write(self,vals):

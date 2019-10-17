@@ -22,7 +22,7 @@
                                     <p>Customer: <b><span t-field="o.Estimate.partner_id.name"/></b></p>
                                 </t>
                                 <p>Job Title: <b><span t-field="o.Estimate.title"/></b></p>
-                                <p>Date: <b><span t-field="o.create_date"/></b></p>
+                                <p>Date: <b><span t-field="o.create_date" t-options="{'widget': 'date'}"/></b></p>
                                                               
                                 <p>Notes: </p>
                                 

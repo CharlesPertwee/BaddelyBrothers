@@ -15,6 +15,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from io import BytesIO
 import io
+import traceback
+import os
 
 class BbEstimate(http.Controller):
     @http.route('/bb_estimate/bb_estimate/estimateLetter/<string:id>', auth='public')
@@ -23,16 +25,12 @@ class BbEstimate(http.Controller):
         Estimate = request.env['bb_estimate.estimate'].sudo().search([('id','=',values['id'])])
         document = Document()
         paragraph_format = document.styles['No Spacing']
-        url = request.httprequest.host_url+"bb_estimate/static/src/img/HeaderNew.jpg"
-        response = requests.get(url, stream=True)
-        header = io.BytesIO(response.content)
         section = document.sections[0]   # Create a section
         sec_header = section.header   # Create header 
         sec_header.left_margin = Cm(0)
         header_tp = sec_header.add_paragraph(style='No Spacing')  # Add a paragraph in the header, you can add any anything in the paragraph
         header_run = header_tp.add_run()   # Add a run in the paragraph. In the run you can set the values 
-        header_run.add_picture(header,width=Inches(6)) 
-        
+        header_run.add_picture('/opt/Bb/BaddelyBrothers/bb_estimate/static/src/img/HeaderNew.jpg',width=Inches(6)) 
         universalTableStyle = "borderColor:white"
         styles = document.styles['No Spacing']
         font = styles.font
@@ -239,7 +237,7 @@ class BbEstimate(http.Controller):
             else:
                 price = (Estimate.total_price_extra_run_on - Estimate.total_price_run_on)
                                 
-            data_table.cell(y,1).text="Run on: £%s per %.2f"%(Estimate.quantity_4,price)
+            data_table.cell(y,1).text="Run on: %s per £%.2f"%(Estimate.total_price_run_on, price)
             y+=1
         
         
@@ -363,14 +361,11 @@ class BbEstimate(http.Controller):
         sen2.font.name = 'Tahoma'
         
 
-        url1 = request.httprequest.host_url+"bb_estimate/static/src/img/FooterNew.jpg"
-        response1 = requests.get(url1, stream=True)
-        footer = io.BytesIO(response1.content)
         section = document.sections[0]
         default_footer = section.footer   # Add a footer
         footer_p = default_footer.add_paragraph()
         footer_r = footer_p.add_run()
-        footer_r.add_picture(footer,width=Inches(6)) 
+        footer_r.add_picture('/opt/Bb/BaddelyBrothers/bb_estimate/static/src/img/FooterNew.jpg',width=Inches(6)) 
         
         docx_stream = io.BytesIO()
         document.save(docx_stream)
@@ -385,7 +380,6 @@ class BbEstimate(http.Controller):
             'mimetype':'application/msword',
             'datas':base64.encodestring(docx_bytes)
         })
-        
         pdfhttpheaders = [('Content-Type','application/msword'),("Content-Disposition","filename= %s.docx"%(Estimate.estimate_number))]       
         return request.make_response(docx_bytes, headers=pdfhttpheaders)
        

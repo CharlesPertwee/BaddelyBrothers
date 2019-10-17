@@ -272,7 +272,7 @@ class EstimateLine(models.Model):
     param_duplex_sheets = fields.Selection(DUPLEX_OPTIONS,string="Duplex Sheets")
     req_param_duplex_sheets = fields.Boolean('Duplex Sheets')
     
-    param_number_of_sheets = fields.Integer('Number of Sections')
+    param_number_of_sheets = fields.Integer('Number of Sections', default=1)
     req_param_number_of_sheets = fields.Boolean('Number of Sections')
     
     param_sheets_per_box = fields.Integer('Sheets per Box')
@@ -1353,3 +1353,6 @@ class EstimateLine(models.Model):
                 process.write(dictProcess)
         
         self.write({'reSync': False})
+
+    def duplicate(self,values):
+        return super(EstimateLine,self).create(values)

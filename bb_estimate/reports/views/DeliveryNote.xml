@@ -6,7 +6,7 @@
                 <t t-set="estimate" t-value="o.getEstimateData()"/>
                 <t t-if="o.partner_id.specialReport">
                   <div class="page" style="font-family: Georgia !important;">
-                      <h2 class="text-center"><b>BATCH DELIVERY NOTIFICATION</b></h2>              
+                      <h2 class="text-center"><b>DELIVERY NOTIFICATION</b></h2>              
                       
                       <!-- <span style="text-decoration: underline;">Delivery Address</span><br/> -->        
                       <div class="row" style="padding:4em; padding-top:0em; padding-bottom:0em;">
@@ -20,25 +20,26 @@
                                           <p><span t-field="o.partner_id.parent_id.name"/><br/>
                                           <span t-field="o.partner_id.street"/><br/>
                                           <span t-field="o.partner_id.city"/><br/>
+                                          <span t-field="o.partner_id.zip"/><br/>
                                           <span t-field="o.partner_id.country_id"/></p>
-                                          <p><span t-field="o.partner_id.zip"/></p>
+                                          
                                       </t>
                                       <t t-else="">
                                           <p><span t-field="o.partner_id.name"/><br/>
                                           <span t-field="o.partner_id.street"/><br/>
                                           <span t-field="o.partner_id.city"/><br/>
+                                          <span t-field="o.partner_id.zip"/><br/>
                                           <span t-field="o.partner_id.country_id"/></p>
-                                          <p><span t-field="o.partner_id.zip"/></p>
                                       </t>                                      
                                   </div>
                                   <div class="col-4 pull-right">
                                       <div class="row">
                                           <div class="col-sm-12">
                                               <t t-if="o.state == 'done'">
-                                                  <p class="pull-left">Date:<span t-field="o.date_done" t-options="{'widget': 'date'}"/></p>
+                                                  <p class="pull-left">Date: <span t-field="o.date_done" t-options="{'widget': 'date'}"/></p>
                                               </t>
                                               <t t-if="o.state != 'done'">
-                                                  <p class="pull-left">Date:<span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/></p>
+                                                  <p class="pull-left">Date: <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/></p>
                                               </t>
                                           </div>
                                       </div>
@@ -50,7 +51,7 @@
                                       </div>
                                       <div class="row">
                                           <div class="col-11">
-                                              <p class="pull-left">Tel:<span t-field="o.partner_id.phone"/> </p>
+                                              <p class="pull-left">Tel: <span t-field="o.partner_id.phone"/> </p>
                                           </div>
                                       </div>
                                       <div class="row">
@@ -98,12 +99,12 @@
                               <tr>
                                   <td>
                                     <t t-if="estimate">
-                                         Job Title:<t t-esc="o.move_ids_without_package[0].product_id.name if not estimate else estimate.title"/>
+                                         Job Title: <t t-esc="o.move_ids_without_package[0].product_id.name if not estimate else estimate.title"/>
                                     </t>
                                   </td>
                                   <td>
                                       <t t-if="estimate">
-                                              Price:<t t-esc="'%.2f'%(float(o.calculatePrice()))"/>
+                                              Price: <t t-esc="'%.2f'%(float(o.calculatePrice()))"/>
                                       </t>
                                       <t t-else="">
                                           <span t-field="o.origin"/><br/>
@@ -129,15 +130,17 @@
                                   <p><span t-field="o.partner_id.parent_id.name"/><br/>
                                   <span t-field="o.partner_id.street"/><br/>
                                   <span t-field="o.partner_id.city"/><br/>
+                                  <span t-field="o.partner_id.zip"/><br/>
                                   <span t-field="o.partner_id.country_id"/></p>
-                                  <p><span t-field="o.partner_id.zip"/></p>
+                                 
                               </t>
                               <t t-else="">
                                   <p><span t-field="o.partner_id.name"/><br/>
                                   <span t-field="o.partner_id.street"/><br/>
                                   <span t-field="o.partner_id.city"/><br/>
+                                  <span t-field="o.partner_id.zip"/><br/>
                                   <span t-field="o.partner_id.country_id"/></p>
-                                  <p><span t-field="o.partner_id.zip"/></p>
+                                  
                               </t>
                           </div>
                           <div class="col-5 pull-right">

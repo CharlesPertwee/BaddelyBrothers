@@ -2,6 +2,8 @@
 import odoo
 from odoo import models, fields, api
 from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
+from datetime import datetime
+from datetime import timedelta
 
 class OrderConvert(models.TransientModel):
     _name = "bb_estimate.wizard_order_convert"
@@ -21,7 +23,7 @@ class OrderConvert(models.TransientModel):
     
     RunOnQuantity = fields.Integer('Run on Quantity',related="EstimateId.run_on")
     RunOnPrice = fields.Float('Run on Price(GBP)')
-    RunOnRequired = fields.Integer('Run on Quantity Required', required=True)
+    RunOnRequired = fields.Integer('Run on Quantity Required')
     
     HasExtra = fields.Boolean('Has Extra',related="EstimateId.hasExtra")
     
@@ -49,7 +51,8 @@ class OrderConvert(models.TransientModel):
     def CreateOrder(self):
         processes = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','process'),('isExtra','=',False)])
         materials = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','material'),('isExtra','=',False)])
-        
+        outworks = [x for x in processes if x.workcenterId.outworkProcessProduct]
+
         runOnRatio = 0.0
         
         if self.RunOnRequired > 0 and self.EstimateId['run_on'] > 0:
@@ -63,6 +66,8 @@ class OrderConvert(models.TransientModel):
         components = self.env['mrp.bom.line'].sudo()
         order = self.env['mrp.production'].sudo()
         sales = self.env['sale.order'].sudo()
+        po = self.env['purchase.order'].sudo()
+
 
         #routes
         newRoute = {
@@ -138,6 +143,24 @@ class OrderConvert(models.TransientModel):
         }
         
         if mo:
+            #PO
+            for outwork in outworks:
+                outwork_po = {
+                    'partner_id': outwork.param_supplier.id,
+                    'origin': mo.name,
+                    'order_line':[(0,0,
+                                   {
+                                        'product_id': outwork.workcenterId.outworkProcessProduct.id,
+                                        'price_unit': outwork['cost_per_unit_'+str(self.QuantityRequired)] + (outwork['cost_per_unit_run_on'] * runOnRatio),
+                                        'name': outwork.JobTicketText or outwork.lineName,
+                                        'date_planned': datetime.now(), # + timedelta(days=1)
+                                        'product_qty': 1,
+                                        'product_uom': outwork.workcenterId.outworkProcessProduct.uom_po_id.id
+                                        
+                                   })]
+                }
+                po.create(outwork_po)
+            
             data['manufacturingOrder'] = mo.id
             data['isLocked'] = True
         if routeId:
@@ -151,8 +174,10 @@ class OrderConvert(models.TransientModel):
             'product_id': self.EstimateId.product_type.id,
             'product_uom_qty': self.TotalQuantity,
             'price_unit': totalPrice/self.TotalQuantity,
+            'commitment_date' : self.EstimateId.target_dispatch_date
 
         }
+
         newSales = {
             'partner_id': self.EstimateId.partner_id.id,
             'partner_invoice_id': self.EstimateId.invoice_account.id,
@@ -166,16 +191,22 @@ class OrderConvert(models.TransientModel):
             'order_line':[(0,0,salesProduct)]
         }
 
+        if self.EstimateId.lead:
+            newSales['opportunity_id'] = self.EstimateId.lead.id
+
         salesId = sales.create(newSales)
+
         if salesId:
             salesId.action_confirm()
             data['salesOrder'] = salesId.id
         
         stage = self.env['bb_estimate.stage'].sudo().search([('ConvertedStage','=','True')],limit=1)
+
         if stage:
             data['state'] = stage.id
             if stage.LeadStage and self.EstimateId.lead:
                 self.EstimateId.lead.write({'stage_id':stage.LeadStage.id})
+
         self.EstimateId.write(data)
         
         

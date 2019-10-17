@@ -8,18 +8,13 @@
         <field name="context">{'default_lead': active_id}</field>
      </record>
       
-     <record id="bb_estimate_enquiry_list" model="ir.actions.act_window">
+    <record id="bb_estimate_enquiry_list" model="ir.actions.act_window">
         <field name="name">Estimates</field>
         <field name="res_model">bb_estimate.estimate</field>
         <field name="domain">[('lead', '=', active_id)]</field>
         <field name="context">{'default_lead': active_id}</field>
     </record> 
       
-    <record id="action_report_bb_conversion_analysis" model="ir.actions.client">
-       <field name="name">Lead Conversion Analysis</field>
-       <field name="tag">lead_conversion_analysis</field>
-       <field name="context" eval="{'model': 'report.crm.conversion_analysis'}" />
-    </record>
     
     <record id="crm_case_form_view_oppor_pro_estimate" model="ir.ui.view">
 		<field name="name">crm.lead.form.opportunity.estimate</field>
@@ -33,7 +28,7 @@
 
                 </xpath>
             <xpath expr="//field[@name='typeOfLead']" position="after">
-                <field name="Project" options="{'no_create_edit': True}" domain="[('partner_id','=',partner_id)]"/>
+                <field name="Project" options="{'no_create_edit': True}" domain="['|',('partner_id','=',partner_id),('partner_id','parent_of',partner_id)]"/>
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Estimate Details">
@@ -164,7 +159,7 @@
             </xpath>
        </template>
       
-    <menuitem id="bb_conversion_analysis_report" name="Conversion Analysis" parent="crm.crm_menu_report" action="action_report_bb_conversion_analysis"/>
+    
       
   </data>
 </odoo>
