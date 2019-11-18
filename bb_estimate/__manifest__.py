@@ -77,6 +77,8 @@
         'reports/views/EstimateMonthlyRates.xml',
         'reports/views/EstimateTimesReport.xml',
         'reports/views/TicketTimesReport.xml',
+        'reports/views/PurchaseDayReport.xml',
+        'reports/views/OnTimeDelivery.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

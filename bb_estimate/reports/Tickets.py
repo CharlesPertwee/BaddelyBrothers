@@ -24,7 +24,7 @@ class TicketsTimesReport(models.Model):
                 order_type AS "OrderType",
                 (
                     SELECT 
-                        avg(extract(epoch from (create_date - effective_date)) / 3600.0) 
+                        avg(extract(epoch from (create_date - effective_date )) / 3600.0) 
                     FROM 
                         sale_order
                     WHERE 
@@ -58,6 +58,60 @@ class TicketsTimesReport(models.Model):
                         CASE WHEN "Estimate" IS NOT NULL THEN 'Bespoke'
                         ELSE 'Trade Counter' END
                         ) m
+        """
+
+    @api.model_cr
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""CREATE or REPLACE VIEW %s as (%s)""" % (self._table, self._query()))
+
+
+class OnTimeDelivery(models.Model):
+    _name = 'bb_estimate.on_time_delivery'
+    _desc = 'On Time Delivery'
+    _auto = False
+    _rec_name = 'Year'
+    _order = "Year, Month"
+
+    FinancialYear = fields.Char('Financial Year', readonly=True)
+    Year = fields.Char('Year', readonly=True)
+    Month = fields.Selection([('01','January'), ('02','February'), ('03','March'), ('04','April'), ('05','May'), ('06','June'), ('07','July'), ('08','August'), ('09','September'), ('10','October'), ('11','November'), ('12','December')],string='Month',readonly=True)
+    JobNumber = fields.Char('Job Number')
+    Customer = fields.Char('Customer')
+    JobTitle = fields.Char('Job Title')
+    OrderDate = fields.Char('OrderDate')
+    TargetDispatchDate = fields.Char('Target Dispatch Date')
+    ActualDeliveryDate = fields.Char('Actual Delivery Date')
+    DeliverySummary = fields.Char('Delivery Summary')
+
+    def _query(self, with_clause='', fields={}, groupby='', from_clause=''):
+        return """
+            SELECT 
+                o.id,
+                CASE
+                    WHEN extract(month from date_order)::int >= 7 THEN extract(year from date_order)::text || '/' || (extract(year from date_order)::int + 1)::text
+                    ELSE (extract(year from date_order)::int - 1)::text || '/' || extract(year from date_order)::text
+                END as "FinancialYear",
+                extract(year from date_order)::text "Year",
+                to_char(date_order,'MM') "Month",
+                m.name "JobNumber",
+                p.name "Customer",
+                e.title "JobTitle",
+                to_char(date_order,'dd/MM/yyyy') "OrderDate",
+                to_char(o.commitment_date,'dd/MM/yyyy') "TargetDispatchDate",
+                to_char(effective_date,'dd/mm/yyyy') "ActualDeliveryDate",
+                case 
+                    when commitment_date > effective_date then 'Early by '||date_part('day',(commitment_date::timestamp - effective_date::timestamp))||' day(s)'
+                    when commitment_date < effective_date then 'Late by '||date_part('day',(effective_Date::timestamp - commitment_date))||' day(s)' 
+                    else 'On Time'
+                end as "DeliverySummary"
+            from sale_order o
+            inner join res_partner p on p.id = o.partner_id
+            left join bb_estimate_estimate e on e.id = o."Estimate"
+            left join mrp_production m on m.id = o."JobTicket" 
+            where 
+                o.commitment_date is not null
+                and o.effective_date is not null
         """
 
     @api.model_cr

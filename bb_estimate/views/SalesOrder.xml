@@ -38,7 +38,32 @@
             name="sale.report_saleorder_pro_forma"
             print_report_name="'PRO-FORMA - %s' % (object.name)"
         />
-        
+      
+      <record id="view_quotation_tree" model="ir.ui.view">
+            <field name="name">quatation.bb</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="Estimate" />
+                    <field name="JobTicket" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_order_tree" model="ir.ui.view">
+            <field name="name">sale.order.tree.bb</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="Estimate" />
+                    <field name="JobTicket" />
+                </xpath>
+            </field>
+        </record>
+
+
       <record id="sales_view_form" model="ir.ui.view">
           <field name="name">sale.view.inherited.form</field>
           <field name="model">sale.order</field>

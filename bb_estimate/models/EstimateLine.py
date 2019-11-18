@@ -590,7 +590,7 @@ class EstimateLine(models.Model):
     def calc_param_running_overs_percent(self):
         self.onChangeEventTrigger('param_running_overs_percent')
         
-    @api.onchange('cost_per_unit_1','cost_per_unit_2','cost_per_unit_4','cost_per_unit_4','cost_per_unit_run_on')
+    @api.onchange('cost_per_unit_1','cost_per_unit_2','cost_per_unit_3','cost_per_unit_4','cost_per_unit_run_on')
     def calc_cost_per_unit(self):
         self.onChangeEventTrigger('cost_per_unit')
         

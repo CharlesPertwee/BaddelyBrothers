@@ -52,7 +52,7 @@
         
         
         
-        <menuitem id="process_types" name="Process" sequence="75" action="bb_process.action_window_process"/>
+        <menuitem id="process_types" name="Processes" sequence="75" action="bb_process.action_window_process"/>
         
    </data>
 </odoo>

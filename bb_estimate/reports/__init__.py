@@ -4,3 +4,4 @@ from . import JobTicket
 from . import Enquiry
 from . import Estimates
 from . import Tickets
+from . import PurchaseReport

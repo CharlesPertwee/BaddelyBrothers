@@ -16,7 +16,7 @@
                                 
                                 <p>Prev Job: </p>  
                                 <t t-if="o.Estimate.partner_id.parent_id">
-                                    <p>Customer: <b><span t-field="o.Estimate.partner_id.partner_id.name"/></b></p>
+                                    <p>Customer: <b><span t-field="o.Estimate.partner_id.parent_id.name"/></b></p>
                                 </t>
                                 <t t-else="">
                                     <p>Customer: <b><span t-field="o.Estimate.partner_id.name"/></b></p>

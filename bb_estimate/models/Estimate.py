@@ -47,7 +47,7 @@ class Estimate(models.Model):
     _name = 'bb_estimate.estimate'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Estimate'
-    _rec_name = 'title'
+    _rec_name = 'estimate_number'
     
     
     @api.model

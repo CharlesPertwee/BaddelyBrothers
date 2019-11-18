@@ -26,11 +26,14 @@ class BbEstimate(http.Controller):
         document = Document()
         paragraph_format = document.styles['No Spacing']
         section = document.sections[0]   # Create a section
+        section.header_distance = Cm(0)# ADD HEADER DISTANCE
+        section.left_margin = Mm(24)# ADD LEFT MARGIIN
+        section.right_margin = Mm(25)# ADD RIGHT MARGIN
         sec_header = section.header   # Create header 
         sec_header.left_margin = Cm(0)
         header_tp = sec_header.add_paragraph(style='No Spacing')  # Add a paragraph in the header, you can add any anything in the paragraph
         header_run = header_tp.add_run()   # Add a run in the paragraph. In the run you can set the values 
-        header_run.add_picture('/opt/Bb/BaddelyBrothers/bb_estimate/static/src/img/HeaderNew.jpg',width=Inches(6)) 
+        header_run.add_picture('/opt/Bb/BaddelyBrothers/bb_estimate/static/src/img/HeaderNew.jpg',width=Inches(6.57)) 
         universalTableStyle = "borderColor:white"
         styles = document.styles['No Spacing']
         font = styles.font
@@ -68,9 +71,9 @@ class BbEstimate(http.Controller):
             
         table.line_spacing_rule = 0
         table.autofit = True
-        table.cell(0,0).text = Estimate.partner_id.name
+        table.cell(0,0).text = Estimate.partner_id.parent_id.name if Estimate.partner_id.parent_id else Estimate.partner_id.name
         table.cell(0,2).paragraphs[0].text = "Date: %s"%(str(datetime.datetime.now().strftime('%d/%m/%Y')))
-        table.cell(0,2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        table.cell(0,2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         
         #.add_paragraph("Date: %s"%(str(datetime.datetime.now().strftime('%d/%m/%Y'))))
         
@@ -99,10 +102,10 @@ class BbEstimate(http.Controller):
             table.cell(x,1).text = " "
             x += 1
           
-        table.cell(x,0).text = "Attn: %s"%(Estimate.contact.name)
+        table.cell(x,0).text = "\nAttn: %s"%(Estimate.contact.name)
         
-        table.cell(x,2).paragraphs[0].text = "Estimate no: %s"%(str(Estimate.estimate_number))
-        table.cell(x,2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        table.cell(x,2).paragraphs[0].text = "\nEstimate no: %s"%(str(Estimate.estimate_number))
+        table.cell(x,2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 #         para = table.cell(x,2).add_paragraph("Estimate no: %s"%(str(Estimate.estimate_number)))
 #         para.alignment=WD_ALIGN_PARAGRAPH.RIGHT
         
@@ -117,12 +120,12 @@ class BbEstimate(http.Controller):
                         font = run.font
                         font.name= "Tahoma"
         
-        parag = document.add_paragraph("")
-        senten = parag.add_run("Dear %s,"%(Estimate.contact.name.split()[0]))
-        senten.font.name = "Tahoma"
-        
         parag1 = document.add_paragraph("")
-        senten1 = parag1.add_run("Thank you for your enquiry, we have pleasure in submitting our estimate as follows:")
+        paragraph_format1 = parag1.paragraph_format
+        paragraph_format1.left_indent = Inches(0.09)
+        senten1 = parag1.add_run("\nDear %s,"%(Estimate.contact.name.split()[0]))
+        senten1.font.name = "Tahoma"
+        senten1 = parag1.add_run("\nThank you for your enquiry, we have pleasure in submitting our estimate as follows:")
         senten1.font.name = "Tahoma"
         
         record_length = len([x for x in Estimate.estimate_line if x.customer_description and (not x.isExtra)])
@@ -186,7 +189,7 @@ class BbEstimate(http.Controller):
                 y += 1
         
         if Estimate.quantity_1:
-            data_table.cell(y,0).text="Qty/Price"
+            data_table.cell(y,0).text="Qty/Price:"
             price = 0
             if Estimate.total_price_1 > Estimate.total_price_extra_1:
                 price =  (Estimate.total_price_1 - Estimate.total_price_extra_1)
@@ -252,7 +255,7 @@ class BbEstimate(http.Controller):
                         
         #for column in data_table.columns[0]:
         data_table.columns[0].width = Inches(inches)
-        data_table.columns[1].width = Inches(5)
+        data_table.columns[1].width = Inches(5.56)
             
 #         for row in data_table.rows:
 #             row.cells[0].width = Inches(0.5)
@@ -268,6 +271,8 @@ class BbEstimate(http.Controller):
         envelopeLine = ""
         if Estimate.isEnvelope:
             envelopeLine = document.add_paragraph(Estimate.GenerateEnvelopeDetails(Estimate),style=paragraph_format)
+            paragraph_format4 = envelopeLine.paragraph_format
+            paragraph_format4.left_indent = Inches(0.09)
             envelopeLine.style.font.size = Pt(8)
             
         if envelopeLine:
@@ -307,7 +312,7 @@ class BbEstimate(http.Controller):
             z = 0
             for extra in Estimate.estimate_line:
                 if extra.isExtra and extra.extraDescription:
-                    extra_table.cell(z,0).text = "Extras"
+                    extra_table.cell(z,0).text = "Extras:"
                     extra_table.cell(z,1).text = extra.extraDescription
                     if extra.quantity_1:
                         z += 1
@@ -335,14 +340,20 @@ class BbEstimate(http.Controller):
                             font.name= "Tahoma"
                             
             extra_table.columns[0].width = Inches(inches)
-            extra_table.columns[1].width = Inches(5)
+            extra_table.columns[1].width = Inches(5.56)
             
         
         
         
         line = ""
+        spaceApplied = False
         for condition in Estimate.estimateConditions:
             line = document.add_paragraph(condition.description,style=paragraph_format)
+            paragraph_format2 = line.paragraph_format
+            if not spaceApplied:
+                paragraph_format2.space_before = Pt(12)
+                spaceApplied = True
+            paragraph_format2.left_indent = Inches(0.09)
             line.style.font.size = Pt(9)
         
         if line:
@@ -350,10 +361,14 @@ class BbEstimate(http.Controller):
             run.add_break() 
         
         p = document.add_paragraph("")
-        sen = p.add_run('Should you require any more information or wish to discuss your detailed requirements further, please contact us on 020 8986 2666.')
+        paragraph_format3 = p.paragraph_format
+        paragraph_format3.left_indent = Inches(0.09)
+        sen = p.add_run('\n\nShould you require any more information or wish to discuss your detailed requirements further, please contact us on 020 8986 2666.')
         sen.font.name = 'Tahoma'
         
         p1 = document.add_paragraph('')
+        paragraph_format3 = p1.paragraph_format
+        paragraph_format3.left_indent = Inches(0.09)
         sen1 = p1.add_run('Yours faithfully,')
         sen1.font.name = 'Tahoma'
         sen1.add_break()
@@ -364,8 +379,9 @@ class BbEstimate(http.Controller):
         section = document.sections[0]
         default_footer = section.footer   # Add a footer
         footer_p = default_footer.add_paragraph()
+        footer_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         footer_r = footer_p.add_run()
-        footer_r.add_picture('/opt/Bb/BaddelyBrothers/bb_estimate/static/src/img/FooterNew.jpg',width=Inches(6)) 
+        footer_r.add_picture('/opt/Bb/BaddelyBrothers/bb_estimate/static/src/img/FooterNew.jpg',width=Inches(3.5)) 
         
         docx_stream = io.BytesIO()
         document.save(docx_stream)

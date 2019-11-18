@@ -10,7 +10,7 @@
                         <div class="row" style="padding-top:18em; padding-left:2em; padding:right:2em;">
                             <div class="col-7">
                                 <t t-if="o.partner_id.parent_id">
-                                    <p><span t-field="o.partner_id.partner_id.name"/><br/>
+                                    <p><span t-field="o.partner_id.parent_id.name"/><br/>
                                         <span t-field="o.partner_id.street"/><br/>
                                         <span t-field="o.partner_id.city"/> <span t-field="o.partner_id.state_id.code"/> <span t-field="o.partner_id.zip"/><br/>
                                         <span t-field="o.partner_id.country_id.name"/><br/></p>
