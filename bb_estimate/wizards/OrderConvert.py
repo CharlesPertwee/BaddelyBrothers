@@ -174,8 +174,8 @@ class OrderConvert(models.TransientModel):
             'product_id': self.EstimateId.product_type.id,
             'product_uom_qty': self.TotalQuantity,
             'price_unit': totalPrice/self.TotalQuantity,
-            'commitment_date' : self.EstimateId.target_dispatch_date
-
+            'commitment_date' : self.EstimateId.target_dispatch_date,
+            'purchase_cost': self.EstimateId['total_cost_%s'%(self.QuantityRequired)]/self.TotalQuantity
         }
 
         newSales = {
