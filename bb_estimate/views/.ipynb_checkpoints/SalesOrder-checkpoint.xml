@@ -1,5 +1,44 @@
 <odoo>
   <data>
+      
+      <report
+            id="account_pro_forma"
+            model="sale.order"
+            string="BB Pro Forma"
+            report_type="qweb-pdf"
+            name="bb_estimate.report_pro_forma_document"
+            file="bb_estimate.report_pro_forma_document"
+            attachment="(('Pro Forma').replace('/','')+'.pdf')"
+            print_report_name="'B.B PRO-FORMA - %s' % (object.name)"
+            groups="sale.group_proforma_sales"
+            paperformat="bb_estimate.paperformat_invoice"
+        />
+        
+        <report
+            id="account_pro_forma_headed"
+            model="sale.order"
+            string="BB Pro Forma(Headed Paper)"
+            report_type="qweb-pdf"
+            name="bb_estimate.report_pro_forma_headed_document"
+            file="bb_estimate.report_pro_forma_headed_document"
+            attachment="(('Pro Forma(Headed)').replace('/','')+'.pdf')"
+            print_report_name="'B.B PRO-FORMA(HEADED) - %s' % (object.name)"
+            groups="sale.group_proforma_sales"
+            paperformat="bb_estimate.paperformat_invoice"
+        />
+        
+        <report
+            id="sale.action_report_pro_forma_invoice"
+            string="PRO-FORMA Invoice"
+            model="sale.order"
+            report_type="qweb-pdf"
+            menu="False"
+            groups="sale.group_proforma_sales"
+            file="sale.report_saleorder_pro_forma"
+            name="sale.report_saleorder_pro_forma"
+            print_report_name="'PRO-FORMA - %s' % (object.name)"
+        />
+        
       <record id="sales_view_form" model="ir.ui.view">
           <field name="name">sale.view.inherited.form</field>
           <field name="model">sale.order</field>
@@ -13,7 +52,13 @@
                   <field name="Estimate" readonly="1"/>
                   <field name="Project" readonly="1"/>
                   <field name="JobTicket" readonly="1"/>
+                  <field name="ProFormaLines" widget="html" invisible="1"/>
               </xpath>
+              <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" icon="fa-pencil" type="object" name="EditProFormaLine">
+                      <span>Edit Pro-Forma Lines</span>
+                  </button>
+            </xpath>
               <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
                   <attribute name="attrs">{'invisible':['|',('partnerOnHold','=',True),('state', 'not in', ['sent'])]}</attribute>
               </xpath>

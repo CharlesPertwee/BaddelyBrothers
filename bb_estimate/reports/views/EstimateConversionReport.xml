@@ -1,0 +1,25 @@
+<odoo>
+	<data>
+		<record id="estimate_conversion_tree_view" model="ir.ui.view">
+	        <field name="name">estimate_conversion_tree</field>
+	        <field name="model">bb_estimate.estimate_conversion_report</field>
+	        <field name="arch" type="xml">
+				<tree string="Conversion">
+	                <field name="FinancialYear" />
+	                <field name="Year" />
+	                <field name="Month" />
+	                <field name="TotalEstimate" />
+	                <field name="ConvertedOrder" />
+	            </tree>
+	        </field>
+	    </record>
+
+	    <record id="estimate_conversion" model="ir.actions.act_window">
+	        <field name="name">Estimate Conversions</field>
+	        <field name="res_model">bb_estimate.estimate_conversion_report</field>
+	        <field name="view_mode">tree</field>
+		</record> 
+
+	    <menuitem id="estimate_conversion_report" name="Conversion Count" parent="bb_estimate.bb_estimate_reports" action="estimate_conversion"/>
+	</data>
+</odoo>

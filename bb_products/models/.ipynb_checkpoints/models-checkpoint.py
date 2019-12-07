@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
+
 class ProductsTemplate(models.Model):
     _inherit = 'product.template'
     _name = 'product.template'
@@ -19,6 +21,7 @@ class ProductsTemplate(models.Model):
     staticPrice = fields.Boolean('Static Price')
     lastUsedEstimateDate = fields.Date(string="Last Used Estimate Date")
     lastUsedEstimateNumber = fields.Char(string="Last Used Estimate Number")
+
     
     @api.onchange('margin')
     def calcPriceChange(self):

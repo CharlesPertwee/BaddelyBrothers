@@ -23,7 +23,6 @@ class OrderConvert(models.TransientModel):
     RunOnPrice = fields.Float('Run on Price(GBP)')
     RunOnRequired = fields.Integer('Run on Quantity Required', required=True)
     
-    ExtrasApplied = fields.Boolean('Extras Applied to the Estimate')
     HasExtra = fields.Boolean('Has Extra',related="EstimateId.hasExtra")
     
     @api.depends('EstimateId')

@@ -6,7 +6,7 @@
         This module creates the estimate and job tickets.
         """,
 
-    'description': """ 
+    'description': """
     """,
 
     'author': "Squadsoft Tech",
@@ -19,10 +19,11 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','web','website_crm','bb_crm','crm','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock'],
+    'depends': ['base','web','website_crm','bb_crm','crm','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock','sale_crm','purchase_stock'],
 
     # always loaded
     'data': [
+        'data/Groups.xml',
         'security/ir.model.access.csv',
         'data/Stages.xml',
         'data/Estimate.xml',
@@ -42,7 +43,9 @@
         'reports/views/ProFormaHeaded.xml',
         'reports/views/InvoiceHeaded.xml',
         'reports/views/DeliveryNote.xml',
-        'wizards/views/DeletedLineInfo.xml',
+        'reports/views/EnquiryConversionReport.xml',
+        'reports/views/EnquiryMonthlyRates.xml',
+        'reports/views/EnquiryTimesReport.xml',
         'views/EstimateLines.xml',
         'views/Estimate.xml',
         'views/EstimateStages.xml',
@@ -54,6 +57,7 @@
         'views/Routing.xml',
         'views/Bom.xml',
         'views/SalesOrder.xml',
+        'data/sale_order_mail_template.xml',
         'views/Invoice.xml',
         'data/invoice_mail_template.xml',
         'views/PurchaseOrder.xml',
@@ -69,7 +73,12 @@
         'wizards/views/PriceAdjustment.xml',
         'wizards/views/SalesAdjustment.xml',
         'wizards/views/AmmendQty.xml',
-        #'wizards/views/ConfirmationBox.xml'
+        'reports/views/EstimateConversionReport.xml',
+        'reports/views/EstimateMonthlyRates.xml',
+        'reports/views/EstimateTimesReport.xml',
+        'reports/views/TicketTimesReport.xml',
+        'reports/views/PurchaseDayReport.xml',
+        'reports/views/OnTimeDelivery.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

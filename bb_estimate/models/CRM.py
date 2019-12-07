@@ -94,5 +94,5 @@ class Leads(models.Model):
     @api.onchange('size')
     def calc_size_change_params(self):
         if self.size:
-            self.enquirySizeHeight = self.size.width
-            self.enquirySizeWidth = self.size.height
+            self.enquirySizeHeight = self.size.height
+            self.enquirySizeWidth = self.size.width

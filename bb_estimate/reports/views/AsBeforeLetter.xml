@@ -14,10 +14,17 @@
                                     </div>
                                 </div>
                                 
-                                <p>Inv: </p>                                
-                                <p>Customer: <b><span t-field="o.Estimate.partner_id"/></b></p>
-                                <p>Job Title: <b><span t-field="o.name"/></b></p>
-                                <p>Spec: <b><!--Add after adding spec field"/--></b></p>
+                                <p>Inv: </p>    
+                                <t t-if="o.Estimate.partner_id.parent_id">
+                                    <p>Customer: <b><span t-field="o.Estimate.partner_id.parent_id.name"/></b>
+                                    <br/>Job Title: <b><span t-field="o.name"/></b>
+                                    <br/>Spec: <b><span t-field="o.SpecifcationType"/></b></p>
+                                </t>
+                                <t t-else="">
+                                    <p>Customer: <b><span t-field="o.Estimate.partner_id.name"/></b>
+                                    <br/>Job Title: <b><span t-field="o.name"/></b>
+                                    <br/>Spec: <b><span t-field="o.SpecifcationType"/></b></p>
+                                </t>
                                 
                                 <div class="row">
                                     <div class='col-6'>

@@ -34,6 +34,7 @@ class Manufacture(models.Model):
     DieType = fields.Selection(GetDie,string="Return Die / Block To :")
     
     customerRef = fields.Char('Customer Reference')
+    previousJobRef = fields.Char('Previous Job Ticket')
     Purchases = fields.Many2many('purchase.order',string='Purchase')   
     
     def write(self,vals):
@@ -131,4 +132,8 @@ class Manufacture(models.Model):
             (moves_finished + moves_raw).write({'workorder_id': workorder.id})
 
             workorder._generate_lot_ids()
+            
+        #Hide the Ammend Qty Button from Estimate, If estimate is present.
+        if estimate:
+            estimate.write({'AppendLog':True})
         return workorders

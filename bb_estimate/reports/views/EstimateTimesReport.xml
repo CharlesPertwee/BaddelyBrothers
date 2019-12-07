@@ -1,0 +1,23 @@
+<odoo>
+	<data>
+		<record id="estimate_times_tree_view" model="ir.ui.view">
+	        <field name="name">estimate_times_tree</field>
+	        <field name="model">bb_estimate.estimate_times_report</field>
+	        <field name="arch" type="xml">
+				<tree string="Conversion">
+	                <field name="Year" />
+	                <field name="Month" />
+	                <field name="AvgConversionTime" />
+	            </tree>
+	        </field>
+	    </record>
+
+	    <record id="estimate_times" model="ir.actions.act_window">
+	        <field name="name">Estimate Times By Month</field>
+	        <field name="res_model">bb_estimate.estimate_times_report</field>
+	        <field name="view_mode">tree</field>
+		</record> 
+
+	    <menuitem id="estimate_times_report" name="Conversion Times By Month" parent="bb_estimate.bb_estimate_reports" action="estimate_times"/>
+	</data>
+</odoo>

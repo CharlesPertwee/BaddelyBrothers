@@ -26,6 +26,51 @@
             </xpath>
         </template>
         
+        <template id="change_log">
+            <div class="col-sm-12">
+                <table class="table text-center table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th colspan="2">Qty 1</th>
+                            <th colspan="2">Qty 2</th>
+                            <th colspan="2">Qty 3</th>
+                            <th colspan="2">Qty 4</th>
+                            <th colspan="2">Run On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td>Old</td>
+                            <td>New</td>
+                            <td>Old</td>
+                            <td>New</td>
+                            <td>Old</td>
+                            <td>New</td>
+                            <td>Old</td>
+                            <td>New</td>
+                            <td>Old</td>
+                            <td>New</td>
+                        </tr>
+                        <tr t-foreach="lines" t-as="line">
+                            <td><t t-esc="line[0]"/></td>
+                            <td><t t-esc="line[1]"/></td>
+                            <td><t t-esc="line[2]"/></td>
+                            <td><t t-esc="line[3]"/></td>
+                            <td><t t-esc="line[4]"/></td>
+                            <td><t t-esc="line[5]"/></td>
+                            <td><t t-esc="line[6]"/></td>
+                            <td><t t-esc="line[7]"/></td>
+                            <td><t t-esc="line[8]"/></td>
+                            <td><t t-esc="line[9]"/></td>
+                            <td><t t-esc="line[10]"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+        
         <template id="qty_amend">
             <div class="alert alert-warning" role="alert"> 
                 Quantity Ammended
@@ -101,7 +146,7 @@
                         <div class="form-group row form-field o_website_form_required_custom">
                             <label class="col-lg-3 col-md-4 col-form-label" for="phone">Phone Number</label>
                             <div class="col-lg-7 col-md-8">
-                                <input type="number" class="form-control o_website_form_input" name="phone" t-att-value="request.params.get('phone', '')" required=""/>
+                                <input type="number" min="0" class="form-control o_website_form_input" name="phone" t-att-value="request.params.get('phone', '')" required=""/>
                             </div>
                         </div>
                         <!-- <div class="form-group row form-field o_website_form_required_custom row">
@@ -166,7 +211,7 @@
                             <div class="col-lg-7 col-md-8">
                                 <select class="form-control" name="country_id">
                                     <t t-foreach="countries" t-as="country">
-                                        <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
+                                        <option t-attf-value="#{country.id}" t-att-selected="country.code == 'GB'"><t t-esc="country.name"/></option>
                                     </t>
                                 </select>
                             </div>
@@ -174,9 +219,9 @@
                         <div class="form-group row form-field o_website_form_required_custom">
                             <label class="col-lg-3 col-md-4 col-form-label" id="Quantity1" for="Quantity1">Quantity 1</label>
                             <div class="col-lg-7 col-md-8">
-                                <input type="number" class="form-control o_website_form_input" name="Quantity1" t-att-value="request.params.get('Quantity1', '')" required=""/>
+                                <input type="number" min="0" class="form-control o_website_form_input" name="Quantity1" t-att-value="request.params.get('Quantity1', '')" required=""/>
                             </div>
-                            <label class="col-lg-3 col-md-4 col-form-label"></label>
+                            <label class="col-lg-3 col-md-4"></label>
                             <div class="col-lg-7 col-md-8">
                                 <p id="moreEnv" style="font-size:10px;">How many envelopes do you need?</p>
                             </div>
@@ -184,19 +229,19 @@
                         <div class="extra form-group row form-field" style="display:none;">
                             <label class="col-lg-3 col-md-4 col-form-label" id="Quantity2" for="Quantity2">Quantity 2</label>
                             <div class="col-lg-7 col-md-8">
-                                <input type="number" class="form-control o_website_form_input" name="Quantity2" t-att-value="request.params.get('Quantity2', '')"/>
+                                <input type="number" min="0" class="form-control o_website_form_input" name="Quantity2" t-att-value="request.params.get('Quantity2', '')"/>
                             </div>
                         </div>
                         <div class="extra form-group row form-field" style="display:none;">
                             <label class="col-lg-3 col-md-4 col-form-label" id="Quantity3" for="Quantity3">Quantity 3</label>
                             <div class="col-lg-7 col-md-8">
-                                <input type="number" class="form-control o_website_form_input" name="Quantity3" t-att-value="request.params.get('Quantity3', '')"/>
+                                <input type="number" min="0" class="form-control o_website_form_input" name="Quantity3" t-att-value="request.params.get('Quantity3', '')"/>
                             </div>
                         </div>
                         <div class="extra form-group row form-field" style="display:none;">
                             <label class="col-lg-3 col-md-4 col-form-label" id="Quantity4" for="Quantity4">Quantity 4</label>
                             <div class="col-lg-7 col-md-8">
-                                <input type="number" class="form-control o_website_form_input" name="Quantity4" t-att-value="request.params.get('Quantity4', '')"/>
+                                <input type="number" min="0" class="form-control o_website_form_input" name="Quantity4" t-att-value="request.params.get('Quantity4', '')"/>
                             </div>
                         </div> 
                         <div class="row">
@@ -329,7 +374,7 @@
                         <div class="form-group row form-field">
                             <label class="col-lg-3 col-md-4 col-form-label" for="enquiryEnvelopeRunOn" id="runOn"></label>
                             <div class="col-lg-7 col-md-8">
-                                <input type="number" class="form-control o_website_form_input" name="runOn" t-att-value="request.params.get('runOn', '')"/>
+                                <input type="number" min="0" class="form-control o_website_form_input" name="runOn" t-att-value="request.params.get('runOn', '')"/>
                             </div>
                             <label class="col-lg-3 col-md-4 col-form-label"></label>
                             <div class="col-lg-7 col-md-8">
@@ -377,7 +422,7 @@
                         <div class="form-group row form-field">
                             <label class="col-lg-3 col-md-4 col-form-label" for="enquiryWeightGsm">Weight(g.s.m)</label>
                             <div class="col-lg-7 col-md-8">
-                                <input type="number" class="form-control o_website_form_input" name="enquiryWeightGsm" t-att-value="request.params.get('enquiryWeightGsm', '')"/>
+                                <input type="number" min="0" class="form-control o_website_form_input" name="enquiryWeightGsm" t-att-value="request.params.get('enquiryWeightGsm', '')"/>
                             </div>
                         </div>
                         <div class="form-group row form-field">

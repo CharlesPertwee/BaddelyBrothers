@@ -233,7 +233,7 @@ class EstimateLine(models.Model):
     param_material_vendor = fields.Many2one('product.supplierinfo',string='Vendor',domain="[('product_id','=',True)]")
     req_param_material_vendor = fields.Boolean('Req Vendor')
     
-    param_number_up = fields.Integer('Number Up', related="estimate_id.number_up")#compute="getEstimateParams")
+    param_number_up = fields.Integer('Number Up')
     req_param_number_up = fields.Boolean('Req Number Up')
     
     param_number_out = fields.Integer('Number out')
@@ -272,7 +272,7 @@ class EstimateLine(models.Model):
     param_duplex_sheets = fields.Selection(DUPLEX_OPTIONS,string="Duplex Sheets")
     req_param_duplex_sheets = fields.Boolean('Duplex Sheets')
     
-    param_number_of_sheets = fields.Integer('Number of Sections')
+    param_number_of_sheets = fields.Integer('Number of Sections', default=1)
     req_param_number_of_sheets = fields.Boolean('Number of Sections')
     
     param_sheets_per_box = fields.Integer('Sheets per Box')
@@ -557,6 +557,10 @@ class EstimateLine(models.Model):
     def calc_gen_param_change(self):
         self.onChangeEventTrigger('param_die_size')
         
+    @api.onchange('param_number_up')
+    def calc_param_number_up_change(self):
+        self.onChangeEventTrigger('param_number_up')
+        
     #--------#
     @api.onchange('param_make_ready_time_1','param_make_ready_time_2','param_make_ready_time_3','param_make_ready_time_4')
     def calc_param_make_ready_time_1(self):
@@ -586,7 +590,7 @@ class EstimateLine(models.Model):
     def calc_param_running_overs_percent(self):
         self.onChangeEventTrigger('param_running_overs_percent')
         
-    @api.onchange('cost_per_unit_1','cost_per_unit_2','cost_per_unit_4','cost_per_unit_4','cost_per_unit_run_on')
+    @api.onchange('cost_per_unit_1','cost_per_unit_2','cost_per_unit_3','cost_per_unit_4','cost_per_unit_run_on')
     def calc_cost_per_unit(self):
         self.onChangeEventTrigger('cost_per_unit')
         
@@ -1006,12 +1010,11 @@ class EstimateLine(models.Model):
                         'processLine' : process.id,
                         'estimate': line.estimate_id.id,
                     }
-                    if not added_working_sheets and process.workcenterId.process_type.OversOnly:
+                    if (not added_working_sheets and process.workcenterId.process_type.OversOnly) and not (process.isExtra or line.isExtra):
                         newLink['overs_only'] = False
                         added_working_sheets = True
                     else:
                         newLink['overs_only'] = True
-                    newLink['overs_only'] = newLink['overs_only'] or (process.isExtra or line.isExtra)   
                     link.create(newLink)
         
     def CreateMaterialLink(self,process,work_twist):
@@ -1020,6 +1023,8 @@ class EstimateLine(models.Model):
         added_working_sheets = False
         for material in materials:
             if process.workcenterId and process.workcenterId.process_type:
+                if material.material_ids:
+                    added_working_sheets = any([(x.overs_only ^ x.processLine.workcenterId.process_type.OversOnly) for x in material.material_ids])
                 if process.work_twist:
                     work_twist = True
                 if process.workcenterId.process_type.MapMaterials:
@@ -1028,13 +1033,11 @@ class EstimateLine(models.Model):
                         'processLine' : process.id,
                         'estimate': process.estimate_id.id,
                     }
-                    if not added_working_sheets and process.workcenterId.process_type.OversOnly:
+                    if (not added_working_sheets and process.workcenterId.process_type.OversOnly) and not (process.isExtra or material.isExtra):
                         newLink['overs_only'] = False
                         added_working_sheets = True
                     else:
                         newLink['overs_only'] = True
-
-                    newLink['overs_only'] = newLink['overs_only'] or (process.isExtra or material.isExtra) 
                     link.create(newLink)
     
     def RecalculatePrices(self,line,work_twist):
@@ -1146,17 +1149,6 @@ class EstimateLine(models.Model):
         vals['hasComputed'] = True
         self.estimate_id.write(estimateData)
         
-        audit_data = {
-            'estimate':self.estimate_id.id,
-            'estimateLine':self.lineName,
-            'quantity_1':self.quantity_required_1,
-            'quantity_2':self.quantity_required_2,
-            'quantity_3':self.quantity_required_3,
-            'quantity_4':self.quantity_required_4,
-            'quantity_run_on':self.quantity_required_run_on,
-            'Action':'Modify'
-        }
-        
         currentRecord = super(EstimateLine, self).write(vals)
         
         if self.option_type == 'process':
@@ -1169,20 +1161,6 @@ class EstimateLine(models.Model):
                 dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
                 dictProcess.pop('hasComputed')
                 process.write(dictProcess)
-                
-            audit_data.update({
-                'changed_quantity_1':self.quantity_required_1,
-                'changed_quantity_2':self.quantity_required_2,
-                'changed_quantity_3':self.quantity_required_3,
-                'changed_quantity_4':self.quantity_required_4,
-                'changed_quantity_run_on':self.quantity_required_run_on
-                
-            })
-            
-            if any(filter(lambda x: x.startswith('quantity_required_'), vals.keys())):
-                self.env['bb_estimate.audit_log'].create(audit_data)
-                
-            
         return currentRecord
         
     
@@ -1375,3 +1353,6 @@ class EstimateLine(models.Model):
                 process.write(dictProcess)
         
         self.write({'reSync': False})
+
+    def duplicate(self,values):
+        return super(EstimateLine,self).create(values)

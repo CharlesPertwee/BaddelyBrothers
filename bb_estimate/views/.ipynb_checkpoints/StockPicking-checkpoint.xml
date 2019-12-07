@@ -8,10 +8,18 @@
                 <xpath expr="//field[@name='picking_type_id']" position="after">
                     <field name="customerRef"/>
                 </xpath>
-                <xpath expr="//field[@name='origin']" position="after">
-                    <field name="consignmentNumber"/>
-                </xpath>
             </field>
         </record>
+        
+        <report
+            string="Picking Operations"
+            id="stock.action_report_picking"
+            model="stock.picking"
+            report_type="qweb-pdf"
+            menu="False"
+            name="stock.report_picking"
+            file="stock.report_picking_operations"
+            print_report_name="'Picking Operations - %s - %s' % (object.partner_id.name or '', object.name)"
+        />
     </data>
 </odoo>

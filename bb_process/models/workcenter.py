@@ -62,6 +62,7 @@ class MrpWorkcenter(models.Model):
     ink_mix_time = fields.Float('Ink Mix Time (hours)',digits=(10,2))
     
     associatedBoxId = fields.Many2one('product.product',string="Packaging Product")
+    outworkProcessProduct = fields.Many2one('product.product',string="Outwork Product")
     sheetsPerBox = fields.Integer('Sheets Per Box')
     timePerBox = fields.Float('Time Per Box')
     paper_type = fields.Selection([('white','White'),('printed','Printed')],string="Paper Type")

@@ -131,4 +131,8 @@ class Manufacture(models.Model):
             (moves_finished + moves_raw).write({'workorder_id': workorder.id})
 
             workorder._generate_lot_ids()
+            
+        #Hide the Ammend Qty Button from Estimate, If estimate is present.
+        if estimate:
+            estimate.write({'AppendLog':True})
         return workorders

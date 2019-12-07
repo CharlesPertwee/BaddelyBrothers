@@ -15,9 +15,14 @@ class Purchase(models.Model):
     _inherit = 'purchase.order'
     
     @api.multi
+    def print_quotation(self):
+        self.write({'state': "sent"})
+        return self.env.ref('bb_estimate.request_for_quotation').report_action(self)
+    
+    @api.multi
     def write(self,vals):
         if 'origin' in vals.keys():
-            pos = vals['origin'].split(',')
+            pos = vals['origin'].split(',') if vals['origin'] else ''
             sq = self.env['ir.sequence'].search([('code','=','bb_estimate.jobticket')],limit=1)
             if sq:
                 for po in pos:
@@ -34,8 +39,8 @@ class Purchase(models.Model):
     @api.model
     def create(self,vals):
         record = super(Purchase,self).create(vals)
-        if vals['origin']:
-            pos = vals['origin'].split(',')
+        if 'origin' in vals.keys():
+            pos = vals['origin'].split(',') if vals['origin'] else ''
             for po in pos:
                 sq = self.env['ir.sequence'].search([('code','=','bb_estimate.jobticket')],limit=1)
                 if sq:

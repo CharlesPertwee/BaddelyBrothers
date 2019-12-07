@@ -1,0 +1,30 @@
+<odoo>
+	<data>
+		<record id="on_time_delivery_tree" model="ir.ui.view">
+	        <field name="name">on_time_delivery</field>
+	        <field name="model">bb_estimate.on_time_delivery</field>
+	        <field name="arch" type="xml">
+				<tree string="On Time Delivery">
+					<field name="FinancialYear" />
+					<field name="Year" />
+	                <field name="Month" />
+	                <field name="JobNumber" />
+	                <field name="Customer" />
+	                <field name="JobTitle" />
+	                <field name="OrderDate" />
+	                <field name="TargetDispatchDate" />
+	                <field name="ActualDeliveryDate" />
+	                <field name="DeliverySummary" />
+	            </tree>
+	        </field>
+	    </record>
+
+	    <record id="delivery_report" model="ir.actions.act_window">
+	        <field name="name">On Time Delivery</field>
+	        <field name="res_model">bb_estimate.on_time_delivery</field>
+	        <field name="view_mode">tree</field>
+		</record> 
+
+	    <menuitem id="on_time_delivery_menu" name="On Time Delivery" parent="sale.menu_sale_report" action="delivery_report"/>
+	</data>
+</odoo>

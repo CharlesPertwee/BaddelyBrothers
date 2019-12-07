@@ -6,7 +6,7 @@
         This module creates the estimate and job tickets.
         """,
 
-    'description': """ 
+    'description': """
     """,
 
     'author': "Squadsoft Tech",
@@ -19,10 +19,11 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','web','website_crm','bb_crm','crm','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock'],
+    'depends': ['base','web','website_crm','bb_crm','crm','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock','sale_crm','purchase_stock'],
 
     # always loaded
     'data': [
+        'data/Groups.xml',
         'security/ir.model.access.csv',
         'data/Stages.xml',
         'data/Estimate.xml',
@@ -54,6 +55,7 @@
         'views/Routing.xml',
         'views/Bom.xml',
         'views/SalesOrder.xml',
+        'data/sale_order_mail_template.xml',
         'views/Invoice.xml',
         'data/invoice_mail_template.xml',
         'views/PurchaseOrder.xml',
@@ -62,6 +64,7 @@
         'views/StockPicking.xml',
         'views/Projects.xml',
         'views/CRM.xml',
+        'reports/views/ConversionAnalysis.xml',
         'wizards/views/OrderConvert.xml',
         'wizards/views/MoConfirmation.xml',
         'wizards/views/Packing.xml',

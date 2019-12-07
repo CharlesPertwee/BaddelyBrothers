@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
+
 class ProductsTemplate(models.Model):
     _inherit = 'product.template'
     _name = 'product.template'
     
-    productType = fields.Selection([('Stock','Stock Material'),('Trade Counter','Trade Counter'),('Non-Stockable','Non Stockable Product'),('Finished','Finished Product'),('Package','Package'),('Delivery','Delivery')],string="Material Type",default="Trade Counter")
+    productType = fields.Selection([('Stock','Stock Material'),('Trade Counter','Trade Counter'),('Non-Stockable','Non Stockable Product'),('Finished','Finished Product'),('Package','Package'),('Delivery','Delivery'),('Outwork','Outwork')],string="Material Type",default="Trade Counter")
     isEnvelope = fields.Boolean('Is Envelope?')
     customerDescription = fields.Char('Standard customer Description')
     jobTicketDescription = fields.Char('Standard Job Ticket Text')
@@ -19,6 +21,7 @@ class ProductsTemplate(models.Model):
     staticPrice = fields.Boolean('Static Price')
     lastUsedEstimateDate = fields.Date(string="Last Used Estimate Date")
     lastUsedEstimateNumber = fields.Char(string="Last Used Estimate Number")
+
     
     @api.onchange('margin')
     def calcPriceChange(self):

@@ -156,7 +156,7 @@ class Estimate(models.Model):
     salesOrder = fields.Many2one('sale.order','Sales Order',copy=False)
     
     hasExtra = fields.Boolean('Has Extra',compute="getExtras")
-    estimateConditions = fields.Many2many('bb_estimate.conditions', string="Estimate Conditions")
+    estimateConditions = fields.Many2many('bb_estimate.conditions', string="Estimate Conditions", copy=True)
     isEnvelope = fields.Boolean('Is Envelope',related="product_type.isEnvelope")
     showMo = fields.Boolean('Show Mo Button',related="state.isOrder")
     EnquiryComments = fields.Text('Enquiry Comments')
@@ -164,7 +164,7 @@ class Estimate(models.Model):
     #PackingInstruction = fields.Text('Packing Instructions')
     isLocked = fields.Boolean('Locked',copy=False)
     hasDelivery = fields.Boolean('Delivery Added?',copy=False)
-    priceHistory = fields.One2many('bb_estimate.price_history','Estimate','Price Adjustments',copy=False)
+    priceHistory = fields.One2many('bb_estimate.price_history','Estimate','Price Adjustments',copy=True)
     
     #Fields For BOM and Invoice Computation
     selectedQuantity = fields.Selection([('1','1'),('2','2'),('3','3'),('4','4')],string="Selected Quantity",default="1",copy=False)
@@ -181,10 +181,12 @@ class Estimate(models.Model):
     Weight_4 = fields.Float('Weight 4',copy=False)
     Weight_run_on = fields.Float('Weight Run On',copy=False)
     
-    lead = fields.Many2one('crm.lead','Enquiry',copy=False)
+    lead = fields.Many2one('crm.lead','Enquiry',copy=True)
     reSyncCount = fields.Integer('Re Sync Count',compute='_compute_reSync')
     
-    AuditLog = fields.One2many('bb_estimate.audit_log','estimate','Audit Log',copy=False)
+    ChangeLog = fields.Html("Change Log")
+    
+    AppendLog = fields.Boolean('Append Log')
     
     def _compute_reSync(self):
         for record in self:
@@ -220,8 +222,39 @@ class Estimate(models.Model):
         val['estimate_number'] = self.env['ir.sequence'].next_by_code('bb_estimate.estimate')
         record = super(Estimate,self).create(val)
         conditions = self.env['bb_estimate.conditions'].sudo().search([('isDefault','=',True)])
-        record.estimateConditions = conditions
+        record.estimateConditions = conditions if not record.estimateConditions else record.estimateConditions
         return record
+    
+    @api.multi
+    def write(self,vals):
+        old = {x.id:[x['lineName'],x['quantity_required_1'],x['quantity_required_2'],x['quantity_required_3'],x['quantity_required_4'],x['quantity_required_run_on']] for x in self.estimate_line}
+        currentRecord = super(Estimate, self).write(vals)
+        new = {x.id:[x['lineName'],x['quantity_required_1'],x['quantity_required_2'],x['quantity_required_3'],x['quantity_required_4'],x['quantity_required_run_on']] for x in self.estimate_line}
+        
+        changedRecords = [[new[x][0],old[x][1],new[x][1],old[x][2],new[x][2],old[x][3],new[x][3],old[x][4],new[x][4],old[x][5],new[x][5]] for x in filter(lambda x: old[x] != new[x], new.keys())]
+#         changedRecords = ['%s - Qty1 %0.2f to %0.2f Qty2 %0.2f to %0.2f Qty3 %0.2f to %0.2f Qty4 %0.2f to %0.2f Qty Run On %0.2f to %0.2f'
+#                             %(new[x][0],old[x][1],new[x][1],old[x][2],new[x][2],old[x][3],new[x][3],old[x][4],new[x][4],old[x][5],new[x][5]) 
+#                             for x in filter(lambda x: old[x] != new[x], new.keys())]
+        #raise Exception(old,new,changedRecords)
+        
+        update_vals = {}
+        if 'estimate_line' in vals.keys():
+            values = {
+                'lines': changedRecords
+                }
+            body = self.env.ref('bb_estimate.change_log').render(values=values)
+            update_vals = { 'ChangeLog': body }
+        else:
+            update_vals = { 'ChangeLog': '' }
+            
+        if 'total_price_1' in vals.keys():
+            self.lead.write({'planned_revenue':vals['total_price_1']})
+            
+        
+        currentRecord = super(Estimate, self).write(update_vals)
+        #raise Exception(old,new)
+        return currentRecord
+        
     
     @api.depends('hasExtra')
     def getExtras(self):
@@ -346,7 +379,7 @@ class Estimate(models.Model):
                 'name': 'Add New Line',
                 'res_model' : 'bb_estimate.estimate_line',
                 'type' : 'ir.actions.act_window',
-                'context' : "{'default_estimate_id' : active_id,'default_grammage' : %d}"%(self.grammage),
+                'context' : "{'default_estimate_id' : active_id,'default_grammage' : %d,'default_param_number_up' : %d}"%(self.grammage,self.number_up),
                 'target' : 'new',
             }
     

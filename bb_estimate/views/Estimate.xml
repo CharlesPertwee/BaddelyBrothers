@@ -42,7 +42,7 @@
                 <header>
                     <button class="oe_stat_button" type="object" name="EstimateLetter" string="Print Letter" />
                     <button name="AdjustPrice" string="Adjust Prices" type="object" attrs="{'invisible':['|',('id','=',False),('isLocked','!=',False)]}"/>
-                    <button name="AmmendQty" string="Amend Qty" type="object" attrs="{'invisible':[('isLocked','=',False)]}"/>
+                    <button name="AmmendQty" string="Amend Qty" type="object" attrs="{'invisible':['|',('isLocked','=',False),('AppendLog','=',True)]}"/>
                     <field name="state" widget="statusbar" clickable="True" />
                 </header>
                 <sheet>
@@ -65,8 +65,9 @@
                         <group>
                             <field name="partner_id" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('is_company','=',True)]" />
                             <field name="contact" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',partner_id)]" />
-                            <field name="project" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('partner_id','=',partner_id)]"/>
+                            <field name="project" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="['|',('partner_id','=',partner_id),('partner_id','parent_of',partner_id)]"/>
                             <field name="invoice_account" options="{'no_create_edit': True}" required="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
+                            <field name="AppendLog" invisible="1"/>
                             <field name="lead" attrs="{'readonly':[('isLocked','=',True)]}" domain="[('typeOfLead','=','Bespoke')]" />
                         </group>
                         <group>
@@ -78,6 +79,9 @@
                             <field name="event_date" attrs="{'readonly':[('isLocked','=',True)]}"/>
                             <field name="target_dispatch_date" attrs="{'readonly':[('isLocked','=',True)]}" required="1"/>
                         </group>
+                    </group>
+                    <group>
+                        <field name="ChangeLog" readonly="1"/>
                     </group>
                     <notebook>
                         <page name="EstimateDetails" string="Estimate Details">
@@ -171,28 +175,8 @@
                         <page name="EstimateLines" string="Estimate Lines" attrs="{'invisible':[('id','=',False)]}">
                             <field name="estimate_line" />
                         </page>
-                        <page string="Estimate Conditions" attrs="{'invisible':[('id','=',False)]}">
+                        <page string="Estimate Conditions">
                             <field name="estimateConditions" attrs="{'readonly':[('isLocked','=',True)]}"/>
-                        </page>
-                        <page name="AuditLog" string="Audit Log">
-                            <field name="AuditLog" readonly="1">
-                                <tree>
-                                    <field name="create_uid" string="By"/>
-                                    <field name="create_date" string="On" />
-                                    <field name="estimateLine"/>
-                                    <field name="quantity_1"/>
-                                    <field name="quantity_2"/>
-                                    <field name="quantity_3"/>
-                                    <field name="quantity_4"/>
-                                    <field name="quantity_run_on"/>
-                                    <field name="changed_quantity_1"/>
-                                    <field name="changed_quantity_2"/>
-                                    <field name="changed_quantity_3"/>
-                                    <field name="changed_quantity_4"/>
-                                    <field name="changed_quantity_run_on"/>
-                                    <field name="Action"/>
-                                </tree>
-                            </field>
                         </page>
                         <page name="PriceAdjustments" string="Price Adjustments">
                             <field name="priceHistory" readonly="1">
@@ -267,6 +251,7 @@
                             </sheet>
                         </page>
                     </notebook>
+                    
                     <group col="15">
                         <label for="total_price_1" string="Prices" colspan="10"/>
                         <field name="total_price_1" nolabel="1" readonly="1"/>
@@ -275,6 +260,7 @@
                         <field name="total_price_4" nolabel="1" readonly="1"/>
                         <field name="total_price_run_on" nolabel="1" readonly="1"/>
                     </group>
+                    
                     <group>
                         <group>
                             <field name="EnquiryComments"/>
@@ -360,7 +346,8 @@
         </field>
     </record>
       
-    <menuitem name="Job Estimates" id="bb_estimate_estimates" action="bb_estimate.action_window_estimate"/>
-    <menuitem name="Configurations" id="bb_estimate_config" parent="bb_estimate_estimates"/>
+    <menuitem name="Estimating" id="bb_estimate_estimates" action="bb_estimate.action_window_estimate"/>
+    <menuitem name="Configurations" id="bb_estimate_config" parent="bb_estimate_estimates" groups="bb_estimate.group_estimate_manager"/>
+    <menuitem name="Reporting" id="bb_estimate_reports" parent="bb_estimate_estimates"/>
   </data>
 </odoo>

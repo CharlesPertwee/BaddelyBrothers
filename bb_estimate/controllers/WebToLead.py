@@ -29,13 +29,21 @@ class WebToLead(WebsiteForm):
             values = {key:value for key,value in values.items() if 'print' not in key.lower()}
             values['enquiryEnvelopeWindow'] = True if values['enquiryEnvelopeWindow'] == 'yes' else False
             if 'enquirySize' in values and values['enquirySize']:
+                size = request.env['bb_products.material_size'].search([('id','=',values['enquirySize'])])
                 values['size'] = values['enquirySize']
+                values['enquirySizeWidth'] = size.width
+                values['enquirySizeHeight'] = size.height
                 values.pop('enquirySize')
+                
         else:
             values = {key:value for key,value in values.items() if 'envelope' not in key.lower()}
             if 'enquiryPrintSize' in values and values['enquiryPrintSize']:
+                size = request.env['bb_products.material_size'].search([('id','=',values['enquiryPrintSize'])])
                 values['size'] = values['enquiryPrintSize']
+                values['enquirySizeWidth'] = size.width
+                values['enquirySizeHeight'] = size.height
                 values.pop('enquiryPrintSize')
+                values.pop('enquirySize')
                 
         #Addition of custom fields
         values['contact_name'] = ("%s %s")%(values['enquiryFirstName'] if 'enquiryFirstName' in values.keys() else "",values['enquiryLastName'] if 'enquiryLastName' in values.keys() else "")

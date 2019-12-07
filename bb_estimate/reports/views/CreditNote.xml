@@ -5,19 +5,28 @@
             <t t-call="web.html_container">
                     <div style="font-family: Georgia;">
                         <t t-set="estimate" t-value="o.getEstimateData()"/>
-                        <div class="backgroundimage" style="position:absolute;z-index:-999;"> 
-                            <img class="img-responsive" src="/bb_estimate/static/src/img/Bb_invoice.jpg" width="900px" height="1335px"/>
-                        </div> 
+                        <div class="backgroundimage" style="position:absolute;z-index:-999;padding-right:30px;"> 
+                            <img class="img-responsive" src="/bb_estimate/static/src/img/BB_invoice.jpg" width="950px" height="1429px"/>
+                        </div>  
                         <div class="page" style="padding-top:16em; padding-left:2em; padding-right:2em;">
                             <t t-set="o" t-value="o.with_context({'lang': lang})" />
                             <div class="container" style="padding:3em; font-size:14px;">
                                 <div class="row">
                                     <div class="col-7">
-                                        <p><span t-field="o.partner_id.name"/><br/>
-                                            <span t-field="o.partner_id.street"/><br/>
-                                            <span t-field="o.partner_id.city"/><br/>
-                                            <span t-field="o.partner_id.zip"/><br/>
-                                            <span t-field="o.partner_id.country_id"/></p>
+                                        <t t-if="o.partner_id.parent_id">
+                                            <p><span t-field="o.partner_id.parent_id.name"/><br/>
+                                                <span t-field="o.partner_id.street"/><br/>
+                                                <span t-field="o.partner_id.city"/><br/>
+                                                <span t-field="o.partner_id.zip"/><br/>
+                                                <span t-field="o.partner_id.country_id"/></p>
+                                        </t>
+                                        <t t-else="">
+                                            <p><span t-field="o.partner_id.name"/><br/>
+                                                <span t-field="o.partner_id.street"/><br/>
+                                                <span t-field="o.partner_id.city"/><br/>
+                                                <span t-field="o.partner_id.zip"/><br/>
+                                                <span t-field="o.partner_id.country_id"/></p>
+                                        </t>
                                     </div>
                                     <div class="col-5 pull-right">
                                         <div class="row">
@@ -25,7 +34,7 @@
                                                 <p class="pull-left">Date/Tax Point: </p>
                                             </div>
                                             <div class="col-6">
-                                                <p class="pull-left"><span t-field="o.date_invoice"/></p>
+                                                <p class="pull-left"><span t-field="o.date_invoice" t-options="{'widget': 'date'}"/></p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -46,7 +55,7 @@
                                         </div> -->
                                     </div>
                                 </div>
-                            <div class="page" style="max-height:51em; height:51em;">
+                            <div class="page" style="max-height:55em; height:55em;">
                                 <h4 class="text-center"><b>Credit Note</b></h4>
                                 <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])" />
                                 <table class="table table-sm" name="p_forma_line_table">
@@ -68,13 +77,13 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="invoice_tbody">                         
-                                        <t t-foreach="o.invoice_line_ids" t-as="in_line">
+                                    <tbody class="invoice_tbody">
+                                          <t t-if="estimate">
                                             <tr>
                                                 <t t-if="estimate">
-                                                    <td name="account_invoice_line_name" >
+                                                    <td name="account_invoice_line_name">
                                                       <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/> <t t-if="o.name">Your Ref: <span t-field="o.name"/></t><br/>
-                                                          Qty: <span t-field="o.invoice_line_ids[0].quantity"/> <span t-field="estimate.title"/><br/>
+                                                          <span t-field="estimate.title"/><br/>
                                                           Size: <span t-field="estimate.finished_size.width"/> x <span t-field="estimate.finished_size.height"/>
                                                      </p>
                                                       <p>
@@ -82,20 +91,25 @@
                                                       </p>
                                                     </td>
                                                 </t>
-                                                <t t-else="">
-                                                    <td>
-                                                        <p><span t-field="in_line.name"/></p>
-                                                    </td>
-                                                </t>
+                                                <td/>
+                                                <td/>
+                                                <td/>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="o.invoice_line_ids" t-as="in_line">
+                                            <tr>
+                                                <td>
+                                                    <p><span t-field="in_line.name"/></p>
+                                                </td>
                                                 <td class="text-right">
-                                                    <span t-field="in_line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
+                                                    <span t-field="in_line.price_subtotal"/>
                                                 </td>
                                                 <td class="text-right">
                                                     <span t-esc="', '.join(map(lambda x: (x.description or x.name), in_line.invoice_line_tax_ids))"/>
                                                 </td>
                                                 <td class="text-right">
-                                                    <t t-set="tax" t-value="sum(map(lambda x: x.amount,in_line.invoice_line_tax_ids))" />
-                                                    <span t-esc="tax if tax > 0 else 0"/>
+                                                    <t t-set="tax" t-value="sum(map(lambda x: x.amount,in_line.invoice_line_tax_ids))"/>
+                                                    <span t-esc="tax if tax &gt; 0 else 0"/>
                                                 </td>
                                             </tr>
                                         </t>
@@ -133,7 +147,7 @@
                                                             </tr>
                                                             <tr>
                                                                 <td width="150">
-                                                                    Invoice Total
+                                                                    Total
                                                                 </td>
                                                                 <td class="text-right">
                                                                     <span t-field="o.amount_total" />

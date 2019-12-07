@@ -35,7 +35,8 @@ class MaterialLink(models.Model):
         line = self.materialLine
         work_twist = self.work_twist
         line.RecalculatePrices(line,work_twist)
-    
+
+    @api.model
     def create(self,vals):
         rec = super(MaterialLink, self).create(vals)
         line = rec.materialLine
@@ -51,3 +52,5 @@ class MaterialLink(models.Model):
         line.RecalculatePrices(line,work_twist)
         return rec
     
+    def duplicate(self,vals):
+        return super(MaterialLink,self).create(vals)

@@ -1,0 +1,31 @@
+<odoo>
+	<data>
+		<record id="purchase_day_book_tree" model="ir.ui.view">
+	        <field name="name">purchase_day_book</field>
+	        <field name="model">bb_estimate.purchase_day_report</field>
+	        <field name="arch" type="xml">
+				<tree string="Purchase Day Book">
+	                <field name="order_date" />
+	                <field name="supplier" />
+	                <field name="name" />
+	                <field name="qty" />
+	                <field name="description" />
+	                <field name="job_no" />
+	                <field name="value" />
+	                <field name="inv_ref" />
+	                <field name="price" />
+	            </tree>
+	        </field>
+	    </record>
+
+	    <record id="purchase_day_book" model="ir.actions.act_window">
+	        <field name="name">Purchase Day Book</field>
+	        <field name="res_model">bb_estimate.purchase_day_report</field>
+	        <field name="view_mode">tree</field>
+		</record> 
+
+		<menuitem name="Reports" id="purchase_reports" parent="purchase.menu_purchase_root" sequence="25"/>
+
+	    <menuitem id="purchase_day_report_menu" name="Purchase Day Book" parent="purchase_reports" action="purchase_day_book"/>
+	</data>
+</odoo>

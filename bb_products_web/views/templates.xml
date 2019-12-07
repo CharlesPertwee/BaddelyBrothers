@@ -9,10 +9,17 @@
             </xpath>
         </template>
         
+        <template id="product_quantity_bb" inherit_id="website_sale.product_quantity">
+            <xpath expr="//input[@name='add_qty']" position="replace">
+                <input type="text" class="form-control quantity" data-min="1" name="add_qty" t-att-value="add_qty or 1" readonly="1"/>
+            </xpath>
+        </template>
+        
         <template id="product_price_bb" inherit_id="website_sale.product_price">
             <xpath expr="//h4[hasclass('decimal_precision')]" position="replace">
                 
             </xpath>
+            
             <xpath expr="//div[hasclass('mt16')]/h4[1]/span[1]" position="before">
                 <span>Unit Price</span>
                 <input type="hidden" name="roundOff" id="roundOff" class="roundOff" value="100"/>
@@ -22,7 +29,9 @@
        
         <template id="product_quantity" inherit_id="website_sale.product" customize_show="True" name="Select Quantity">
           <xpath expr="//a[@id='add_to_cart']" position="before">
-              <span class="roundOffMsg" id="roundOffMsg">Minimum Quantity and multiples of the same this product can be ordered in: 100</span>
+		  <div class="row col-sm-12"> 
+			<span class="roundOffMsg" id="roundOffMsg">Minimum Quantity and multiples of the same this product can be ordered in: 100</span>
+	  	</div>
           </xpath>
         </template>
         

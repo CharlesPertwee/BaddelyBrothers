@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import odoo, math
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
 from odoo.tools import float_compare, float_round, float_is_zero
 
@@ -110,9 +110,10 @@ class AmmendQty(models.TransientModel):
             price = (self.AmmendedPrice - otherSum)
             current = so.amount_untaxed 
             
-            record.write(
+            record.sudo().write(
                 {
-                    'price_unit': (price / self.AmmendedQty)
+                    'price_unit': (price / self.AmmendedQty),
+                    'product_uom_qty':  self.AmmendedQty + self.RunOn
                 }
             )
     
@@ -120,11 +121,11 @@ class AmmendQty(models.TransientModel):
     def _update_product_to_produce(self, production, qty, old_qty):
         production_move = production.move_finished_ids.filtered(lambda x: x.product_id.id == production.product_id.id and x.state not in ('done', 'cancel'))
         if production_move:
-            production_move.write({'product_uom_qty': qty})
+            production_move.sudo().write({'product_uom_qty': qty})
         else:
             production_move = production._generate_finished_moves()
             production_move = production.move_finished_ids.filtered(lambda x: x.state not in ('done', 'cancel') and production.product_id.id == x.product_id.id)
-            production_move.write({'product_uom_qty': qty})
+            production_move.sudo().write({'product_uom_qty': qty})
         return {production_move: (qty, old_qty)}
 
     @api.multi
@@ -137,17 +138,17 @@ class AmmendQty(models.TransientModel):
             raise UserError(_("You have already processed %s. Please input a quantity higher than %s ") % (format_qty % produced, format_qty % produced))
         
         old_production_qty = production.product_qty
-        production.write({'product_qty': self.AmmendedQty + self.RunOn})
+        production.sudo().write({'product_qty': self.AmmendedQty + self.RunOn})
         done_moves = production.move_finished_ids.filtered(lambda x: x.state == 'done' and x.product_id == production.product_id)
         qty_produced = production.product_id.uom_id._compute_quantity(sum(done_moves.mapped('product_qty')), production.product_uom_id)
         factor = production.product_uom_id._compute_quantity(production.product_qty - qty_produced, production.bom_id.product_uom_id) / production.bom_id.product_qty
         materials, process = ({x.EstimateLineId.id:x for x in self.ChangeLog if (x.product_id and x.EstimateLineId.option_type == 'material' and (not x.EstimateLineId.isExtra))},{x.EstimateLineId.id:x for x in self.ChangeLog if (x.workcenter_id and x.EstimateLineId.option_type == 'process' and (not x.EstimateLineId.isExtra))})
         computed = []
         if production.bom_id:
-            production.bom_id.write({'product_qty': (self.AmmendedQty + self.RunOn)})
+            production.bom_id.sudo().write({'product_qty': (self.AmmendedQty + self.RunOn)})
             for bom_line in production.bom_id.bom_line_ids:
-                line = self.ChangeLog.search([('EstimateLineId.estimate_id','=',self.EstimateId.id),('product_id','=',bom_line.product_id.id),('EstimateLineId.option_type','=','material'),('EstimateLineId.isExtra','=',False),('EstimateLineId.id','not in', computed)],limit=1)
-                bom_line.write({'product_qty':materials[line.EstimateLineId.id].NewRequired})
+                line = self.ChangeLog.search([('EstimateLineId.estimate_id','=',self.EstimateId.id),('product_id','=',bom_line.sudo().product_id.id),('EstimateLineId.option_type','=','material'),('EstimateLineId.isExtra','=',False),('EstimateLineId.id','not in', computed)],limit=1)
+                bom_line.sudo().write({'product_qty':materials[line.EstimateLineId.id].NewRequired})
                 computed.append(line.EstimateLineId.id)
                 
         
@@ -155,7 +156,7 @@ class AmmendQty(models.TransientModel):
         if production.routing_id:
             for route in production.routing_id.operation_ids:
                 line = self.ChangeLog.search([('EstimateLineId.estimate_id','=',self.EstimateId.id),('workcenter_id','=',route.workcenter_id.id),('EstimateLineId.option_type','=','process'),('EstimateLineId.isExtra','=',False),('EstimateLineId.id','not in', computed)],limit=1)
-                route.write({'time_cycle_manual':process[line.EstimateLineId.id].NewRequired})
+                route.sudo().write({'time_cycle_manual':process[line.EstimateLineId.id].NewRequired})
                 computed.append(line.EstimateLineId.id)
         
         boms, lines = production.bom_id.explode(production.product_id, factor, picking_type=production.bom_id.picking_type_id)
@@ -242,8 +243,8 @@ class AmmendQty(models.TransientModel):
             if wo == production.workorder_ids[-1]:
                 moves_raw |= production.move_raw_ids.filtered(lambda move: not move.operation_id)
             moves_finished = production.move_finished_ids.filtered(lambda move: move.operation_id == operation) #TODO: code does nothing, unless maybe by_products?
-            moves_raw.mapped('move_line_ids').write({'workorder_id': wo.id})
-            (moves_finished + moves_raw).write({'workorder_id': wo.id})
+            moves_raw.mapped('move_line_ids').sudo().write({'workorder_id': wo.id})
+            (moves_finished + moves_raw).sudo().write({'workorder_id': wo.id})
             if quantity > 0 and wo.move_raw_ids.filtered(lambda x: x.product_id.tracking != 'none') and not wo.active_move_line_ids:
                 wo._generate_lot_ids()
         return {}
