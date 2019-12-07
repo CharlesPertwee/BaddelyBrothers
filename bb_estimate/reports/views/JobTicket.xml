@@ -86,6 +86,7 @@
                   </tr>
                 </table>
               </td>
+              <p style="page-break-after:always;"/>
             </tr>
             <tr>
              <td colspan="6" style="padding:0px;border:0px">
@@ -114,6 +115,7 @@
 
             </table>
           </td>
+          <p style="page-break-after:always;"/>
         </tr>
         <tr>
          <td colspan="6" style="padding:0px;border:0px">
@@ -152,6 +154,7 @@
          </t>
        </table>
      </td>
+     <p style="page-break-after:always;"/>
    </tr>
    <tr>
      <td colspan="6" style="padding:0px;border:0px">
@@ -174,6 +177,7 @@
          </td>
        </tr>
      </table>
+     <p style="page-break-after:always;"/>
    </td>
  </tr>
  <tr>
@@ -189,25 +193,21 @@
        </tr>
      </table>
    </td>
+   <p style="page-break-after:always;"/>
  </tr>
 </tbody>
 </table>
 </div>
-<div style="width:100%;">
-  <table class="table">
+<div style="width:100%; border: 1px black solid;">
+  <table>
     <tr>
-      <td style="width:90%; border: 1px solid">
-        <span class="pull-left">Feedback</span>
+      <td style="width:90%;">
+        <span class="pull-left">Feedback</span><br/><br/><br/>
       </td>
       <td style="border: 0px black solid;">
-        <center>
-          <p style="transform: rotate(90deg); font-weight: bold; font-size: larger; margin-top: 35%; -webkit-transform: rotate(90deg)">
-            <t t-esc="o.name" />
-          </p>
-        </center>
-        <!--div style="-webkit-transform: rotate(90deg);">
-          <span class="pull-right"><h2><span t-field="o.name"/></h2></span>
-        </div-->
+        <div class="header" style="position: absolute; opacity:0.6;border:0;bottom: -1270px; right: -30px; ;-webkit-transform: rotate(90deg);">
+          <span class="pull-right"><h4><span t-field="o.name"/></h4></span>
+        </div>
       </td>
     </tr>
   </table>
