@@ -10,7 +10,7 @@
                   <tr>
                     <td colspan="2" style="width:33%; border: 1px black solid;">
                       <center>
-                        <b><span t-field="o.name"/></b>
+                        <b style="font-size:22px;"><span t-field="o.name"/></b>
                       </center><br/>
                       <center>
                         <img alt="Barcode" t-if="len(o.name) == 13" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', o.name, 600, 150)" style="width:100%;height:30%;"/>
@@ -94,7 +94,7 @@
 
                 <!-- material -->
                 <t t-foreach="o.Estimate.estimate_line" t-as="line">
-                  <t t-if="line.option_type and line.option_type == 'material' and line.documentCatergory != 'Despatch' and (not line.isExtra)">
+                  <t t-if="line.option_type and line.option_type == 'material' and line.documentCatergory != 'Despatch' and (not line.isExtra) and (line.param_number_out != 0)">
                     <tr>
                       <td style="border-top: 0px; width:35%; line-height: 18px;">
                        <b><span t-esc="line.GenerateMaterialDetails(line)" /></b>
@@ -105,11 +105,8 @@
                      <td style="border-top: 0px; width:15%; line-height: 18px;">
                       <b><span>Cut <t t-esc="line.param_number_out"/> out </span></b>
                     </td>
-                    <td style="border-top: 0px; width:20%; line-height: 18px;">
+                    <td style="border-top: 0px; width:40%; line-height: 18px; border-right: 1px solid black;">
                       <b><span>W/Size:</span>&#160;&#160;&#160;&#160; <t t-esc="o.Estimate.working_width"/> x <t t-esc="o.Estimate.working_height"/> &#160;&#160;&#160;&#160;<span>mm</span></b>
-                    </td>
-                    <td style="border-top: 0px; border-right: 1px black solid; width:15%; line-height: 18px;">
-                      <b><span t-esc="'%0.2f'%((line['quantity_required_'+o.Estimate.selectedQuantity]  * o.Estimate.SelectedQtyRatio) + (line['quantity_required_run_on'] * o.Estimate.selectedRatio))"/></b>
                     </td>
                   </tr>
                 </t>
