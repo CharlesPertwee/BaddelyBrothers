@@ -1,28 +1,28 @@
 <odoo>
     <template id="report_inv_head_document">
         <t t-foreach="docs" t-as="o">
-        <t t-call="web.basic_layout">
-            <t t-call="web.html_container">
+            <t t-call="web.basic_layout">
+                <t t-call="web.html_container">
                     <div style="font-family: Georgia;">
                         <t t-set="estimate" t-value="o.getEstimateData()"/>
                         <div class="page" style="padding-top:16em; padding-left:2em; padding-right:2em;">
-                            <t t-set="o" t-value="o.with_context({'lang': lang})" />
+                            <t t-set="o" t-value="o.with_context({'lang': lang})"/>
                             <div class="container" style="padding:3em; font-size:14px;">
                                 <div class="row">
                                     <div class="col-7">
                                         <t t-if="o.partner_id.parent_id">
                                             <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/><br/>
-                                                <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id"/></p>
+                                            <span t-field="o.partner_id.street"/><br/>
+                                            <span t-field="o.partner_id.city"/><br/>
+                                            <span t-field="o.partner_id.zip"/><br/>
+                                            <span t-field="o.partner_id.country_id"/></p>
                                         </t>
                                         <t t-else="">
                                             <p><span t-field="o.partner_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/><br/>
-                                                <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id"/></p>
+                                            <span t-field="o.partner_id.street"/><br/>
+                                            <span t-field="o.partner_id.city"/><br/>
+                                            <span t-field="o.partner_id.zip"/><br/>
+                                            <span t-field="o.partner_id.country_id"/></p>
                                         </t>
                                     </div>
                                     <div class="col-5 pull-right">
@@ -36,136 +36,195 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-6">
-                                                <p class="pull-left">Invoice No: </p>
+                                                <t t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">
+                                                    <p class="pull-left">Invoice No: </p>
+                                                </t>
+                                                <t t-if="o.type == 'out_invoice' and o.state == 'draft'">
+                                                    <p class="pull-left">Invoice No: </p>
+                                                </t>
+                                                <t t-if="o.type == 'out_invoice' and o.state == 'cancel'">
+                                                    <p class="pull-left">Invoice No: </p>
+                                                </t>
+                                                <t t-if="o.type == 'out_refund'">
+                                                    <p class="pull-left">Credit No: </p>
+                                                </t>
+                                                <t t-if="o.type == 'in_refund'">
+                                                    <p class="pull-left">Credit No: </p>
+                                                </t>
+                                                <t t-if="o.type == 'in_invoice'">
+                                                    <p class="pull-left">Bill No: </p>
+                                                </t>
                                             </div>
                                             <div class="col-6">
                                                 <p class="pull-left"><span t-field="o.number"/></p>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <p class="pull-left">A/C Ref: </p>
-                                            </div>
-                                            <div class="col-6">
-                                                <p class="pull-left"><span t-field="o.partner_id.reference"/></p>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
-                            <div class="page" style="max-height:53em; height:53em;">
-                                <h4 class="text-center"><b>Invoice</b></h4>
-                                <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])" />
-                                <table class="table table-sm" name="p_forma_line_table">
-                                    <thead>
-                                        <tr>
-                                            <t t-set="colspan" t-value="6" />
-                                            <th class="text-left">
-                                                <span>Description</span>
-                                            </th>
-                                            <th class="text-right">
-                                                <span>Net Amount</span>
-                                            </th>
-                                            <th t-attf-class="text-right {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                                                <span>VAT Rate</span>
-                                            </th>
-                                            <th t-attf-class="text-right {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                                                <span>VAT</span>
-                                                <t t-set="colspan" t-value="colspan+1" />
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="invoice_tbody">
+                                <div class="page" style="max-height:55em; height:55em;">
+                                    <t t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">
+                                        <h4 class="text-center"><b>Invoice</b></h4>
+                                    </t>
+                                    <t t-if="o.type == 'out_invoice' and o.state == 'draft'">
+                                        <h4 class="text-center"><b>Invoice</b></h4>
+                                    </t>
+                                    <t t-if="o.type == 'out_invoice' and o.state == 'cancel'">
+                                        <h4 class="text-center"><b>Invoice</b></h4>
+                                    </t>
+                                    <t t-if="o.type == 'out_refund'">
+                                        <h4 class="text-center"><b>Credit Note</b></h4>
+                                    </t>
+                                    <t t-if="o.type == 'in_refund'">
+                                        <h4 class="text-center"><b>Credit Note</b></h4>
+                                    </t>
+                                    <t t-if="o.type == 'in_invoice'">
+                                        <h4 class="text-center"><b>Bill</b></h4>
+                                    </t>
+                                    
+                                    <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
+                                    <table class="table table-sm" name="p_forma_line_table">
+                                        <thead>
+                                            <tr>
+                                                <t t-set="colspan" t-value="6"/>
+                                                <th class="text-left">
+                                                    <span>Description</span>
+                                                </th>
+                                                <th class="text-right">
+                                                    <span>Net Amount</span>
+                                                </th>
+                                                <th t-attf-class="text-right {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                                    <span>VAT Rate</span>
+                                                </th>
+                                                <th t-attf-class="text-right {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                                    <span>VAT</span>
+                                                    <t t-set="colspan" t-value="colspan+1"/>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="invoice_tbody">
                                           <t t-if="estimate">
                                             <tr>
                                                 <t t-if="estimate">
                                                     <td name="account_invoice_line_name">
                                                       <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/> <t t-if="o.name">Your Ref: <span t-field="o.name"/></t><br/>
-                                                          <span t-field="estimate.title"/><br/>
-                                                          Size: <span t-field="estimate.finished_size.width"/> x <span t-field="estimate.finished_size.height"/>
-                                                     </p>
-                                                      <p>
-                                                          <span t-field="o.invoiceDescription"/>
-                                                      </p>
-                                                    </td>
-                                                </t>
-                                                <td/>
-                                                <td/>
-                                                <td/>
-                                            </tr>
-                                        </t>
-                                        <t t-foreach="o.invoice_line_ids" t-as="in_line">
-                                            <tr>
-                                                <td>
-                                                    <p><span t-field="in_line.name"/></p>
-                                                </td>
-                                                <td class="text-right">
-                                                    <span t-field="in_line.price_subtotal"/>
-                                                </td>
-                                                <td class="text-right">
-                                                    <span t-esc="', '.join(map(lambda x: (x.description or x.name), in_line.invoice_line_tax_ids))"/>
-                                                </td>
-                                                <td class="text-right">
-                                                    <t t-set="tax" t-value="sum(map(lambda x: x.amount,in_line.invoice_line_tax_ids))"/>
-                                                    <span t-esc="tax if tax &gt; 0 else 0"/>
-                                                </td>
-                                            </tr>
-                                        </t>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div style="position: relative; left: 0; bottom: 0;width: 100%;">
-                                <t t-if="o.partner_id.vat"><p class="pull-left">VAT: <span t-field="o.partner_id.vat"/></p></t>
-                                <hr/>
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-8" style="font-size: 14px;">
-                                            <p>Settlement terms are strictly 30 days net of invoice</p>
-                                            <p class="pull-left">Kindly ensure all remittances are sent to the above address.<br/>
-                                                                Bank details Sort Code: 20-99-21 Account No: 60134015<br/>
-                                                                Thankyou</p>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="clearfix">
-                                                <div id="total" class="row">
-                                                    <div>
-                                                        <table>
-                                                            <tr>
-                                                                <td width="150">
-                                                                    Total Net
-                                                                </td>
-                                                                <td class="text-right">
-                                                                    <span t-field="o.amount_untaxed" />
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td width="150">
-                                                                    Total VAT
-                                                                </td>
-                                                                <td class="text-right">
-                                                                    <span t-field="o.amount_tax" />
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td width="150">
-                                                                    Invoice Total
-                                                                </td>
-                                                                <td class="text-right">
-                                                                    <span t-field="o.amount_total" />
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </div>
-                                                </div>
+                                                      <span t-field="estimate.title"/><br/>
+                                                      Size: <span t-field="estimate.finished_size.width"/> x <span t-field="estimate.finished_size.height"/>
+                                                  </p>
+                                                  <p>
+                                                      <span t-field="o.invoiceDescription"/>
+                                                  </p>
+                                              </td>
+                                          </t>
+                                          <td/>
+                                          <td/>
+                                          <td/>
+                                      </tr>
+                                  </t>
+                                  <t t-foreach="o.invoice_line_ids" t-as="in_line">
+                                    <tr>
+                                        <td>
+                                            <p><span t-field="in_line.name"/></p>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="in_line.price_subtotal"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="', '.join(map(lambda x: (x.description or x.name), in_line.invoice_line_tax_ids))"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <t t-set="tax" t-value="sum(map(lambda x: x.amount,in_line.invoice_line_tax_ids))"/>
+                                            <span t-esc="tax if tax &gt; 0 else 0"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                    <footer style="position: relative; left: 0; bottom: 0;width: 100%;">
+                        <t t-if="o.partner_id.vat"><p class="pull-left">VAT: <span t-field="o.partner_id.vat"/></p></t>
+                        <hr/>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-8" style="font-size: 14px;">
+                                    <t t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">
+                                        <p>Settlement terms are strictly 30 days net of invoice</p>
+                                        <p class="pull-left">Kindly ensure all remittances are sent to the above address.<br/>
+                                        Bank details Sort Code: 20-99-21 Account No: 60134015<br/>
+                                        Thankyou</p>
+                                    </t>
+                                    <t t-if="o.type == 'out_invoice' and o.state == 'draft'">
+                                        <p>Settlement terms are strictly 30 days net of invoice</p>
+                                        <p class="pull-left">Kindly ensure all remittances are sent to the above address.<br/>
+                                        Bank details Sort Code: 20-99-21 Account No: 60134015<br/>
+                                        Thankyou</p>
+                                    </t>
+                                    <t t-if="o.type == 'out_invoice' and o.state == 'cancel'">
+                                        <p>Settlement terms are strictly 30 days net of invoice</p>
+                                        <p class="pull-left">Kindly ensure all remittances are sent to the above address.<br/>
+                                        Bank details Sort Code: 20-99-21 Account No: 60134015<br/>
+                                        Thankyou</p>
+                                    </t>
+                                </div>
+                                <div class="col-4">
+                                    <div class="clearfix">
+                                        <div id="total" class="row">
+                                            <div>
+                                                <table>
+                                                    <tr>
+                                                        <td width="150">
+                                                            Total Net
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-field="o.amount_untaxed"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="150">
+                                                            Total VAT
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-field="o.amount_tax"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="150">
+                                                            <t t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">
+                                                                Invoice Total
+                                                            </t>
+                                                            <t t-if="o.type == 'out_invoice' and o.state == 'draft'">
+                                                                Invoice Total
+                                                            </t>
+                                                            <t t-if="o.type == 'out_invoice' and o.state == 'cancel'">
+                                                                Invoice Total
+                                                            </t>
+                                                            <t t-if="o.type == 'out_refund'">
+                                                                Total
+                                                            </t>
+                                                            <t t-if="o.type == 'in_refund'">
+                                                                Total
+                                                            </t>
+                                                            <t t-if="o.type == 'in_invoice'">
+                                                                Total
+                                                            </t>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-field="o.amount_total"/>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>                                    
                                 </div>
-                            </div>
+                            </div>                                    
                         </div>
-                    </div>
-                    </div>
-                </t>
-            </t>
-        </t>
-    </template>  
+                    </footer>
+                </div>
+            </div>
+        </div>
+    </t>
+</t>
+</t>
+</template>   
 </odoo>
+
