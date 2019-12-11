@@ -18,6 +18,43 @@ import io
 import traceback
 import os
 
+DIE_SIZES = [
+    ('none', ''),
+    ('standard','No Die (No Charge)'),
+    ('small','Crest Die'),
+    ('medium','Heading Die'),
+    ('large','Invitation Die')
+]
+
+ENVELOPE_TYPES = [
+    ('none', ''),
+    ('diamond', 'Diamond'),
+    ('highcutdiamond','High Cut Diamond'),
+    ('tuck', 'Tuck'),
+    ('pocket', 'Pocket'),
+    ('walletpocket','Walletstyle Pocket'),
+    ('wallet', 'Wallet'),
+    ('banker', 'Banker'),
+    ('tissuelined', 'Tissue Lined, Embossed & Windowed'),
+]
+
+FLAP_GLUE_TYPES = [
+    ('none', ''),
+    ('gummed', 'Gummed'),
+    ('doublegummed','Double Gummed'),
+    ('peel', 'Peel & Stick'),
+    ('ungummed', 'Un-gummed'),
+    ('topless', 'Topless'),
+    ('stringwasher', 'String & Washer'),
+]
+
+TISSUE_LINING_OPTIONS = [
+    ('none', ''),
+    ('full', 'Yes - Fully'),
+    ('half', 'Yes - Half'),
+    ('unlined', 'Unlined'),
+]
+
 class BbEstimate(http.Controller):
     @http.route('/bb_estimate/bb_estimate/estimateLetter/<string:id>', auth='public')
     def estimate_letter(self, **kw):
@@ -71,7 +108,7 @@ class BbEstimate(http.Controller):
             
         table.line_spacing_rule = 0
         table.autofit = True
-        table.cell(0,0).text = Estimate.partner_id.parent_id.name if Estimate.partner_id.parent_id else Estimate.partner_id.name
+        table.cell(0,0).text = Estimate.partner_id.name
         table.cell(0,2).paragraphs[0].text = "Date: %s"%(str(datetime.datetime.now().strftime('%d/%m/%Y')))
         table.cell(0,2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         
@@ -127,9 +164,29 @@ class BbEstimate(http.Controller):
         senten1.font.name = "Tahoma"
         senten1 = parag1.add_run("\nThank you for your enquiry, we have pleasure in submitting our estimate as follows:")
         senten1.font.name = "Tahoma"
+
+        new_col = 2
+        if Estimate.isEnvelope:
+            if (Estimate.envelope_type) and (not Estimate.envelope_type == 'none'):
+                new_col += 1
+
+            if (Estimate.flap_glue_type) and (not Estimate.flap_glue_type == 'none'):
+                new_col += 1
+
+            if (Estimate.tissue_lined) and (not Estimate.tissue_lined == 'none'):
+                new_col += 1
+
+            if Estimate.embossed:
+                new_col += 1
+
+            if Estimate.windowed:
+                if not Estimate.standardWindowSize:
+                    new_col += 1
+                else:
+                    new_col += 2
         
         record_length = len([x for x in Estimate.estimate_line if x.customer_description and (not x.isExtra)])
-        addtitional = sum([1 for x in ['quantity_1','quantity_2','quantity_3','quantity_4','run_on'] if Estimate[x] > 0]) + 2
+        addtitional = sum([1 for x in ['quantity_1','quantity_2','quantity_3','quantity_4','run_on'] if Estimate[x] > 0]) + new_col
         data_table = document.add_table((record_length + addtitional) , 2)  
         #raise Exception((record_length + addtitional))
         data_table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -161,7 +218,7 @@ class BbEstimate(http.Controller):
             tcBorders.append(right)
             tcPr.append(tcBorders)
         
-        inches = 1.0 
+        inches = 1.5
         
         data_table.cell(0,0).text = "Title: "   
         #data_table[0].width = Inches(inches)
@@ -172,13 +229,49 @@ class BbEstimate(http.Controller):
         data_table.cell(1,1).text = "%s X %s\n"%(Estimate.finished_height,Estimate.finished_width)
         data_table.cell(1,1).vertical_alignment = WD_ALIGN_VERTICAL.TOP
        
-        y = 2
+        y = 2             
+
         for estimate_line_material in Estimate.estimate_line:
             if estimate_line_material.option_type == 'material' and estimate_line_material.customer_description and (not estimate_line_material.isExtra):
                 data_table.cell(y,0).text = "Material: "
                 #data_table.cell(y,0).width = Inches(inches)
                 data_table.cell(y,1).text = estimate_line_material.customer_description
                 y += 1
+
+        if Estimate.isEnvelope:
+            if (Estimate.envelope_type) and (not Estimate.envelope_type == 'none'):
+                data_table.cell(y,0).text = "Type: "   
+                data_table.cell(y,1).text = dict(ENVELOPE_TYPES)[Estimate.envelope_type]
+                y += 1
+
+            if (Estimate.flap_glue_type) and (not Estimate.flap_glue_type == 'none'):
+                data_table.cell(y,0).text = "Flap: "   
+                data_table.cell(y,1).text = dict(FLAP_GLUE_TYPES)[Estimate.flap_glue_type]
+                y += 1
+
+            if (Estimate.tissue_lined) and (not Estimate.tissue_lined == 'none'):
+                data_table.cell(y,0).text = "Lining: "   
+                data_table.cell(y,1).text = dict(TISSUE_LINING_OPTIONS)[Estimate.tissue_lined]
+                y += 1
+
+            if Estimate.embossed:
+                data_table.cell(y,0).text = "Process: "   
+                data_table.cell(y,1).text ="Blind Embossed"
+                y += 1
+
+            if Estimate.windowed:
+                if not Estimate.standardWindowSize:
+                    data_table.cell(y,0).text = "Window Size: "   
+                    data_table.cell(y,1).text ="Standard"
+                    y += 1
+
+                else:
+                    data_table.cell(y,0).text = "Window Size: "
+                    data_table.cell(y,1).text = '%s mm  x  %s mm' % (Estimate.windowHeight, Estimate.windowWidth)
+                    y += 1
+                    data_table.cell(y,0).text = "Window Pos: "
+                    data_table.cell(y,1).text = '%s mm FLHS,  %s mm Up' % (Estimate.windowFlhs, Estimate.windowUp)
+                    y += 1
         
         
         for estimate_line_process in Estimate.estimate_line:
@@ -255,7 +348,7 @@ class BbEstimate(http.Controller):
                         
         #for column in data_table.columns[0]:
         data_table.columns[0].width = Inches(inches)
-        data_table.columns[1].width = Inches(5.56)
+        data_table.columns[1].width = Inches(5.06)
             
 #         for row in data_table.rows:
 #             row.cells[0].width = Inches(0.5)
@@ -268,16 +361,16 @@ class BbEstimate(http.Controller):
 #         run = line.add_run()
 #         run.add_break() 
 
-        envelopeLine = ""
-        if Estimate.isEnvelope:
-            envelopeLine = document.add_paragraph(Estimate.GenerateEnvelopeDetails(Estimate),style=paragraph_format)
-            paragraph_format4 = envelopeLine.paragraph_format
-            paragraph_format4.left_indent = Inches(0.09)
-            envelopeLine.style.font.size = Pt(8)
+        # envelopeLine = ""
+        # if Estimate.isEnvelope:
+        #     envelopeLine = document.add_paragraph(Estimate.GenerateEnvelopeDetails(Estimate),style=paragraph_format)
+        #     paragraph_format4 = envelopeLine.paragraph_format
+        #     paragraph_format4.left_indent = Inches(0.09)
+        #     envelopeLine.style.font.size = Pt(8)
             
-        if envelopeLine:
-            runEnv = envelopeLine.add_run()
-            runEnv.add_break()
+        # if envelopeLine:
+        #     runEnv = envelopeLine.add_run()
+        #     runEnv.add_break()
         
         if Estimate.hasExtra:
             extra_length = (len([x for x in Estimate.estimate_line if (x.isExtra and x.extraDescription)]))
@@ -354,6 +447,7 @@ class BbEstimate(http.Controller):
                 paragraph_format2.space_before = Pt(12)
                 spaceApplied = True
             paragraph_format2.left_indent = Inches(0.09)
+
             line.style.font.size = Pt(9)
         
         if line:
