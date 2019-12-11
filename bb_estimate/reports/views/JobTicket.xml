@@ -43,7 +43,7 @@
                   </tr>
                   <tr>
                    <td colspan="6" style="padding:0px;border:0px">
-                     <table class="table" style="margin:0px;">
+                      <table class="table" style="margin:0px;">
                        <tr>
                         <td style="border-right: 0px; width:23% line-height: 15px;">
                          <span class="pull-left">Job Type: &#160;&#160;&#160;&#160; <b><span t-field="o.JobType"/></b></span>
@@ -53,10 +53,10 @@
                        </td>
                        <td style="border-right: 1px black solid; width:23%; line-height: 15px;">
                         <span class="pull-right">Fin Size:&#160;&#160;&#160;<b>(<span t-field="o.Estimate.finished_height" /> x <span t-field="o.Estimate.finished_width" />)</b></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colspan="6" style="border-top: 1px black solid; border-right: 1px black solid; line-height: 18px;">
+                       </td>
+                      </tr>
+                      <tr>
+                       <td colspan="6" style="border-top: 1px black solid; border-right: 1px black solid; line-height: 18px;">
                         <span>Job Description</span><span class="pull-right">Printed <b><t t-esc="o.Estimate.number_up"/></b> up</span><br/>
                         <t t-foreach="o.Estimate.estimate_line" t-as="line">
                           <t t-if="line.JobTicketText and (not line.isExtra)">
@@ -64,7 +64,7 @@
                           </t>
                         </t>
                       </td>
-                    </tr>
+                      </tr>
                   </table>
                 </td>
               </tr>
@@ -86,7 +86,6 @@
                   </tr>
                 </table>
               </td>
-              <p style="page-break-after:always;"/>
             </tr>
             <tr>
              <td colspan="6" style="padding:0px;border:0px">
@@ -115,76 +114,77 @@
 
             </table>
           </td>
-          <p style="page-break-after:always;"/>
         </tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:-18px;">
+  <tr>
+    <td colspan="6" style="padding:0px;border:0px">
+      <table class="table" style="margin:0px;">
         <tr>
-         <td colspan="6" style="padding:0px;border:0px">
-           <table class="table" style="margin:0px;">
-             <tr>
-              <td style="border-top: 1px black solid; border-right: 1px black dotted; width:57%; padding: 0 0.75rem;">
-                <span>Process</span><br/>
+          <td style="border-left: 1px black solid;border-top: 1px black solid; border-right: 1px black dotted; width:57%; padding: 0 0.75rem;">
+            <span>Process</span><br/>
+          </td>
+          <td style="border-top: 1px black solid; border-right: 1px black dotted; width:15%; padding: 0;">
+           <center><span>Qty Req'd</span></center>
+         </td>
+         <td style="border-top: 1px black solid; border-right: 1px black dotted; width:14%; padding: 0;">
+           <center><span>Qty Finish</span></center>
+         </td>
+         <td style="border-top: 1px black solid; border-right: 1px black solid; width:14%;padding: 0;">
+           <center><span>Time</span></center>
+         </td>
+        </tr>
+        <t t-foreach="o.Estimate.estimate_line" t-as="line">
+          <t t-if="line.option_type and line.option_type == 'process' and (not line.isExtra)">
+            <tr>
+              <td style="border-left: 1px black solid;border-top: 1px black dotted; border-right: 1px black dotted; width:57%; padding: 0 0.75rem;">
+                <span><b><t t-esc="line.lineName"/></b></span><br/>
               </td>
-              <td style="border-top: 1px black solid; border-right: 1px black dotted; width:15%; padding: 0;">
-               <center><span>Qty Req'd</span></center>
+              <td style="border-top: 1px black dotted; border-right: 1px black dotted; width:15%; padding: 0;">
+                <center></center>
+              </td>
+              <td style="border-top: 1px black dotted; border-right: 1px black dotted; width:14%; padding: 0;">
+               <center></center>
              </td>
-             <td style="border-top: 1px black solid; border-right: 1px black dotted; width:14%; padding: 0;">
-               <center><span>Qty Finish</span></center>
-             </td>
-             <td style="border-top: 1px black solid; border-right: 1px black solid; width:14%;">
-               <center><span>Time</span></center>
+             <td style="border-top: 1px black dotted; border-right: 1px black solid; width:14%; padding: 0;">
+               <center><b><span t-esc="(line['quantity_required_'+o.Estimate.selectedQuantity] * o.Estimate.SelectedQtyRatio) + (line['quantity_required_run_on'] * o.Estimate.selectedRatio)" t-options="{'widget': 'float_time'}"/></b></center>
              </td>
            </tr>
-           <t t-foreach="o.Estimate.estimate_line" t-as="line">
-            <t t-if="line.option_type and line.option_type == 'process' and (not line.isExtra)">
-              <tr>
-                <td style="border-top: 1px black dotted; border-right: 1px black dotted; width:57%; padding: 0 0.75rem;">
-                  <span><b><t t-esc="line.lineName"/></b></span><br/>
-                </td>
-                <td style="border-top: 1px black dotted; border-right: 1px black dotted; width:15%; padding: 0;">
-                  <center></center>
-                </td>
-                <td style="border-top: 1px black dotted; border-right: 1px black dotted; width:14%; padding: 0;">
-                 <center></center>
-               </td>
-               <td style="border-top: 1px black dotted; border-right: 1px black solid; width:14%; padding: 0;">
-                 <center><b><span t-esc="(line['quantity_required_'+o.Estimate.selectedQuantity] * o.Estimate.SelectedQtyRatio) + (line['quantity_required_run_on'] * o.Estimate.selectedRatio)" t-options="{'widget': 'float_time'}"/></b></center>
-               </td>
-             </tr>
-           </t>
          </t>
-       </table>
-     </td>
-     <p style="page-break-after:always;"/>
-   </tr>
-   <tr>
-     <td colspan="6" style="padding:0px;border:0px">
-       <table class="table" style="margin:0px;">
-         <tr>
-           <td style="border-top: 1px black solid; border-right: 1px black solid; width:20%; line-height: 18px; ">
+       </t>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="6" style="padding:0px;border:0px">
+      <table class="table" style="margin:0px;">
+        <tr>
+          <td style="border-left: 1px black solid;border-top: 1px black solid; border-right: 1px black solid; width:20%; line-height: 18px; ">
             <center><span>No of File Copies Req'd: <b><span t-field="o.NoOfCopiesRequired" /></b></span></center>
           </td>
           <td style="border-top: 1px black solid; border-right: 1px black solid; width:20%; line-height: 18px;">
-           <center><span>Overs Req'd(Y/N): <b><t t-esc="'Y' if o.ChargeOvers else 'N'"/> <span t-field="o.OversRequired" /></b></span></center>
+            <center><span>Overs Req'd(Y/N): <b><t t-esc="'Y' if o.ChargeOvers else 'N'"/> <span t-field="o.OversRequired" /></b></span></center>
          </td>
          <td style="border-top: 1px black solid; border-right: 1px black solid; width:17%; line-height: 18px;">
-           <center><span>Return Die to: <b><span t-field="o.DieType"/></b></span></center>
+            <center><span>Return Die to: <b><span t-field="o.DieType"/></b></span></center>
          </td>
          <td style="border-top: 1px black solid; border-right: 1px black solid; width:20%; line-height: 18px;">
-           <center><span>Despatch Method: <b><span t-field="o.Estimate.DeliveryMethod.name" /></b></span></center>
+            <center><span>Despatch Method: <b><span t-field="o.Estimate.DeliveryMethod.name" /></b></span></center>
          </td>
          <td style="border-top: 1px black solid; border-right: 1px black solid; width:23%;">
-           <span class="pull-left">Date: <b></b></span>
+            <span class="pull-left">Date: <b></b></span>
          </td>
-       </tr>
-     </table>
-     <p style="page-break-after:always;"/>
-   </td>
- </tr>
- <tr>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
    <td colspan="6" style="padding:0px;border:0px">
      <table class="table">
        <tr>
-         <td style="border-top: 1px black solid; border-right: 1px black solid;  line-height: 18px;">
+         <td style="border-left: 1px black solid;border-top: 1px black solid; border-right: 1px black solid; border-bottom: 1px black solid; line-height: 18px;">
            <span class="pull-left">Delivery Address: <span t-field="o.Estimate.Delivery.street" />
            <span t-field="o.Estimate.Delivery.street2" />
            <span t-field="o.Estimate.Delivery.city" />
@@ -193,24 +193,19 @@
        </tr>
      </table>
    </td>
-   <p style="page-break-after:always;"/>
  </tr>
-</tbody>
-</table>
 </div>
 <div style="width:100%; border: 1px black solid;">
-  <table>
+  <table class="table">
     <tr>
-      <td style="width:90%;">
+      <td style="width:90%;border-top: 1px black solid;">
         <span class="pull-left">Feedback</span><br/><br/><br/>
-      </td>
-      <td style="border: 0px black solid;">
-        <div class="header" style="position: absolute; opacity:0.6;border:0;bottom: -1270px; right: -30px; ;-webkit-transform: rotate(90deg);">
-          <span class="pull-right"><h4><span t-field="o.name"/></h4></span>
-        </div>
       </td>
     </tr>
   </table>
+  <div class="header" style="position: absolute; opacity:0.6;border:0;bottom: -1270px; right: -30px; ;-webkit-transform: rotate(90deg);">
+    <span class="pull-right"><h4><span t-field="o.name"/></h4></span>
+  </div>
 </div>
 
 </div>
