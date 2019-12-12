@@ -130,7 +130,8 @@ class OrderConvert(models.TransientModel):
             'product_id' : self.EstimateId.product_type.id,
             'product_uom_id':  self.EstimateId.product_type.uom_id.id,
             'Estimate' : self.EstimateId.id,
-            'Project':self.EstimateId.project.id
+            'Project':self.EstimateId.project.id,
+            'analytic_account':self.EstimateId.analytic_account.id
         }
         
         mo = order.create(newOrder)
@@ -189,7 +190,8 @@ class OrderConvert(models.TransientModel):
             'user_id': self.EstimateId.estimator.id,
             'Project':self.EstimateId.project.id,
             'commitment_date':self.EstimateId.target_dispatch_date,
-            'order_line':[(0,0,salesProduct)]
+            'order_line':[(0,0,salesProduct)],
+            'analytic_account_id':self.EstimateId.analytic_account.id
         }
 
         if self.EstimateId.lead:
