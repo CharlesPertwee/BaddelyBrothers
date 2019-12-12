@@ -86,6 +86,9 @@ class Leads(models.Model):
     size = fields.Many2one('bb_products.material_size','Size')
     enquirySizeHeight = fields.Integer('Size Height')
     enquirySizeWidth = fields.Integer('Size Width')
+
+    #analytic account
+    analytic_account = fields.Many2one('account.analytic.account','Analytic Account')
         
     def _compute_estimates(self):
             for record in self:
