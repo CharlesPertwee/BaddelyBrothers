@@ -24,14 +24,15 @@
             <xpath expr="//header" position="inside">
                     <button string="New Estimate" name="%(bb_estimate_enquiry)d" type="action" class="oe_highlight"
                             attrs="{'invisible': ['|','&amp;',  ('probability', '=', 0), ('active', '=', False), ('typeOfLead','=','Trade Counter')]}"
-                            context="{'default_lead': active_id, 'default_project': Project, 'default_partner_id': partner_id,'default_quantity_1':Quantity1,'default_quantity_2':Quantity2,'default_quantity_3':Quantity3,'default_quantity_4':Quantity4, 'default_run_on':runOn, 'default_envelope_type':enquiryEnvelopeType, 'default_flap_glue_type':enquiryEnvelopeFlaptype, 'default_tissue_lined':enquiryEnvelopeTissuelIne, 'default_windowed':enquiryEnvelopeWindow, 'default_grammage':enquiryWeightGsm, 'default_finished_size':size, 'default_working_size':size, 'default_finished_height':enquirySizeHeight, 'default_working_height':enquirySizeHeight, 'default_finished_width':enquirySizeWidth,'default_EnquiryComments':description, 'default_working_width':enquirySizeWidth }" />
+                            context="{'default_lead': active_id, 'default_project': Project, 'default_partner_id': partner_id,'default_quantity_1':Quantity1,'default_quantity_2':Quantity2,'default_quantity_3':Quantity3,'default_quantity_4':Quantity4, 'default_run_on':runOn, 'default_envelope_type':enquiryEnvelopeType, 'default_flap_glue_type':enquiryEnvelopeFlaptype, 'default_tissue_lined':enquiryEnvelopeTissuelIne, 'default_windowed':enquiryEnvelopeWindow, 'default_grammage':enquiryWeightGsm, 'default_finished_size':size, 'default_working_size':size, 'default_finished_height':enquirySizeHeight, 'default_working_height':enquirySizeHeight, 'default_finished_width':enquirySizeWidth,'default_EnquiryComments':description, 'default_working_width':enquirySizeWidth,'default_analytic_account':analytic_account }" />
 
                 </xpath>
             <xpath expr="//field[@name='typeOfLead']" position="after">
                 <field name="Project" options="{'no_create_edit': True}" domain="['|',('partner_id','=',partner_id),('partner_id','parent_of',partner_id)]"/>
+                <field name="analytic_account"/>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page string="Estimate Details">
+                <page string="Estimate Details" attrs="{'invisible':[('typeOfLead','=','Trade Counter')]}">
                     <group>
                         <field name="enquiryType" string="Enquiry Type"/>                        
                     </group>
@@ -118,7 +119,7 @@
 		<field name="inherit_id" ref="bb_crm.crm_case_form_view_leads_bb"/>
 		<field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page string="Estimate Details">
+                <page string="Estimate Details" attrs="{'invisible':[('typeOfLead','=','Trade Counter')]}">
                     <group>
                         <field name="enquiryType" string="Enquiry Type"/>                        
                     </group>
