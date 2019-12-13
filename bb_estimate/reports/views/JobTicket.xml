@@ -203,11 +203,16 @@
       </td>
     </tr>
   </table>
-  <div class="header" style="position: absolute; opacity:0.6;border:0;bottom: -1270px; right: -30px; ;-webkit-transform: rotate(90deg);">
-    <span class="pull-right"><h4><span t-field="o.name"/></h4></span>
-  </div>
 </div>
-
+</div>
+<div class="footer">
+	<div class="col-sm-12">
+		<div>
+      <div style="float:right">
+      	<h4><span style="opacity: 0.6" t-field="o.name"/></h4>
+			</div>
+		</div>
+  </div>
 </div>
 </t>
 </t>
