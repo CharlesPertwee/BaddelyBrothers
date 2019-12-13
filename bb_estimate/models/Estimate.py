@@ -300,7 +300,8 @@ class Estimate(models.Model):
             'Weight_3' : self.Weight_3,
             'Weight_4' : self.Weight_4,
             'Weight_run_on' : self.Weight_run_on,
-            'lead' : self.lead,
+            'lead' : self.lead.id if self.lead else False,
+            'analytic_account': self.analytic_account.id if self.analytic_account else False,
             'priceHistory': [(0,0,
                               {
                                 'CurrentPrice1': x.ChangedPrice1,
