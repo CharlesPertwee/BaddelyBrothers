@@ -202,7 +202,6 @@
 <div class="footer" style="opacity:0.6;">
     <span class="pull-right"><h4><span t-field="o.name"/></h4></span>
 </div>
-
 </div>
 </t>
 </t>
