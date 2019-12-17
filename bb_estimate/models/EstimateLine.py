@@ -315,7 +315,7 @@ class EstimateLine(models.Model):
         
         if line.option_type == 'material':
             Grammage = line.material.grammage
-        if Grammage:
+        if Grammage and False:
             name =  '%s %s gsm' % (name, Grammage)
         return name
     

@@ -58,7 +58,8 @@
                       <tr>
                        <td colspan="6" style="border-top: 1px black solid; border-right: 1px black solid; line-height: 18px;">
                         <span>Job Description</span><span class="pull-right">Printed <b><t t-esc="o.Estimate.number_up"/></b> up</span><br/>
-                        <t t-foreach="o.Estimate.estimate_line" t-as="line">
+			<b><t t-raw="o.Estimate.GenerateEnvelopeDetails(o.Estimate).replace('\n','&lt;br/&gt;')"/></b><br/>
+			<t t-foreach="o.Estimate.estimate_line" t-as="line">
                           <t t-if="line.JobTicketText and (not line.isExtra)">
                             <b><span t-field="line.JobTicketText" /></b><br/>
                           </t>
@@ -127,7 +128,7 @@
             <span>Process</span><br/>
           </td>
           <td style="border-top: 1px black solid; border-right: 1px black dotted; width:15%; padding: 0;">
-           <center><span>Qty Req'd</span></center>
+           <center><span>Qty Rec'd</span></center>
          </td>
          <td style="border-top: 1px black solid; border-right: 1px black dotted; width:14%; padding: 0;">
            <center><span>Qty Finish</span></center>
@@ -185,27 +186,21 @@
      <table class="table">
        <tr>
          <td style="border-left: 1px black solid;border-top: 1px black solid; border-right: 1px black solid; border-bottom: 1px black solid; line-height: 18px;">
-           <span class="pull-left">Delivery Address: <span t-field="o.Estimate.Delivery.street" />
+		 <span class="pull-left">Delivery Address: <b><span t-field="o.Estimate.Delivery.street" />
            <span t-field="o.Estimate.Delivery.street2" />
            <span t-field="o.Estimate.Delivery.city" />
-           <span t-field="o.Estimate.Delivery.zip" /></span><br/>
+	   <span t-field="o.Estimate.Delivery.zip" /></b></span><br/>
          </td>
        </tr>
      </table>
    </td>
  </tr>
 </div>
-<div style="width:100%; border: 1px black solid;">
-  <table class="table">
-    <tr>
-      <td style="width:90%;border-top: 1px black solid;">
-        <span class="pull-left">Feedback</span><br/><br/><br/>
-      </td>
-    </tr>
-  </table>
-  <div class="header" style="position: absolute; opacity:0.6;border:0;bottom: -1270px; right: -30px; ;-webkit-transform: rotate(90deg);">
+<div>
+	<span class="pull-left">Feedback: </span>
+</div>
+<div class="footer" style="opacity:0.6;">
     <span class="pull-right"><h4><span t-field="o.name"/></h4></span>
-  </div>
 </div>
 
 </div>

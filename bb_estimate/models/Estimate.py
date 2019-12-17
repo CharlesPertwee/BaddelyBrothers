@@ -144,7 +144,7 @@ class Estimate(models.Model):
     knife_number = fields.Char('Knife Number')
     embossed = fields.Boolean('Embossed')
     windowed = fields.Boolean('Windowed')
-    standardWindowSize = fields.Boolean('Standard Window Size')
+    standardWindowSize = fields.Boolean('Custom Window Size')
     windowHeight = fields.Float('Window Size: Height (mm)',digits=(10,2))
     windowWidth = fields.Float('Window Size:Widht (mm)',digits=(10,2))
     windowFlhs = fields.Float('Window Pos: FLHS',digits=(10,2))
@@ -197,19 +197,19 @@ class Estimate(models.Model):
     def GenerateEnvelopeDetails(self,estimate):
         line = ''
         if estimate.envelope_type:
-            line += '%s' % dict(ENVELOPE_TYPES)[estimate.envelope_type]
+            line += 'Type: %s' % dict(ENVELOPE_TYPES)[estimate.envelope_type]
         if estimate.flap_glue_type:
-            line += '\n%s' % dict(FLAP_GLUE_TYPES)[estimate.flap_glue_type]
+            line += '\nFlap: %s' % dict(FLAP_GLUE_TYPES)[estimate.flap_glue_type]
         if estimate.tissue_lined:
-            line += '\n%s' % dict(TISSUE_LINING_OPTIONS)[estimate.tissue_lined]
+            line += '\nLining: %s' % dict(TISSUE_LINING_OPTIONS)[estimate.tissue_lined]
         if estimate.embossed:
-            line += '\nBlind Embossed'
+            line += '\nProcess: Blind Embossed'
         if estimate.windowed:
             if estimate.standardWindowSize:
-                line += '\nStandard'
+                line += '\nWindow Size: Standard'
             else:
-                line += '\n%s mm  x  %s mm' % (estimate.windowHeight, estimate.windowWidth)
-                line += '\n%s mm FLHS,  %s mm Up' % (estimate.windowFlhs, estimate.windowUp)
+                line += '\nWindow Size: %s mm  x  %s mm' % (estimate.windowHeight, estimate.windowWidth)
+                line += '\nWindow Pos: %s mm FLHS,  %s mm Up' % (estimate.windowFlhs, estimate.windowUp)
         return line
     
     @api.multi
