@@ -205,7 +205,7 @@ class Estimate(models.Model):
         if estimate.embossed:
             line += '\nProcess: Blind Embossed'
         if estimate.windowed:
-            if estimate.standardWindowSize:
+            if not estimate.standardWindowSize:
                 line += '\nWindow Size: Standard'
             else:
                 line += '\nWindow Size: %s mm  x  %s mm' % (estimate.windowHeight, estimate.windowWidth)
