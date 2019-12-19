@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+		<record id="paperformat_check_bb" model="report.paperformat">
+            <field name="name">BB check Letter</field>
+            <field name="default" eval="False"/>
+            <field name="format">Letter</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">0</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">0</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+        
+        <report id="action_print_check_top"
+            string="Print check (Top)"
+            model="account.payment"
+            name="bb_check_printing.print_check_top"
+            file="bb_check_printing.print_check_top"
+            report_type="qweb-pdf"
+            attachment_use="True"
+            attachment="'check_'+(object.partner_id.name)+'_'+(object.name)+'_top.pdf'"
+            paperformat="bb_check_printing.paperformat_check_bb"
+            print_report_name="'check - %s' % (object.partner_id.name or '',)"
+            menu="False"
+        />
+
+        <report id="action_print_check_middle"
+            string="Print check (Middle)"
+            model="account.payment"
+            name="bb_check_printing.print_check_middle"
+            file="bb_check_printing.print_check_middle"
+            report_type="qweb-pdf"
+            attachment_use="True"
+            attachment="'check_'+(object.partner_id.name)+'_'+(object.name)+'_middle.pdf'"
+            paperformat="bb_check_printing.paperformat_check_bb"
+            print_report_name="'check - %s' % (object.partner_id.name or '',)"
+            menu="False"
+        />
+
+        <report id="action_print_check_bottom"
+            string="Print check (Bottom)"
+            model="account.payment"
+            name="bb_check_printing.print_check_bottom"
+            file="bb_check_printing.print_check_bottom"
+            report_type="qweb-pdf"
+            attachment_use="True"
+            attachment="'check_'+(object.partner_id.name)+'_'+(object.name)+'_bottom.pdf'"
+            paperformat="bb_check_printing.paperformat_check_bb"
+            print_report_name="'check - %s' % (object.partner_id.name or '',)"
+            menu="False"
+        />
+
+	</data>
+</odoo>
