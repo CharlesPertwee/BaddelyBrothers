@@ -144,7 +144,7 @@
                         </table>
                     </div>
                     <footer style="position: relative; left: 0; bottom: 0;width: 100%;">
-                        <t t-if="o.partner_id.vat"><p class="pull-left">VAT: <span t-field="o.partner_id.vat"/></p></t>
+                        <t t-if="o.partner_id.vat"><p class="pull-left" style="margin-left:15px;">VAT: <span t-field="o.partner_id.vat"/></p></t>
                         <hr/>
                         <div class="container">
                             <div class="row">
@@ -167,13 +167,13 @@
                                         Bank details Sort Code: 20-99-21 Account No: 60134015<br/>
                                         Thankyou</p>
                                     </t>
-                                    <t t-if="o.type == 'out_invoice' and o.state == 'out_refund'">
+                                    <t t-if="o.type == 'out_refund'">
                                         <p>Settlement terms are strictly 30 days net of invoice</p>
                                         <p class="pull-left">Kindly ensure all remittances are sent to the above address.<br/>
                                         Bank details Sort Code: 20-99-21 Account No: 60134015<br/>
                                         Thankyou</p>
                                     </t>
-                                    <t t-if="o.type == 'out_invoice' and o.state == 'in_refund'">
+                                    <t t-if="o.type == 'in_refund'">
                                         <p>Settlement terms are strictly 30 days net of invoice</p>
                                         <p class="pull-left">Kindly ensure all remittances are sent to the above address.<br/>
                                         Bank details Sort Code: 20-99-21 Account No: 60134015<br/>
