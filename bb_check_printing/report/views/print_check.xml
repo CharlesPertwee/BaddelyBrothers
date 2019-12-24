@@ -29,7 +29,7 @@
         <template id="ckin_stub">
             <div t-attf-class="ckin_stub ckin_stub_{{ stub_num }}">
                 <div class="sequence_number"/>
-                <table style="margin-left:60.2px; margin-top:-70px;">
+                <table style="margin-left:60.2px; margin-top:-67px;">
                     <thead><tr>
                         <th style="text-align: left; font-size: 1.0em; font-family: Georgia;" width="12%">Date</th>
                         <th style="text-align: left; font-size: 1.0em; font-family: Georgia;" width="17%">Ref</th>
@@ -42,7 +42,7 @@
                             <tr>
                                 <td width="12%" style="text-align: left; font-size: 1.0em; font-family: Georgia;"><t t-esc="stub_line['date_invoice'].strftime('%d/%m/%Y')"/></td>
                                 <td width="17%" style="text-align: left; font-size: 1.0em; font-family: Georgia;"><t t-esc="stub_line['number']"/></td>
-                                <td width="53%" style="text-align: left; font-size: 1.0em; font-family: Georgia;">Detail</td>
+				<td width="53%" style="text-align: left; font-size: 1.0em; font-family: Georgia;"><t t-esc="stub_line['origin']"/></td>
                                 <td width="10%" style="text-align: left; font-size: 1.0em; font-family: Georgia;">
                                     £
                                 </td>
@@ -57,7 +57,7 @@
                     <t t-esc="'%.2f'%(float(o.amount))"/>
                 </div>
                 <div class ="stub_total_amount3"><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></div>
-                <div class="stub_total_amount4"><t t-esc="page['partner_id'].name"/>**</div>
+                <div class="stub_total_amount4"><t t-esc="page['partner_id'].parent_id.name if page['partner_id'].parent_id else page['partner_id'].name"/>**</div>
                 <div class="stub_total_amount5">**<t t-esc="'%.2f'%(float(o.amount))"/>**</div>
                  <div class ="stub_total_amount6"><t t-foreach="o.wordamount()" t-as="line">
                     <span style="margin-right:55px;" t-esc="line"/></t>
