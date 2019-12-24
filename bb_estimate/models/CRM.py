@@ -88,7 +88,7 @@ class Leads(models.Model):
     enquirySizeWidth = fields.Integer('Size Width')
 
     #analytic account
-    analytic_account = fields.Many2one('account.analytic.account','Analytic Account')
+    analytic_account = fields.Many2one('account.analytic.account','Analytic Account', required=True)
         
     def _compute_estimates(self):
             for record in self:

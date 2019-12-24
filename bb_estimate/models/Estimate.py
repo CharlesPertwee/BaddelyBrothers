@@ -188,7 +188,7 @@ class Estimate(models.Model):
     
     AppendLog = fields.Boolean('Append Log')
 
-    analytic_account = fields.Many2one('account.analytic.account','Analytic Account')
+    analytic_account = fields.Many2one('account.analytic.account','Analytic Account', required=True)
     
     def _compute_reSync(self):
         for record in self:

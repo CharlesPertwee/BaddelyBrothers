@@ -116,7 +116,10 @@
                              </tree>
                         </field>
                     </page>
-              </xpath>
+	    </xpath>
+	    <xpath expr="//group[@name='sales_person']/field[@name='analytic_account_id']" position="attributes">
+		    <attribute name="required">True</attribute>
+	    </xpath>
           </field>
       </record>
   </data>
