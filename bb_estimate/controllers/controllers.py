@@ -374,7 +374,7 @@ class BbEstimate(http.Controller):
         
         if Estimate.hasExtra:
             extra_length = (len([x for x in Estimate.estimate_line if (x.isExtra and x.extraDescription)]))
-            extra_table = document.add_table(extra_length*(addtitional), 2)  
+            extra_table = document.add_table(extra_length*(addtitional-new_col+1), 2)  
             extra_table.alignment = WD_TABLE_ALIGNMENT.CENTER
             extra_table.style = 'Table Grid'
             tblExtraData = extra_table._tbl # get xml element in table
@@ -433,7 +433,7 @@ class BbEstimate(http.Controller):
                             font.name= "Tahoma"
                             
             extra_table.columns[0].width = Inches(inches)
-            extra_table.columns[1].width = Inches(5.56)
+            extra_table.columns[1].width = Inches(5.06)
             
         
         
