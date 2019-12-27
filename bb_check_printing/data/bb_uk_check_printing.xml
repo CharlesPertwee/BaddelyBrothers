@@ -19,7 +19,7 @@
         </record>
         
         <report id="action_print_check_top"
-            string="Print check (Top)"
+            string="Print Cheque (Top)"
             model="account.payment"
             name="bb_check_printing.print_check_top"
             file="bb_check_printing.print_check_top"
@@ -27,12 +27,12 @@
             attachment_use="True"
             attachment="'check_'+(object.partner_id.name)+'_'+(object.name)+'_top.pdf'"
             paperformat="bb_check_printing.paperformat_check_bb"
-            print_report_name="'check - %s' % (object.partner_id.name or '',)"
+            print_report_name="'Cheque - %s' % (object.partner_id.name or '',)"
             menu="False"
         />
 
         <report id="action_print_check_middle"
-            string="Print check (Middle)"
+            string="Print Cheque (Middle)"
             model="account.payment"
             name="bb_check_printing.print_check_middle"
             file="bb_check_printing.print_check_middle"
@@ -40,12 +40,12 @@
             attachment_use="True"
             attachment="'check_'+(object.partner_id.name)+'_'+(object.name)+'_middle.pdf'"
             paperformat="bb_check_printing.paperformat_check_bb"
-            print_report_name="'check - %s' % (object.partner_id.name or '',)"
+            print_report_name="'Cheque - %s' % (object.partner_id.name or '',)"
             menu="False"
         />
 
         <report id="action_print_check_bottom"
-            string="Print check (Bottom)"
+            string="Print Cheque (Bottom)"
             model="account.payment"
             name="bb_check_printing.print_check_bottom"
             file="bb_check_printing.print_check_bottom"
@@ -53,7 +53,7 @@
             attachment_use="True"
             attachment="'check_'+(object.partner_id.name)+'_'+(object.name)+'_bottom.pdf'"
             paperformat="bb_check_printing.paperformat_check_bb"
-            print_report_name="'check - %s' % (object.partner_id.name or '',)"
+            print_report_name="'Cheque - %s' % (object.partner_id.name or '',)"
             menu="False"
         />
 
