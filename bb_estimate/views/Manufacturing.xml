@@ -61,7 +61,7 @@
                     <field name="Project" readonly="1"/>
                     <field name="SpecifcationType" />
                     <field name="JobType" />
-                    <field name="analytic_account" options="{'no_create_edit': True}"/>
+                    <field name="analytic_account" options="{'no_create': True}"/>
                 </xpath>
                 <xpath expr="//field[@name='availability']" position="after">
                     <field name="NoOfCopiesRequired"/>
