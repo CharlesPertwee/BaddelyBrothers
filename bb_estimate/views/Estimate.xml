@@ -78,7 +78,7 @@
                             <field name="estimate_number" attrs="{'readonly':[('isLocked','=',True)]}" readonly="1"/>
                             <field name="event_date" attrs="{'readonly':[('isLocked','=',True)]}"/>
                             <field name="target_dispatch_date" attrs="{'readonly':[('isLocked','=',True)]}" required="1"/>
-                            <field name="analytic_account"/>
+                            <field name="analytic_account" options="{'no_create_edit': True}"/>
                         </group>
                     </group>
                     <group>
