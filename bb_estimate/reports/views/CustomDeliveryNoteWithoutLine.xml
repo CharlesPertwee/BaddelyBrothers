@@ -1,0 +1,134 @@
+<odoo>
+    <template id="report_custom_delivery_note_without_line">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="web.basic_layout">
+            <t t-call="web.html_container">
+                <t t-set="estimate" t-value="o.getEstimateData()"/>
+                  <div class="page" style="font-family: Georgia !important;">
+                      <h2 class="text-center"><b>DELIVERY NOTIFICATION</b></h2>            
+                      
+                      <!-- <span style="text-decoration: underline;">Delivery Address</span><br/> -->        
+                      <div class="row" style="padding:4em; padding-top:0em; padding-bottom:0em;">
+                          <div class="col">
+                              <div class="row">
+                                <p class="col-8" style="text-decoration: underline;">Delivery Address</p>
+                              </div>
+                              <div class="row">
+                                  <div class="col-8">
+                                      <t t-if="o.partner_id.parent_id">
+                                          <p><span t-field="o.partner_id.parent_id.name"/><br/>
+                                          <span t-field="o.partner_id.street"/><br/>
+                                          <span t-field="o.partner_id.city"/><br/>
+                                          <span t-field="o.partner_id.zip"/><br/>
+                                          <span t-field="o.partner_id.country_id"/></p>
+                                          
+                                      </t>
+                                      <t t-else="">
+                                          <p><span t-field="o.partner_id.name"/><br/>
+                                          <span t-field="o.partner_id.street"/><br/>
+                                          <span t-field="o.partner_id.city"/><br/>
+                                          <span t-field="o.partner_id.zip"/><br/>
+                                          <span t-field="o.partner_id.country_id"/></p>
+                                      </t>                                      
+                                  </div>
+                                  <div class="col-4 pull-right">
+                                      <div class="row">
+                                          <div class="col-sm-12">
+                                              <t t-if="o.state == 'done'">
+                                                  <p class="pull-left">Date: <span t-field="o.date_done" t-options="{'widget': 'date'}"/></p>
+                                              </t>
+                                              <t t-if="o.state != 'done'">
+                                                  <p class="pull-left">Date: <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/></p>
+                                              </t>
+                                          </div>
+                                      </div>
+                                      <div class="row">
+                                          <div class="col-11">
+                                              <p class="pull-left">E-mail: <br/>
+                                                  <span t-field="o.partner_id.email"/></p>
+                                          </div>
+                                      </div>
+                                      <div class="row">
+                                          <div class="col-11">
+                                              <p class="pull-left">Tel: <span t-field="o.partner_id.phone"/> </p>
+                                          </div>
+                                      </div>
+                                      <div class="row">
+                                          <div class="col">
+                                              <div class="row">
+                                                  <div class="col-4">
+                                                      <p class="pull-left">Method: </p>
+                                                  </div>
+                                                  <div class="col-8">
+                                                      <p class="pull-left"><span t-field="o.carrier_id"/></p>
+                                                  </div>
+                                              </div>
+                                              <t t-if="o.carrier_tracking_ref">
+                                                  <div class="row">
+                                                      <div class="col-7">
+                                                          <p class="pull-left">Consignment No: </p>
+                                                      </div>
+                                                      <div class="col-5">
+                                                          <p class="pull-left"><span t-field="o.carrier_tracking_ref"/></p>
+                                                      </div>
+                                                  </div>
+                                              </t>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                          Attn: <span t-field="o.partner_id.name"/>
+                      <hr/>
+                      <table style="width:100%">
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      <t t-if="o.customerRef">
+                                          <p>Your Ref: <span t-field="o.customerRef"/></p>
+                                      </t>
+                                  </td>
+                                  <td>
+                                      <t t-if="estimate">
+                                          <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
+                                      </t>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                    <t t-if="estimate">
+                                         Job Title: <t t-esc="o.move_ids_without_package[0].product_id.name if not estimate else estimate.title"/>
+                                    </t>
+                                  </td>
+                                  <td>
+                                      <t t-if="estimate">
+                                              Price: <t t-esc="'%.2f'%(float(o.calculatePrice()))"/>
+                                      </t>
+                                      <t t-else="">
+                                          <span t-field="o.origin"/><br/>
+                                           <t t-foreach="o.GetProductData()" t-as="line">
+                                              <t t-esc="line"> </t><br/>
+                                          </t>
+                                      </t>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+            </t>
+         </t>
+        </t>
+    </template>
+    
+      <report
+        id="delievery_note_one"
+        model="stock.picking"
+        string="Custom Delivery Note"
+        report_type="qweb-pdf"
+        name="bb_estimate.report_custom_delivery_note_without_line"
+        file="bb_estimate.report_custom_delivery_note_without_line"
+        attachment="((object.name or '').replace('/','')+'.pdf')"
+        print_report_name="(object.name or '')"
+      />
+</odoo>

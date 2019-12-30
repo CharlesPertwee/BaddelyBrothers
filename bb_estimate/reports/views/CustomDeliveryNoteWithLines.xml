@@ -1,0 +1,164 @@
+<odoo>
+    <template id="report_custom_delivery_note_with_line">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="web.basic_layout">
+            <t t-call="web.html_container">
+                <t t-set="estimate" t-value="o.getEstimateData()"/>
+                  <div class="page" style="font-family: Georgia !important;">
+                    <h2 class="text-center"><b>DELIVERY NOTE</b></h2>
+                      <h2 class="text-center"><b><span t-field="o.name"/></b></h2>                   
+                      
+                      <span style="text-decoration:underline;">Delivery Address</span><br/>                  
+                      <div class="row" style="padding:4em; padding-top:0em; padding-bottom:0em;">
+                          <div class="col-7">
+                             <t t-if="o.partner_id.parent_id">
+                                  <p><span t-field="o.partner_id.parent_id.name"/><br/>
+                                  <span t-field="o.partner_id.street"/><br/>
+                                  <span t-field="o.partner_id.city"/><br/>
+                                  <span t-field="o.partner_id.zip"/><br/>
+                                  <span t-field="o.partner_id.country_id"/></p>
+                                 
+                              </t>
+                              <t t-else="">
+                                  <p><span t-field="o.partner_id.name"/><br/>
+                                  <span t-field="o.partner_id.street"/><br/>
+                                  <span t-field="o.partner_id.city"/><br/>
+                                  <span t-field="o.partner_id.zip"/><br/>
+                                  <span t-field="o.partner_id.country_id"/></p>
+                                  
+                              </t>
+                          </div>
+                          <div class="col-5 pull-right">
+                              <div class="row">
+                                  <div class="col-4">
+                                      <p class="pull-left">Date: </p>
+                                  </div>
+                                  <div class="col-8">
+                                      <t t-if="o.state == 'done'">
+                                          <span t-field="o.date_done" t-options="{'widget': 'date'}"/>
+                                     </t>
+                                     <t t-if="o.state != 'done'">
+                                          <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/>
+                                     </t>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-4">
+                                      <p class="pull-left">E-mail: </p>
+                                  </div>
+                                  <div class="col-8">
+                                      <p class="pull-left"><span t-field="o.partner_id.email"/></p>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-4">
+                                      <p class="pull-left">Tel: </p>
+                                  </div>
+                                  <div class="col-8">
+                                      <p class="pull-left"><span t-field="o.partner_id.phone"/></p>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col">
+                                      <div class="row">
+                                          <div class="col-4">
+                                              <p class="pull-left">Method: </p>
+                                          </div>
+                                          <div class="col-8">
+                                              <p class="pull-left"><span t-field="o.carrier_id"/></p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                          Attn: <span t-field="o.partner_id.name"/>
+                      <hr/>
+                      <div class="row">
+                        <div class="col-6">
+                          <t t-if="o.customerRef">
+                              <p>Your Ref: <span t-field="o.customerRef"/></p>
+                          </t>
+                        </div>
+                        <div class="col-6">
+                          <t t-if="estimate">
+                              <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
+                          </t>
+                        </div>
+                      </div>
+                      <t t-if="estimate">
+                              <p>Job Title: <span t-field="estimate.title"/></p>
+                          </t>
+                      <table style="width:100%; margin-top:0.9375em;">
+                          <thead>
+                              <tr>
+                                  <td width="25%"><u>Quantity</u></td>
+                                  <td><u>Description</u></td>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      <span t-esc="'%0.0f'%(o.move_ids_without_package[0].quantity_done)"/>
+                                  </td>
+                                  <td>
+                                      <t t-esc="o.move_ids_without_package[0].product_id.name if not estimate else estimate.title"/>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                     <div class="row" style="position: relative; left: 0; bottom: 0;padding-top:25em;">
+                         <p class="text-right" style="width:84%;">
+                             Total Boxes:          <t t-esc="o.TotalBoxes()"/>
+                         </p>
+                         
+                     </div>
+                      <table style="width:100%">
+                             <tbody>
+                                 <tr>
+                                     <td width="25%">
+                                         Received by (Signature)
+                                     </td>
+                                     <td style="border-bottom:1px black solid">
+                                        
+                                     </td>
+                                     <td width="5%">
+                                         Date
+                                     </td>
+                                     <td style="border-bottom:1px black solid">
+                                         
+                                     </td>
+                                 </tr>
+                                 <tr>
+                                     <td width="25%">
+                                         Print Name
+                                     </td>
+                                     <td style="border-bottom:1px black solid">
+                                         
+                                     </td>
+                                     <td width="5%">
+                                         Time
+                                     </td>
+                                     <td style="border-bottom:1px black solid">
+                                         
+                                     </td>
+                                 </tr>
+                             </tbody>
+                         </table>
+                  </div>
+            </t>
+         </t>
+        </t>
+    </template>
+    
+      <report
+        id="delievery_note_two"
+        model="stock.picking"
+        string="Custom Delivery Note 2"
+        report_type="qweb-pdf"
+        name="bb_estimate.report_custom_delivery_note_with_line"
+        file="bb_estimate.report_custom_delivery_note_with_line"
+        attachment="((object.name or '').replace('/','')+'.pdf')"
+        print_report_name="(object.name or '')"
+      />
+</odoo>

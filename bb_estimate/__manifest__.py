@@ -43,6 +43,8 @@
         'reports/views/ProFormaHeaded.xml',
         'reports/views/InvoiceHeaded.xml',
         'reports/views/DeliveryNote.xml',
+        'reports/views/CustomDeliveryNoteWithoutLine.xml',
+        'reports/views/CustomDeliveryNoteWithLines.xml',
         'reports/views/EnquiryConversionReport.xml',
         'reports/views/EnquiryMonthlyRates.xml',
         'reports/views/EnquiryTimesReport.xml',
