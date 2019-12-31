@@ -118,3 +118,89 @@ class OnTimeDelivery(models.Model):
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""CREATE or REPLACE VIEW %s as (%s)""" % (self._table, self._query()))
+
+class DeliveryPerfomance(models.Model):
+    _name = 'bb_estimate.delivery_performance'
+    _desc = 'Delivery Performance'
+    _auto = False
+    _rec_name = 'Year'
+    _order = "Year, Month"
+
+    FinancialYear = fields.Char('Financial Year', readonly=True)
+    Year = fields.Char('Year', readonly=True)
+    Month = fields.Selection([('01','January'), ('02','February'), ('03','March'), ('04','April'), ('05','May'), ('06','June'), ('07','July'), ('08','August'), ('09','September'), ('10','October'), ('11','November'), ('12','December')],string='Month',readonly=True)
+    Early = fields.Integer('Early Orders')
+    OnTime = fields.Integer('On-Time Orders')
+    Delayed = fields.Integer('Delayed Orders')
+    DeliverySummary = fields.Char('Delivery Summary')
+
+    def _query(self, with_clause='', fields={}, groupby='', from_clause=''):
+        return """
+            select 
+                id,
+                "FinancialYear",
+                "Year",
+                "Month",
+                "Early",
+                "OnTime",
+                "Delayed",
+                (case when delivery_summary > 0 then 'Early by '|| delivery_summary ||' day(s)'  
+                    when delivery_summary < 0 then 'Late by '|| delivery_summary ||' day(s)'
+                    else 'On Time'  
+                end
+                ) as "DeliverySummary"
+            from
+            (
+            SELECT 
+                o.id,
+                CASE
+                    WHEN extract(month from date_order)::int >= 7 THEN extract(year from date_order)::text || '/' || (extract(year from date_order)::int + 1)::text
+                    ELSE (extract(year from date_order)::int - 1)::text || '/' || extract(year from date_order)::text
+                END as "FinancialYear",
+                extract(year from date_order)::text "Year",
+                to_char(date_order,'MM') "Month",
+                (
+                    select early AS "Early" from (
+                        SELECT 
+                            sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as early
+                        from sale_order 
+                        where to_char(date_order,'MM') = to_char(o.date_order,'MM')
+                        group by to_char(date_order,'MM')
+                    ) P where p.early > 0
+                ),
+                (
+                    select on_time AS "OnTime" from (
+                        SELECT 
+                            sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as on_time
+                        from sale_order 
+                        where to_char(date_order,'MM') = to_char(o.date_order,'MM')
+                        group by to_char(date_order,'MM')
+                    ) P where p.on_time = 0
+                ),
+                (
+                    select late AS "Delayed" from (
+                        SELECT 
+                            sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as late
+                        from sale_order 
+                        where to_char(date_order,'MM') = to_char(o.date_order,'MM')
+                        group by to_char(date_order,'MM')
+                    ) P where p.late < 0
+                ),
+                (
+                    SELECT 
+                        round(avg(date_part('day',(commitment_date::timestamp - effective_date::timestamp)))::numeric,2) as delivery_summary
+                    from sale_order 
+                    where to_char(date_order,'MM') = to_char(o.date_order,'MM')
+                    group by to_char(date_order,'MM')
+                )
+            from sale_order o
+            where 
+                o.commitment_date is not null
+                    and o.effective_date is not null
+            ) T
+        """
+
+    @api.model_cr
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""CREATE or REPLACE VIEW %s as (%s)""" % (self._table, self._query()))

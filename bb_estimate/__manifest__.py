@@ -80,7 +80,8 @@
         'reports/views/EstimateTimesReport.xml',
         'reports/views/TicketTimesReport.xml',
         'reports/views/PurchaseDayReport.xml',
-        'reports/views/OnTimeDelivery.xml'
+        'reports/views/OnTimeDelivery.xml',
+        'reports/views/DeliveryPerformance.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
