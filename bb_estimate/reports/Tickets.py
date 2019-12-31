@@ -160,44 +160,48 @@ class DeliveryPerfomance(models.Model):
                 extract(year from date_order)::text "Year",
                 to_char(date_order,'MM') "Month",
                 (
-                    select early AS "Early" from (
+                    select count AS "Early" from (
                         SELECT 
+                            count(id) as count,
                             sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as early
                         from sale_order 
-                        where to_char(date_order,'MM') = to_char(o.date_order,'MM')
-                        group by to_char(date_order,'MM')
+                        where to_char(date_order,'MM') = to_char(o.date_order,'MM') and to_char(date_order,'YYYY')= to_char(o.date_order,'YYYY')
+                        group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
                     ) P where p.early > 0
                 ),
                 (
-                    select on_time AS "OnTime" from (
+                    select count AS "OnTime" from (
                         SELECT 
+                            count(id) as count,
                             sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as on_time
                         from sale_order 
-                        where to_char(date_order,'MM') = to_char(o.date_order,'MM')
-                        group by to_char(date_order,'MM')
+                        where to_char(date_order,'MM') = to_char(o.date_order,'MM') and to_char(date_order,'YYYY')= to_char(o.date_order,'YYYY')
+                        group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
                     ) P where p.on_time = 0
                 ),
                 (
-                    select late AS "Delayed" from (
+                    select count AS "Delayed" from (
                         SELECT 
+                            count(id) as count,
                             sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as late
                         from sale_order 
-                        where to_char(date_order,'MM') = to_char(o.date_order,'MM')
-                        group by to_char(date_order,'MM')
+                        where to_char(date_order,'MM') = to_char(o.date_order,'MM') and to_char(date_order,'YYYY')= to_char(o.date_order,'YYYY')
+                        group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
                     ) P where p.late < 0
                 ),
                 (
                     SELECT 
                         round(avg(date_part('day',(commitment_date::timestamp - effective_date::timestamp)))::numeric,2) as delivery_summary
                     from sale_order 
-                    where to_char(date_order,'MM') = to_char(o.date_order,'MM')
-                    group by to_char(date_order,'MM')
+                    where to_char(date_order,'MM') = to_char(o.date_order,'MM') and to_char(date_order,'YYYY')= to_char(o.date_order,'YYYY')
+                    group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
                 )
             from sale_order o
             where 
                 o.commitment_date is not null
                     and o.effective_date is not null
             ) T
+
         """
 
     @api.model_cr
