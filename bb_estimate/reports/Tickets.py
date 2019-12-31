@@ -141,66 +141,58 @@ class DeliveryPerfomance(models.Model):
                 "FinancialYear",
                 "Year",
                 "Month",
-                "Early",
-                "OnTime",
-                "Delayed",
-                (case when delivery_summary > 0 then 'Early by '|| delivery_summary ||' day(s)'  
-                    when delivery_summary < 0 then 'Late by '|| delivery_summary ||' day(s)'
-                    else 'On Time'  
-                end
-                ) as "DeliverySummary"
-            from
-            (
-            SELECT 
-                o.id,
-                CASE
-                    WHEN extract(month from date_order)::int >= 7 THEN extract(year from date_order)::text || '/' || (extract(year from date_order)::int + 1)::text
-                    ELSE (extract(year from date_order)::int - 1)::text || '/' || extract(year from date_order)::text
-                END as "FinancialYear",
-                extract(year from date_order)::text "Year",
-                to_char(date_order,'MM') "Month",
                 (
-                    select count AS "Early" from (
-                        SELECT 
-                            count(id) as count,
-                            sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as early
-                        from sale_order 
-                        where to_char(date_order,'MM') = to_char(o.date_order,'MM') and to_char(date_order,'YYYY')= to_char(o.date_order,'YYYY')
-                        group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
-                    ) P where p.early > 0
-                ),
-                (
-                    select count AS "OnTime" from (
-                        SELECT 
-                            count(id) as count,
-                            sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as on_time
-                        from sale_order 
-                        where to_char(date_order,'MM') = to_char(o.date_order,'MM') and to_char(date_order,'YYYY')= to_char(o.date_order,'YYYY')
-                        group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
-                    ) P where p.on_time = 0
-                ),
-                (
-                    select count AS "Delayed" from (
-                        SELECT 
-                            count(id) as count,
-                            sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as late
-                        from sale_order 
-                        where to_char(date_order,'MM') = to_char(o.date_order,'MM') and to_char(date_order,'YYYY')= to_char(o.date_order,'YYYY')
-                        group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
-                    ) P where p.late < 0
-                ),
-                (
-                    SELECT 
-                        round(avg(date_part('day',(commitment_date::timestamp - effective_date::timestamp)))::numeric,2) as delivery_summary
-                    from sale_order 
-                    where to_char(date_order,'MM') = to_char(o.date_order,'MM') and to_char(date_order,'YYYY')= to_char(o.date_order,'YYYY')
-                    group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
-                )
-            from sale_order o
-            where 
-                o.commitment_date is not null
-                    and o.effective_date is not null
-            ) T
+                        select count AS "Early" from (
+                            SELECT 
+                                count(id) as count,
+                                sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as early
+                            from sale_order 
+                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year"
+                            group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
+                        ) P where p.early > 0
+                    ),
+                    (
+                        select count AS "OnTime" from (
+                            SELECT 
+                                count(id) as count,
+                                sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as on_time
+                            from sale_order 
+                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year"
+                            group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
+                        ) P where p.on_time = 0
+                    ),
+                    (
+                        select count AS "Delayed" from (
+                            SELECT 
+                                count(id) as count,
+                                sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as late
+                            from sale_order 
+                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year"
+                            group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
+                        ) P where p.late < 0
+                    ),
+                    (case when delivery_summary > 0 then 'Early by '|| delivery_summary ||' day(s)'  
+                        when delivery_summary < 0 then 'Late by '|| delivery_summary ||' day(s)'
+                        else 'On Time'  
+                    end
+                    ) as "DeliverySummary"
+                from
+                (SELECT
+                    min(id) AS id,
+                    CASE
+                        WHEN extract(month from date_order)::int >= 7 THEN extract(year from date_order)::text || '/' || (extract(year from date_order)::int + 1)::text
+                        ELSE (extract(year from date_order)::int - 1)::text || '/' || extract(year from date_order)::text
+                    END as "FinancialYear",
+                    extract(year from date_order)::text "Year",
+                    to_char(date_order,'MM') "Month",
+                    round(avg(date_part('day',(commitment_date::timestamp - effective_date::timestamp)))::numeric,2) as delivery_summary
+                FROM
+                    sale_order 
+                GROUP BY
+                    extract(month from date_order),
+                    extract(year from date_order),
+                    to_char(date_order, 'MM')
+                ) o
 
         """
 
