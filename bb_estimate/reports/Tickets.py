@@ -147,8 +147,10 @@ class DeliveryPerfomance(models.Model):
                                 count(id) as count,
                                 sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as early
                             from sale_order 
-                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year"
-                            group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
+                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year" and
+				commitment_date is not null
+				and effective_date is not null
+                            group by extract(month from date_order), extract(year from date_order)
                         ) P where p.early > 0
                     ),
                     (
@@ -157,8 +159,10 @@ class DeliveryPerfomance(models.Model):
                                 count(id) as count,
                                 sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as on_time
                             from sale_order 
-                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year"
-                            group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
+                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year" and
+				commitment_date is not null
+				and effective_date is not null
+                            group by extract(month from date_order), extract(year from date_order)
                         ) P where p.on_time = 0
                     ),
                     (
@@ -167,8 +171,10 @@ class DeliveryPerfomance(models.Model):
                                 count(id) as count,
                                 sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as late
                             from sale_order 
-                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year"
-                            group by to_char(date_order,'YYYY'),to_char(date_order,'MM')
+                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year" and
+				commitment_date is not null
+				and effective_date is not null
+                            group by extract(month from date_order), extract(year from date_order)
                         ) P where p.late < 0
                     ),
                     (case when delivery_summary > 0 then 'Early by '|| delivery_summary ||' day(s)'  
@@ -188,12 +194,14 @@ class DeliveryPerfomance(models.Model):
                     round(avg(date_part('day',(commitment_date::timestamp - effective_date::timestamp)))::numeric,2) as delivery_summary
                 FROM
                     sale_order 
+                where
+		    commitment_date is not null
+		    and effective_date is not null
                 GROUP BY
                     extract(month from date_order),
                     extract(year from date_order),
                     to_char(date_order, 'MM')
                 ) o
-
         """
 
     @api.model_cr
