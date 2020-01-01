@@ -132,6 +132,7 @@ class DeliveryPerfomance(models.Model):
     Early = fields.Integer('Early Orders')
     OnTime = fields.Integer('On-Time Orders')
     Delayed = fields.Integer('Delayed Orders')
+    TotalOrders = fields.Integer('Total Orders')
     DeliverySummary = fields.Char('Delivery Summary')
 
     def _query(self, with_clause='', fields={}, groupby='', from_clause=''):
@@ -171,6 +172,17 @@ class DeliveryPerfomance(models.Model):
 			from sale_order 
 			where
 				date_part('day',(commitment_date::timestamp - effective_date::timestamp)) < 0 and
+				commitment_date is not null
+				and effective_date is not null
+				and to_char(date_order,'MM') = o."Month" 
+				and to_char(date_order,'YYYY')= o."Year"
+			) T
+                    ),
+                    (
+                        select count(*) as "TotalOrders" from (SELECT 
+				id
+			from sale_order 
+			where
 				commitment_date is not null
 				and effective_date is not null
 				and to_char(date_order,'MM') = o."Month" 

@@ -11,6 +11,7 @@
 	                <field name="Early" />
 	                <field name="OnTime" />
 	                <field name="Delayed" />
+					<field name="TotalOrders" />
 	                <field name="DeliverySummary" />
 	            </tree>
 	        </field>
