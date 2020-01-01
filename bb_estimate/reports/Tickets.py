@@ -142,40 +142,40 @@ class DeliveryPerfomance(models.Model):
                 "Year",
                 "Month",
                 (
-                        select count AS "Early" from (
-                            SELECT 
-                                count(id) as count,
-                                sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as early
-                            from sale_order 
-                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year" and
+                        select count(*) as "Early" from (SELECT 
+				id
+			from sale_order 
+			where
+				date_part('day',(commitment_date::timestamp - effective_date::timestamp)) > 0 and
 				commitment_date is not null
 				and effective_date is not null
-                            group by extract(month from date_order), extract(year from date_order)
-                        ) P where p.early > 0
+				and to_char(date_order,'MM') = o."Month" 
+				and to_char(date_order,'YYYY')= o."Year"
+			) T
                     ),
                     (
-                        select count AS "OnTime" from (
-                            SELECT 
-                                count(id) as count,
-                                sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as on_time
-                            from sale_order 
-                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year" and
+                        select count(*) as "OnTime" from (SELECT 
+				id
+			from sale_order 
+			where
+				date_part('day',(commitment_date::timestamp - effective_date::timestamp)) = 0 and
 				commitment_date is not null
 				and effective_date is not null
-                            group by extract(month from date_order), extract(year from date_order)
-                        ) P where p.on_time = 0
+				and to_char(date_order,'MM') = o."Month" 
+				and to_char(date_order,'YYYY')= o."Year"
+			) T
                     ),
                     (
-                        select count AS "Delayed" from (
-                            SELECT 
-                                count(id) as count,
-                                sum(date_part('day',(commitment_date::timestamp - effective_date::timestamp))) as late
-                            from sale_order 
-                            where to_char(date_order,'MM') = o."Month" and to_char(date_order,'YYYY')= o."Year" and
+                        select count(*) as "Delayed" from (SELECT 
+				id
+			from sale_order 
+			where
+				date_part('day',(commitment_date::timestamp - effective_date::timestamp)) < 0 and
 				commitment_date is not null
 				and effective_date is not null
-                            group by extract(month from date_order), extract(year from date_order)
-                        ) P where p.late < 0
+				and to_char(date_order,'MM') = o."Month" 
+				and to_char(date_order,'YYYY')= o."Year"
+			) T
                     ),
                     (case when delivery_summary > 0 then 'Early by '|| delivery_summary ||' day(s)'  
                         when delivery_summary < 0 then 'Late by '|| delivery_summary ||' day(s)'
