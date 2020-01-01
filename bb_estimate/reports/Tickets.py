@@ -177,8 +177,8 @@ class DeliveryPerfomance(models.Model):
 				and to_char(date_order,'YYYY')= o."Year"
 			) T
                     ),
-                    (case when delivery_summary > 0 then 'Early by '|| delivery_summary ||' day(s)'  
-                        when delivery_summary < 0 then 'Late by '|| delivery_summary ||' day(s)'
+                    (case when delivery_summary > 0 then 'Early by '|| abs(delivery_summary) ||' day(s)'  
+                        when delivery_summary < 0 then 'Late by '|| abs(delivery_summary) ||' day(s)'
                         else 'On Time'  
                     end
                     ) as "DeliverySummary"
