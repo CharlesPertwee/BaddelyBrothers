@@ -16,12 +16,10 @@
                 <div class="ckin_payee_address" t-esc="page['partner_id']" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
                 <div class="ckin_memo1"><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></div>
                 <div class="ckin_memo2"><span t-field="o.check_number"/></div>
-                <t t-if="o.partner_id.reference">
-                    <div class="ckin_memo3"><span t-field="o.partner_id.reference"/></div>
-                </t>
-                 <t t-else="">
-                    <div class="ckin_memo3"><span t-field="o.partner_id.parent_id.reference"/></div>
-                </t>
+                <div class="ckin_memo3">
+                    <span t-esc="o.partner_id.reference if o.partner_id.reference else (o.partner_id.parent_id.reference if o.partner_id.parent_id else '')"/>
+                </div>
+                
             </div>
         </template>
         <template id="ckin_stub">
