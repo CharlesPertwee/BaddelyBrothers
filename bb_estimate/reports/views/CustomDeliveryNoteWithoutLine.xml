@@ -124,7 +124,7 @@
       <report
         id="delievery_note_one"
         model="stock.picking"
-        string="Custom Delivery Note"
+        string="Smythson D.Note"
         report_type="qweb-pdf"
         name="bb_estimate.report_custom_delivery_note_without_line"
         file="bb_estimate.report_custom_delivery_note_without_line"
