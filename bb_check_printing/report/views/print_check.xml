@@ -15,7 +15,7 @@
             <div class="ckin_check">
                 <div class="ckin_payee_address" t-esc="page['partner_id']" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
                 <div class="ckin_memo1"><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></div>
-                <div class="ckin_memo2"><span t-field="o.check_number"/></div>
+                <div class="ckin_memo2"><span t-esc="'%06d'%(o.check_number)"/></div>
                 <div class="ckin_memo3">
                     <span t-esc="o.partner_id.reference if o.partner_id.reference else (o.partner_id.parent_id.reference if o.partner_id.parent_id else '')"/>
                 </div>

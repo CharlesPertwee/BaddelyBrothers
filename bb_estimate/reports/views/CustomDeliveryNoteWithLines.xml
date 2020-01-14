@@ -158,7 +158,7 @@
 <report
   id="delievery_note_two"
   model="stock.picking"
-  string="Custom Delivery Note 2"
+  string="Delivery Note(Material Lines)"
   report_type="qweb-pdf"
   name="bb_estimate.report_custom_delivery_note_with_line"
   file="bb_estimate.report_custom_delivery_note_with_line"
