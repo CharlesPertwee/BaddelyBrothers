@@ -95,6 +95,9 @@ class Partner(models.Model):
         data.joiningDate = None
         data.leavingDate = None
         
+        #Archive Contact
+        self.write({'active':False})
+
         return {
             "name": "Contact Form",
             "view_type": "form",
