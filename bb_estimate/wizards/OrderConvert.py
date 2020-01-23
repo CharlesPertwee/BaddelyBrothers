@@ -207,9 +207,11 @@ class OrderConvert(models.TransientModel):
 
         if stage:
             data['state'] = stage.id
+            self.EstimateId.write(data)
             if stage.LeadStage and self.EstimateId.lead:
                 self.EstimateId.lead.write({'stage_id':stage.LeadStage.id})
-
-        self.EstimateId.write(data)
+        else:
+            self.EstimateId.write(data)
+        
         
         

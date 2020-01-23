@@ -25,3 +25,4 @@ access_mrp_routing_workcenter_user,mrp.routing.workcenter_estimate,mrp.model_mrp
 access_bb_estimate_pruchase_day_report,bb_estimate.purhase_day_report,model_bb_estimate_purchase_day_report,,1,1,1,1
 access_bb_estimate_on_time,bb_estimate.on_time_delivery,model_bb_estimate_on_time_delivery,,1,1,1,1
 access_bb_estimate_delivery_performance,bb_estimate.delivery_performance,model_bb_estimate_delivery_performance,,1,1,1,1
+access_bb_estimate_delivery_material_lines,bb_estimate.delivery_material_lines,model_bb_estimate_delivery_material_lines,,1,1,1,1

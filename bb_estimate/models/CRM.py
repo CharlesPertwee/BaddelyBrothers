@@ -99,3 +99,16 @@ class Leads(models.Model):
         if self.size:
             self.enquirySizeHeight = self.size.height
             self.enquirySizeWidth = self.size.width
+
+    @api.constrains('stage_id')
+    def ValidateStage(self):
+        for record in self:
+            if record.typeOfLead == 'Bespoke' and record.Estimates:
+                estimate = record.Estimates[-1]
+                if estimate:
+                    stage = estimate.state.LeadStage
+                    if stage and record.stage_id.sequence > stage.sequence:
+                        raise ValidationError('Enquiry stage cannot move ahead of the estimate.')
+                
+            elif record.typeOfLead == 'Bespoke' and record.Estimate_Count == 0 and record.stage_id.sequence != 0:
+                raise ValidationError('Please provide an estimate first.')

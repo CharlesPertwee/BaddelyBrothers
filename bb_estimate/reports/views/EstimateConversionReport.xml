@@ -20,6 +20,6 @@
 	        <field name="view_mode">tree</field>
 		</record> 
 
-	    <menuitem id="estimate_conversion_report" name="Conversion Count" parent="bb_estimate.bb_estimate_reports" action="estimate_conversion"/>
+	    <menuitem id="estimate_conversion_report" name="Conversion Analysis" parent="bb_estimate.bb_estimate_reports" action="estimate_conversion"/>
 	</data>
 </odoo>

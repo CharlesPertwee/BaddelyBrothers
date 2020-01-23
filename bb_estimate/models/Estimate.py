@@ -619,10 +619,6 @@ class Estimate(models.Model):
                     
             record.hasDelivery = len(record.estimate_line.filtered(lambda x: x.documentCatergory == 'Despatch')) > 0
     
-    @api.onchange('materialInfo')
-    def ShowChangedLines(self):
-        pass
-    
     @api.onchange('finished_size')
     def finished_size_change(self):
         for record in self:

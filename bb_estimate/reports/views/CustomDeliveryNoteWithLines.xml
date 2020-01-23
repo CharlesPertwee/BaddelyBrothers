@@ -97,17 +97,15 @@
               </tr>
             </thead>
             <tbody>
-              <t t-foreach="estimate.estimate_line" t-as="line">
-                <t t-if="not line.isExtra and line.option_type == 'material' and line.documentCatergory not in ['Packing','Despatch'] and line.JobTicketText">
+              <t t-foreach="o.Materials" t-as="line">
                   <tr>
                     <td>
-                      <span t-esc="'%0.0f'%((line['param_finished_quantity_'+line.estimate_id.selectedQuantity] * line.estimate_id.SelectedQtyRatio) + (line.param_finished_quantity_run_on * line.estimate_id.selectedRatio))"/>
+                      <span t-field="line.Quantity"/>
                     </td>
                     <td>
-                      <t t-esc="line.JobTicketText"/>
+                      <t t-esc="line.Name"/>
                     </td>
                   </tr>
-                </t>
               </t>
             </tbody>
           </table>

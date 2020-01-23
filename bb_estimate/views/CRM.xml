@@ -40,20 +40,20 @@
                         <group>
                             <field name="Quantity1"/>
                             <field name="Quantity2"/>
-                            <field name="runOn"/>
-                            <field name="enquiryEnvelopeType" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
-                            <field name="enquiryPrintEdging" attrs="{'invisible':[('enquiryType','!=','Print Estimate')]}"/>
-                            <field name="enquirySizeWidth"/>
-                        </group>
-                        <group>
                             <field name="Quantity3"/>
                             <field name="Quantity4"/>
+                            <field name="runOn"/>
+                        </group>
+                        <group>
                             <field name="size"/>
+                            <field name="enquirySizeWidth"/>
+                            <field name="enquirySizeHeight"/>
+                            <field name="enquiryEnvelopeType" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
+                            <field name="enquiryPrintEdging" attrs="{'invisible':[('enquiryType','!=','Print Estimate')]}"/>
                             <field name="enquiryEnvelopeTissuelIne" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
                             <field name="enquiryEnvelopeFlaptype" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
                             <field name="enquiryEnvelopeWindow" attrs="{'invisible':[('enquiryType','!=','Envelope Estimate')]}"/>
                             <field name="enquiryEdgeColor" attrs="{'invisible':['|',('enquiryType','!=','Print Estimate'),('enquiryPrintEdging','!=','Custom')]}"/>
-                            <field name="enquirySizeHeight"/>
                         </group>
                     </group>
                     <group>

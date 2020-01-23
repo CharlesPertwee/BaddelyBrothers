@@ -9,7 +9,3 @@ class ConfirmationBox(models.TransientModel):
     
     data = fields.Text('Message')
     
-class divyansh(models.TransientModel):
-    _name = 'estimate.delete_line_info'
-    
-    info = fields.Text('gadha')

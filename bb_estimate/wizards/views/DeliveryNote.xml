@@ -1,0 +1,30 @@
+<odoo>
+    <data>
+        <record id="wizard_delivery_note" model="ir.ui.view">
+            <field name="name">Materials Delivery Note</field>
+            <field name="model">bb_estimate.delivery_note</field>
+            <field name="arch" type="xml">
+                <form string="Materials">
+                    <sheet>
+                        <field name="delivery_id" invisible="1"/>
+                        <h5>Materials</h5>
+                        <hr/>
+                        <field name="lines">
+                            <tree editable="top" create="0" delete="0">
+                                <field name="note_id" invisible="1"/>
+                                <field name="name" />
+                                <field name="value"/>
+                                <field name="picking_line_id" invisible="1"/>
+                            </tree>
+                        </field>
+                        <footer>
+                            <button name="Confirm" string="Confirm" class="oe_right oe_highlight" type="object"/>
+                            <button string="Cancel" class="oe_right" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>
