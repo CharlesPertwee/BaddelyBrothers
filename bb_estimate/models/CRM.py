@@ -80,7 +80,7 @@ class Leads(models.Model):
     enquiryEnvelopeWindow  = fields.Boolean('Windowed')
     
     enquiryMaterial = fields.Char('Material')
-    enquiryWeightGsm = fields.Char('Weight(g.s.m)')
+    enquiryWeightGsm = fields.Integer('Weight(g.s.m)')
     enquiryPrintOrigination = fields.Selection(ORIGINATION,'Print Origination')
     
     size = fields.Many2one('bb_products.material_size','Size')

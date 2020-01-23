@@ -10,7 +10,7 @@
                 </xpath>
 
                 <xpath expr="//notebook" position="inside">
-                    <page string="Delivered Materials" name="delivered_materials" attribs="{'invisible':['&amp;',('state','!=','done'),('Materials','=',False)]}">
+                    <page string="Delivered Materials" name="delivered_materials" attrs="{'invisible':[('Materials','=',False)]}">
                         <field name="Materials">
                             <tree editable="top" create="0" delete="0" edit="0">
                                 <field name="Name" readonly="1"/>
