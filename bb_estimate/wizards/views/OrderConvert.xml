@@ -8,6 +8,12 @@
                     <sheet>
                         <field name="EstimateId" invisible="1"/>
                         <field name="HasExtra" invisible="1"/>
+                        <field name="NoMaterial" invisible="1"/>
+
+                        <div attrs="{'invisible':[('NoMaterial','=',True)]}">
+                            <h5 style="font-color:red"><b>This estimate does not contain any material.</b></h5>
+                            <hr/>
+                        </div>
                         <h5>Final Quantity Selection</h5>
                         <hr/>
                         <group>

@@ -6,8 +6,8 @@
           <field name="inherit_id" ref="website_partner.view_partners_form_website"/>
           <field name="arch" type="xml">
               <xpath expr="//button[@name='toggle_active']" position="replace">
-                    <button name="toggle_active" position="before" >
-                        <button class="oe_stat_button" name="website_publish_button" type="object" icon="fa-globe" groups="website.group_website_designer">
+                    <button name="toggle_active" position="before" groups="website.group_website_designer">
+                        <button class="oe_stat_button" name="website_publish_button" type="object" icon="fa-globe">
                             <field name="website_published" widget="website_button"/>
                         </button>
                     </button>

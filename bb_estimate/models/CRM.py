@@ -108,7 +108,7 @@ class Leads(models.Model):
                 if estimate:
                     stage = estimate.state.LeadStage
                     if stage and record.stage_id.sequence > stage.sequence:
-                        raise ValidationError('Enquiry stage cannot move ahead of the estimate.')
+                        raise ValidationError('Enquiry cannot move ahead of the estimate.')
                 
             elif record.typeOfLead == 'Bespoke' and record.Estimate_Count == 0 and record.stage_id.sequence != 0:
                 raise ValidationError('Please provide an estimate first.')

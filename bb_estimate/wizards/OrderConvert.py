@@ -26,7 +26,13 @@ class OrderConvert(models.TransientModel):
     RunOnRequired = fields.Integer('Run on Quantity Required')
     
     HasExtra = fields.Boolean('Has Extra',related="EstimateId.hasExtra")
-    
+    NoMaterial = fields.Boolean('No Material',compute="_noMaterial")
+
+    @api.depends("EstimateId")
+    def _noMaterial(self):
+        for record in self:
+            record.NoMaterial = any([line for line in record.EstimateId.estimate_line if (not line.isExtra) and (line.option_type == 'material') and (line.documentCatergory not in ['Packing','Despatch'])])
+
     @api.depends('EstimateId')
     def getEstimateExtra(self):
         for record in self:

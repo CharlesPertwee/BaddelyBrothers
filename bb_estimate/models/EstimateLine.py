@@ -471,7 +471,10 @@ class EstimateLine(models.Model):
     
     @api.onchange('SheetSize')
     def _onChangeSheetSize(self):
-        if self.SheetSize:
+        if self.SheetSize and self.material:
+            self.SheetHeight = (self.material.sheet_height or self.SheetSize.height)
+            self.SheetWidth = (self.material.sheet_width or self.SheetSize.width)
+        elif self.SheetSize:
             self.SheetHeight = self.SheetSize.height
             self.SheetWidth = self.SheetSize.width
     

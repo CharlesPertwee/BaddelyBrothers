@@ -34,7 +34,7 @@ class DeliveryNote(models.TransientModel):
 
     def Confirm(self):
         self.delivery_id.write({"Materials":[(1 if x.picking_line_id else 0,x.picking_line_id.id if x.picking_line_id else 0,{'Name':x.name,'Quantity':x.value}) for x in self.lines if int(x.value) > 0]})
-        return self.env.ref('bb_estimate.delievery_note_two').report_action(self)                            
+        return #self.env.ref('bb_estimate.delievery_note_two').report_action(self)                            
 
     
 
