@@ -288,9 +288,10 @@ class BbEstimate(http.Controller):
                 price =  (Estimate.total_price_1 - Estimate.total_price_extra_1)
             else:
                 price = (Estimate.total_price_extra_1 - Estimate.total_price_1)
-                                
-            data_table.cell(y,1).text="%d    @    £%.2f"%(Estimate.quantity_1,price)
-            y+=1
+            
+            if price:
+                data_table.cell(y,1).text="%d    @    £%.2f"%(Estimate.quantity_1,price)
+                y+=1
         
         if Estimate.quantity_2:
             data_table.cell(y,0).text=""
@@ -299,9 +300,10 @@ class BbEstimate(http.Controller):
                 price =  (Estimate.total_price_2 - Estimate.total_price_extra_2)
             else:
                 price = (Estimate.total_price_extra_2 - Estimate.total_price_2)
-                                
-            data_table.cell(y,1).text="%d    @    £%.2f"%(Estimate.quantity_2,price)
-            y+=1
+               
+            if price:
+                data_table.cell(y,1).text="%d    @    £%.2f"%(Estimate.quantity_2,price)
+                y+=1
         
         if Estimate.quantity_3:
             data_table.cell(y,0).text=""
@@ -310,9 +312,10 @@ class BbEstimate(http.Controller):
                 price =  (Estimate.total_price_3 - Estimate.total_price_extra_3)
             else:
                 price = (Estimate.total_price_extra_3 - Estimate.total_price_3)
-                                
-            data_table.cell(y,1).text="%s    @    £%.2f"%(Estimate.quantity_3,price)
-            y+=1
+                   
+            if price:        
+                data_table.cell(y,1).text="%s    @    £%.2f"%(Estimate.quantity_3,price)
+                y+=1
         
         if Estimate.quantity_4:
             data_table.cell(y,0).text=""
@@ -321,9 +324,10 @@ class BbEstimate(http.Controller):
                 price =  (Estimate.total_price_4 - Estimate.total_price_extra_4)
             else:
                 price = (Estimate.total_price_extra_4 - Estimate.total_price_4)
-                                
-            data_table.cell(y,1).text="%s    @    £%.2f"%(Estimate.quantity_4,price)
-            y+=1
+            
+            if price:
+                data_table.cell(y,1).text="%s    @    £%.2f"%(Estimate.quantity_4,price)
+                y+=1
         
         if Estimate.total_price_run_on:
             data_table.cell(y,0).text=""
@@ -332,9 +336,10 @@ class BbEstimate(http.Controller):
                 price =  (Estimate.total_price_run_on - Estimate.total_price_extra_run_on)
             else:
                 price = (Estimate.total_price_extra_run_on - Estimate.total_price_run_on)
-                                
-            data_table.cell(y,1).text="Run on: %s per £%.2f"%(Estimate.total_price_run_on, price)
-            y+=1
+            
+            if price:
+                data_table.cell(y,1).text="Run on: £%.2f per %s"%(price,Estimate.run_on)
+                y+=1
         
         
         
@@ -407,21 +412,21 @@ class BbEstimate(http.Controller):
                 if extra.isExtra and extra.extraDescription:
                     extra_table.cell(z,0).text = "Extras:"
                     extra_table.cell(z,1).text = extra.extraDescription
-                    if extra.quantity_1:
+                    if extra.quantity_1 and extra.total_price_1:
                         z += 1
                         extra_table.cell(z,1).text = "%s    @    £%s"%(str(extra.quantity_1).encode("utf-8").decode("utf-8"),str(extra.total_price_1).encode("utf-8").decode("utf-8"))
-                    if extra.quantity_2:
+                    if extra.quantity_2 and extra.total_price_2:
                         z += 1
                         extra_table.cell(z,1).text = "%s    @    £%s"%(str(extra.quantity_2).encode("utf-8").decode("utf-8"),str(extra.total_price_2).encode("utf-8").decode("utf-8"))
-                    if extra.quantity_3:
+                    if extra.quantity_3 and extra.total_price_3:
                         z += 1
                         extra_table.cell(z,1).text = "%s    @    £%s"%(str(extra.quantity_3).encode("utf-8").decode("utf-8"),str(extra.total_price_3).encode("utf-8").decode("utf-8"))
-                    if extra.quantity_4:
+                    if extra.quantity_4 and extra.total_price_4:
                         z += 1
                         extra_table.cell(z,1).text = "%s    @    £%s"%(str(extra.quantity_4).encode("utf-8").decode("utf-8"),str(extra.total_price_4).encode("utf-8").decode("utf-8"))
-                    if extra.run_on:
+                    if extra.run_on and extra.total_price_run_on:
                         z += 1
-                        extra_table.cell(z,1).text = "Run on: £ %s per %s"%(str(extra.total_price_run_on).encode("utf-8").decode("utf-8"),str(extra.run_on).encode("utf-8").decode("utf-8"))
+                        extra_table.cell(z,1).text = "Run on: £%s per %s"%(str(extra.total_price_run_on).encode("utf-8").decode("utf-8"),str(extra.run_on).encode("utf-8").decode("utf-8"))
                     z += 1
                     
             for row in extra_table.rows:
