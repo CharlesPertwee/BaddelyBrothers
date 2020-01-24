@@ -65,7 +65,7 @@
                         <group>
                             <field name="partner_id" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('is_company','=',True)]" />
                             <field name="contact" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',partner_id)]" />
-                            <field name="project" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="['|',('partner_id','=',partner_id),('partner_id','parent_of',partner_id)]"/>
+                            <field name="project" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="['|',('partner_id','=',partner_id),('partner_id','parent_of',partner_id)]" widget="selection"/>
                             <field name="invoice_account" options="{'no_create_edit': True}" required="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                             <field name="AppendLog" invisible="1"/>
                             <field name="lead" attrs="{'readonly':[('isLocked','=',True)]}" domain="[('typeOfLead','=','Bespoke')]" />
