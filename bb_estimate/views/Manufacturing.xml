@@ -58,7 +58,7 @@
                 </xpath>
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="Estimate" readonly="1"/>
-                    <field name="Project" readonly="1"/>
+                    <field name="Project" readonly="1" widget="selection"/>
                     <field name="SpecifcationType" />
                     <field name="JobType" />
                     <field name="analytic_account" widget="selection"/>
