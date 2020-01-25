@@ -23,7 +23,7 @@ class HistoryGroup(models.Model):
     _rec_name = 'name'
     name = fields.Char('Name',required=True)
     
-    contacts = fields.One2many('res.partner','history_id',string='Contacts')
+    contacts = fields.One2many('res.partner','history_id',string='Contacts',context={'active_test': False})
     
 class Partner(models.Model):
     _inherit = 'res.partner'
