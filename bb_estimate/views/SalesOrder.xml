@@ -87,7 +87,7 @@
               <xpath expr="//field[@name='partner_id']" position="after">
                   <field name="partnerOnHold"/>
                   <field name="Estimate" readonly="1"/>
-                  <field name="Project" readonly="1"/>
+                  <field name="Project" readonly="1" widget="selection"/>
                   <field name="JobTicket" readonly="1"/>
                   <field name="ProFormaLines" widget="html" invisible="1"/>
               </xpath>
