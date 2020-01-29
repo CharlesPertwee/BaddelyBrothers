@@ -108,7 +108,7 @@
                                                     <td name="account_invoice_line_name">
                                                       <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/> <t t-if="o.name">Your Ref: <span t-field="o.name"/></t><br/>
                                                       <span t-field="estimate.title"/><br/>
-                                                      Size: <span t-field="estimate.finished_size.width"/> x <span t-field="estimate.finished_size.height"/>
+                                                      Size: <span t-field="estimate.finished_width"/> x <span t-field="estimate.finished_height"/>
                                                   </p>
                                                   <p>
                                                       <span t-field="o.invoiceDescription"/>
