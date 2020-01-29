@@ -26,7 +26,13 @@ class OrderConvert(models.TransientModel):
     RunOnRequired = fields.Integer('Run on Quantity Required')
     
     HasExtra = fields.Boolean('Has Extra',related="EstimateId.hasExtra")
-    
+    NoMaterial = fields.Boolean('No Material',compute="_noMaterial")
+
+    @api.depends("EstimateId")
+    def _noMaterial(self):
+        for record in self:
+            record.NoMaterial = any([line for line in record.EstimateId.estimate_line if (not line.isExtra) and (line.option_type == 'material') and (line.documentCatergory not in ['Packing','Despatch'])])
+
     @api.depends('EstimateId')
     def getEstimateExtra(self):
         for record in self:
@@ -130,7 +136,8 @@ class OrderConvert(models.TransientModel):
             'product_id' : self.EstimateId.product_type.id,
             'product_uom_id':  self.EstimateId.product_type.uom_id.id,
             'Estimate' : self.EstimateId.id,
-            'Project':self.EstimateId.project.id
+            'Project':self.EstimateId.project.id,
+            'analytic_account':self.EstimateId.analytic_account.id
         }
         
         mo = order.create(newOrder)
@@ -189,7 +196,8 @@ class OrderConvert(models.TransientModel):
             'user_id': self.EstimateId.estimator.id,
             'Project':self.EstimateId.project.id,
             'commitment_date':self.EstimateId.target_dispatch_date,
-            'order_line':[(0,0,salesProduct)]
+            'order_line':[(0,0,salesProduct)],
+            'analytic_account_id':self.EstimateId.analytic_account.id
         }
 
         if self.EstimateId.lead:
@@ -205,9 +213,11 @@ class OrderConvert(models.TransientModel):
 
         if stage:
             data['state'] = stage.id
+            self.EstimateId.write(data)
             if stage.LeadStage and self.EstimateId.lead:
                 self.EstimateId.lead.write({'stage_id':stage.LeadStage.id})
-
-        self.EstimateId.write(data)
+        else:
+            self.EstimateId.write(data)
+        
         
         

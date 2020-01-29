@@ -38,6 +38,18 @@
             name="sale.report_saleorder_pro_forma"
             print_report_name="'PRO-FORMA - %s' % (object.name)"
         />
+
+        <record model="ir.ui.view" id="sale_search">
+          <field name="name">Sale Search Options</field>
+          <field name="model">sale.order</field>
+          <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+          <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+              <field name="Estimate"/>
+              <field name="JobTicket"/>
+            </xpath>
+          </field>
+        </record>
       
       <record id="view_quotation_tree" model="ir.ui.view">
             <field name="name">quatation.bb</field>
@@ -75,7 +87,7 @@
               <xpath expr="//field[@name='partner_id']" position="after">
                   <field name="partnerOnHold"/>
                   <field name="Estimate" readonly="1"/>
-                  <field name="Project" readonly="1"/>
+                  <field name="Project" readonly="1" widget="selection"/>
                   <field name="JobTicket" readonly="1"/>
                   <field name="ProFormaLines" widget="html" invisible="1"/>
               </xpath>
@@ -104,7 +116,16 @@
                              </tree>
                         </field>
                     </page>
-              </xpath>
+	    </xpath>
+	    <xpath expr="//group[@name='sales_person']/field[@name='analytic_account_id']" position="replace">
+            <field name="analytic_account_id" required="True" widget="selection"/>
+        </xpath>
+        
+        <xpath expr="//field[@name='team_id']" position="attributes">
+            <attribute name="invisible">1</attribute>
+        </xpath>
+
+
           </field>
       </record>
   </data>

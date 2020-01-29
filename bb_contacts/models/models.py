@@ -23,7 +23,7 @@ class HistoryGroup(models.Model):
     _rec_name = 'name'
     name = fields.Char('Name',required=True)
     
-    contacts = fields.One2many('res.partner','history_id',string='Contacts')
+    contacts = fields.One2many('res.partner','history_id',string='Contacts',context={'active_test': False})
     
 class Partner(models.Model):
     _inherit = 'res.partner'
@@ -95,6 +95,9 @@ class Partner(models.Model):
         data.joiningDate = None
         data.leavingDate = None
         
+        #Archive Contact
+        self.write({'active':False})
+
         return {
             "name": "Contact Form",
             "view_type": "form",

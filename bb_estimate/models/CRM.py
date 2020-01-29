@@ -80,12 +80,15 @@ class Leads(models.Model):
     enquiryEnvelopeWindow  = fields.Boolean('Windowed')
     
     enquiryMaterial = fields.Char('Material')
-    enquiryWeightGsm = fields.Char('Weight(g.s.m)')
+    enquiryWeightGsm = fields.Integer('Weight(g.s.m)')
     enquiryPrintOrigination = fields.Selection(ORIGINATION,'Print Origination')
     
     size = fields.Many2one('bb_products.material_size','Size')
     enquirySizeHeight = fields.Integer('Size Height')
     enquirySizeWidth = fields.Integer('Size Width')
+
+    #analytic account
+    analytic_account = fields.Many2one('account.analytic.account','Analytic Account', required=True)
         
     def _compute_estimates(self):
             for record in self:
@@ -96,3 +99,16 @@ class Leads(models.Model):
         if self.size:
             self.enquirySizeHeight = self.size.height
             self.enquirySizeWidth = self.size.width
+
+    @api.constrains('stage_id')
+    def ValidateStage(self):
+        for record in self:
+            if record.typeOfLead == 'Bespoke' and record.Estimates:
+                estimate = record.Estimates[-1]
+                if estimate:
+                    stage = estimate.state.LeadStage
+                    if stage and record.stage_id.sequence > stage.sequence:
+                        raise ValidationError('Enquiry cannot move ahead of the estimate.')
+                
+            elif record.typeOfLead == 'Bespoke' and record.Estimate_Count == 0 and record.stage_id.sequence != 0:
+                raise ValidationError('Please provide an estimate first.')

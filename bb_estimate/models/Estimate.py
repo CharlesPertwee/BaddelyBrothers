@@ -58,7 +58,7 @@ class Estimate(models.Model):
     #Estimate For Fields
     partner_id = fields.Many2one('res.partner', string='Customer', required=True)
     contact = fields.Many2one('res.partner', string='Contact')
-    project = fields.Many2one('project.project', string='Project',required=True,ondelete='restrict')
+    project = fields.Many2one('project.project', string='Project',ondelete='restrict')
     invoice_account = fields.Many2one('res.partner', string='Invoice Account')
     
     #Estimate Summary
@@ -144,7 +144,7 @@ class Estimate(models.Model):
     knife_number = fields.Char('Knife Number')
     embossed = fields.Boolean('Embossed')
     windowed = fields.Boolean('Windowed')
-    standardWindowSize = fields.Boolean('Standard Window Size')
+    standardWindowSize = fields.Boolean('Custom Window Size')
     windowHeight = fields.Float('Window Size: Height (mm)',digits=(10,2))
     windowWidth = fields.Float('Window Size:Widht (mm)',digits=(10,2))
     windowFlhs = fields.Float('Window Pos: FLHS',digits=(10,2))
@@ -187,6 +187,8 @@ class Estimate(models.Model):
     ChangeLog = fields.Html("Change Log")
     
     AppendLog = fields.Boolean('Append Log')
+
+    analytic_account = fields.Many2one('account.analytic.account','Analytic Account', required=True)
     
     def _compute_reSync(self):
         for record in self:
@@ -195,19 +197,19 @@ class Estimate(models.Model):
     def GenerateEnvelopeDetails(self,estimate):
         line = ''
         if estimate.envelope_type:
-            line += '%s' % dict(ENVELOPE_TYPES)[estimate.envelope_type]
+            line += 'Type: %s' % dict(ENVELOPE_TYPES)[estimate.envelope_type]
         if estimate.flap_glue_type:
-            line += '\n%s' % dict(FLAP_GLUE_TYPES)[estimate.flap_glue_type]
+            line += '\nFlap: %s' % dict(FLAP_GLUE_TYPES)[estimate.flap_glue_type]
         if estimate.tissue_lined:
-            line += '\n%s' % dict(TISSUE_LINING_OPTIONS)[estimate.tissue_lined]
+            line += '\nLining: %s' % dict(TISSUE_LINING_OPTIONS)[estimate.tissue_lined]
         if estimate.embossed:
-            line += '\nBlind Embossed'
+            line += '\nProcess: Blind Embossed'
         if estimate.windowed:
-            if estimate.standardWindowSize:
-                line += '\nStandard'
+            if not estimate.standardWindowSize:
+                line += '\nWindow Size: Standard'
             else:
-                line += '\n%s mm  x  %s mm' % (estimate.windowHeight, estimate.windowWidth)
-                line += '\n%s mm FLHS,  %s mm Up' % (estimate.windowFlhs, estimate.windowUp)
+                line += '\nWindow Size: %s mm  x  %s mm' % (estimate.windowHeight, estimate.windowWidth)
+                line += '\nWindow Pos: %s mm FLHS,  %s mm Up' % (estimate.windowFlhs, estimate.windowUp)
         return line
     
     @api.multi
@@ -298,7 +300,8 @@ class Estimate(models.Model):
             'Weight_3' : self.Weight_3,
             'Weight_4' : self.Weight_4,
             'Weight_run_on' : self.Weight_run_on,
-            'lead' : self.lead,
+            'lead' : self.lead.id if self.lead else False,
+            'analytic_account': self.analytic_account.id if self.analytic_account else False,
             'priceHistory': [(0,0,
                               {
                                 'CurrentPrice1': x.ChangedPrice1,
@@ -615,10 +618,6 @@ class Estimate(models.Model):
                     record['unAllocated_'+qty] = record[qty] - sum([x['param_finished_quantity_'+qty] for x in record.estimate_line if x.option_type == 'material'])
                     
             record.hasDelivery = len(record.estimate_line.filtered(lambda x: x.documentCatergory == 'Despatch')) > 0
-    
-    @api.onchange('materialInfo')
-    def ShowChangedLines(self):
-        pass
     
     @api.onchange('finished_size')
     def finished_size_change(self):

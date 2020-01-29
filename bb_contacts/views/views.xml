@@ -1,5 +1,20 @@
 <odoo>
   <data> 
+       <record id="view_partners_form_website" model="ir.ui.view">
+          <field name="name">view.res.partner.form.website.bb</field>
+          <field name="model">res.partner</field>
+          <field name="inherit_id" ref="website_partner.view_partners_form_website"/>
+          <field name="arch" type="xml">
+              <xpath expr="//button[@name='website_publish_button']" position="replace">
+                    <button name="toggle_active" groups="website.group_website_designer">
+                        <button class="oe_stat_button" name="website_publish_button" type="object" icon="fa-globe">
+                            <field name="website_published" widget="website_button"/>
+                        </button>
+                    </button>
+              </xpath>
+          </field>
+      </record>
+
        <record id="view_partner_form_accounting" model="ir.ui.view">
           <field name="name">res.partner.accounting.form</field>
           <field name="model">res.partner</field>

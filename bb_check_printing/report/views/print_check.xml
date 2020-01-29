@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="assets_common" name="bb_check_printing_assets" inherit_id="web.report_assets_common">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" type="text/scss" href="/bb_check_printing/static/src/scss/report_check_commons.scss"/>
+                <link rel="stylesheet" type="text/scss" href="/bb_check_printing/static/src/scss/report_check_bottom.scss"/>
+                <link rel="stylesheet" type="text/scss" href="/bb_check_printing/static/src/scss/report_check_middle.scss"/>
+                <link rel="stylesheet" type="text/scss" href="/bb_check_printing/static/src/scss/report_check_top.scss"/>
+            </xpath>
+        </template>
+
+        <template id="ckin_check">
+            <div class="ckin_check">
+                <div class="ckin_payee_address" t-esc="page['partner_id']" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                <div class="ckin_memo1"><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></div>
+                <div class="ckin_memo2"><span t-esc="'%06d'%(o.check_number)"/></div>
+                <div class="ckin_memo3">
+                    <span t-esc="o.partner_id.reference if o.partner_id.reference else (o.partner_id.parent_id.reference if o.partner_id.parent_id else '')"/>
+                </div>
+                
+            </div>
+        </template>
+        <template id="ckin_stub">
+            <div t-attf-class="ckin_stub ckin_stub_{{ stub_num }}">
+                <div class="sequence_number"/>
+                <table style="margin-left:60.2px; margin-top:-67px;">
+                    <thead><tr>
+                        <th style="text-align: left; font-size: 1.0em; font-family: Georgia;" width="12%">Date</th>
+                        <th style="text-align: left; font-size: 1.0em; font-family: Georgia;" width="17%">Ref</th>
+                        <th style="text-align: left; font-size: 1.0em; font-family: Georgia;" width="53%">Details</th>
+                        <th style="text-align: left; font-size: 1.0em; font-family: Georgia;" width="10%"><span><![CDATA[&nbsp;]]></span></th>
+                        <th style="text-align: right; font-size: 1.0em; font-family: Georgia;" width="10%">Payment</th>
+                    </tr></thead>
+                    <tbody>
+                        <t t-foreach="o.reconciled_invoice_ids" t-as="stub_line">
+                            <tr>
+                                <td width="12%" style="text-align: left; font-size: 1.0em; font-family: Georgia;"><t t-esc="stub_line['date_invoice'].strftime('%d/%m/%Y')"/></td>
+                                <td width="17%" style="text-align: left; font-size: 1.0em; font-family: Georgia;"><t t-esc="stub_line['number']"/></td>
+                                <td width="53%" style="text-align: left; font-size: 1.0em; font-family: Georgia;"><t t-esc="stub_line['origin']"/></td>
+                                <td width="10%" style="text-align: left; font-size: 1.0em; font-family: Georgia;">
+                                    £
+                                </td>
+                                <td width="10%" style="text-align: right; font-size: 1.0em; font-family: Georgia;"><t t-esc="'%.2f'%(stub_line['amount_total'])"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <div class="stub_total_amount" >NOTE: All values are shown in Pound Sterling</div>
+                <div class="stub_total_amount1">£</div>
+                <div class="stub_total_amount2" style="border-top: 1px black solid;">
+                    <t t-esc="'%.2f'%(float(o.amount))"/>
+                </div>
+                <div class ="stub_total_amount3"><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></div>
+                <t t-if="page['partner_id'].parent_id">
+                    <div class="stub_total_amount4"><t t-esc="page['partner_id'].parent_id.name"/>**</div>
+                </t>
+                <t t-else="">
+                    <div class="stub_total_amount4"><t t-esc="page['partner_id'].name"/>**</div>
+                </t>
+                <div class="stub_total_amount5">**<t t-esc="'%.2f'%(float(o.amount))"/>**</div>
+                <div class ="stub_total_amount6"><span t-esc="o.wordamount()[0]"/></div>
+                <div class ="stub_total_amount7"><span t-esc="o.wordamount()[1]"/></div>
+                <div class ="stub_total_amount8"><span t-esc="o.wordamount()[2]"/></div>
+                <div class ="stub_total_amount9"><span t-esc="o.wordamount()[3]"/></div>
+                <div class ="stub_total_amount10"><span t-esc="o.wordamount()[4]"/></div>
+                <div class ="stub_total_amount11"><span t-esc="o.wordamount()[5]"/></div>
+            </div>
+        </template>
+
+    </data>
+</odoo>

@@ -118,3 +118,105 @@ class OnTimeDelivery(models.Model):
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""CREATE or REPLACE VIEW %s as (%s)""" % (self._table, self._query()))
+
+class DeliveryPerfomance(models.Model):
+    _name = 'bb_estimate.delivery_performance'
+    _desc = 'Delivery Performance'
+    _auto = False
+    _rec_name = 'Year'
+    _order = "Year, Month"
+
+    FinancialYear = fields.Char('Financial Year', readonly=True)
+    Year = fields.Char('Year', readonly=True)
+    Month = fields.Selection([('01','January'), ('02','February'), ('03','March'), ('04','April'), ('05','May'), ('06','June'), ('07','July'), ('08','August'), ('09','September'), ('10','October'), ('11','November'), ('12','December')],string='Month',readonly=True)
+    Early = fields.Integer('Early Orders')
+    OnTime = fields.Integer('On-Time Orders')
+    Delayed = fields.Integer('Delayed Orders')
+    TotalOrders = fields.Integer('Total Orders')
+    DeliverySummary = fields.Char('Delivery Summary')
+
+    def _query(self, with_clause='', fields={}, groupby='', from_clause=''):
+        return """
+            select 
+                id,
+                "FinancialYear",
+                "Year",
+                "Month",
+                (
+                        select count(*) as "Early" from (SELECT 
+                        id
+                    from sale_order 
+                    where
+                        date_part('day',(commitment_date::timestamp - effective_date::timestamp)) > 0 and
+                        commitment_date is not null
+                        and effective_date is not null
+                        and to_char(date_order,'MM') = o."Month" 
+                        and to_char(date_order,'YYYY')= o."Year"
+                    ) T
+                ),
+                (
+                    select count(*) as "OnTime" from (SELECT 
+                        id
+                    from sale_order 
+                    where
+                        date_part('day',(commitment_date::timestamp - effective_date::timestamp)) = 0 and
+                        commitment_date is not null
+                        and effective_date is not null
+                        and to_char(date_order,'MM') = o."Month" 
+                        and to_char(date_order,'YYYY')= o."Year"
+                    ) T
+                ),
+                (
+                        select count(*) as "Delayed" from (SELECT 
+                        id
+                    from sale_order 
+                    where
+                        date_part('day',(commitment_date::timestamp - effective_date::timestamp)) < 0 and
+                        commitment_date is not null
+                        and effective_date is not null
+                        and to_char(date_order,'MM') = o."Month" 
+                        and to_char(date_order,'YYYY')= o."Year"
+                    ) T
+                ),
+                (
+                        select count(*) as "TotalOrders" from (SELECT 
+                        id
+                    from sale_order 
+                    where
+                        commitment_date is not null
+                        and effective_date is not null
+                        and to_char(date_order,'MM') = o."Month" 
+                        and to_char(date_order,'YYYY')= o."Year"
+                    ) T
+                ),
+                (case when delivery_summary > 0 then 'Early by '|| abs(delivery_summary) ||' day(s)'  
+                        when delivery_summary < 0 then 'Late by '|| abs(delivery_summary) ||' day(s)'
+                        else 'On Time'  
+                    end
+                ) as "DeliverySummary"
+                from
+                (SELECT
+                    min(id) AS id,
+                    CASE
+                        WHEN extract(month from date_order)::int >= 7 THEN extract(year from date_order)::text || '/' || (extract(year from date_order)::int + 1)::text
+                        ELSE (extract(year from date_order)::int - 1)::text || '/' || extract(year from date_order)::text
+                    END as "FinancialYear",
+                    extract(year from date_order)::text "Year",
+                    to_char(date_order,'MM') "Month",
+                    round(avg(date_part('day',(commitment_date::timestamp - effective_date::timestamp)))::numeric,2) as delivery_summary
+                FROM
+                    sale_order 
+                where
+		    commitment_date is not null
+		    and effective_date is not null
+                GROUP BY
+                    extract(month from date_order),
+                    extract(year from date_order),
+                    to_char(date_order, 'MM')
+                ) o
+        """
+
+    @api.model_cr
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""CREATE or REPLACE VIEW %s as (%s)""" % (self._table, self._query()))

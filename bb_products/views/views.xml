@@ -6,7 +6,7 @@
 		<field name="inherit_id" ref="product.product_template_form_view"/>
 		<field name="arch" type="xml">
             <xpath expr="//field[@name='categ_id']" position="after">
-                <field name="estimateAvailable" />
+                <!--field name="estimateAvailable" /-->
                 <field name="grammage" />
                 <field name="sheetSize" />
                 <field name="customerDescription"/>

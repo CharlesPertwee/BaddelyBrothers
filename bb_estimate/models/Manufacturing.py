@@ -35,7 +35,8 @@ class Manufacture(models.Model):
     
     customerRef = fields.Char('Customer Reference')
     previousJobRef = fields.Char('Previous Job Ticket')
-    Purchases = fields.Many2many('purchase.order',string='Purchase')   
+    Purchases = fields.Many2many('purchase.order',string='Purchase')  
+    analytic_account = fields.Many2one('account.analytic.account','Analytic Account', required=True)  
     
     def write(self,vals):
         if 'customerRef' in vals.keys():

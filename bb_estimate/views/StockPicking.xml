@@ -8,6 +8,17 @@
                 <xpath expr="//field[@name='picking_type_id']" position="after">
                     <field name="customerRef"/>
                 </xpath>
+
+                <xpath expr="//notebook" position="inside">
+                    <page string="Delivered Materials" name="delivered_materials" attrs="{'invisible':[('Materials','=',False)]}">
+                        <field name="Materials">
+                            <tree editable="top" create="0" delete="0" edit="0">
+                                <field name="Name" readonly="1"/>
+                                <field name="Quantity" readonly="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
             </field>
         </record>
         

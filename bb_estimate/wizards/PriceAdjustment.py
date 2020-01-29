@@ -147,3 +147,4 @@ class PriceAdjustment(models.TransientModel):
             )
             
             self.Estimate.message_post(body="Adjusted Price for estimate")
+            return { 'type': 'ir.actions.client','tag':'reload' }

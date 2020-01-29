@@ -13,13 +13,23 @@ from odoo.addons.stock.models.stock_move import PROCUREMENT_PRIORITIES
 from operator import itemgetter
 import math
 
+class DeliveryMaterialLines(models.Model):
+    _name = 'bb_estimate.delivery_material_lines'
+    _desc = 'Materials Delivered'
+    _rec_name = "Name"
+    
+    Name = fields.Char('Name')
+    Quantity = fields.Char('Quantity Delivered')
+    PickingId = fields.Many2one('stock.picking')
+
 class PickingType(models.Model):
     _inherit = "stock.picking"
     
     Project = fields.Many2one('project.project','Project')
     customerRef = fields.Char('Customer Reference')
     consignmentNumber = fields.Char('Consignment Number')
-    
+    Materials = fields.One2many('bb_estimate.delivery_material_lines','PickingId','Materials Delivered')
+
     @api.multi
     def do_print_picking(self):
         self.write({'printed': True})
@@ -35,7 +45,6 @@ class PickingType(models.Model):
         return super(PickingType,self).create(vals)
     
     def _estimate_pack(self,sale):
-        package = False
         picks = self.filtered(lambda p: p.state not in ('done', 'cancel'))
         if picks:
             return {
@@ -89,4 +98,28 @@ class PickingType(models.Model):
         price = ((estimate['total_price_%s'%(estimate.selectedQuantity)] - estimate['total_price_extra_%s'%(estimate.selectedQuantity)]) * estimate.SelectedQtyRatio) + ((estimate.total_price_run_on - estimate.total_price_extra_run_on) * estimate.selectedRatio)
         return str(price)
     
+    @api.model
+    def print_note(self):
+        if self:
+            estimate = self.getEstimateData()
+            if estimate:
+                materials = [(0,0, {
+                                'name': line.JobTicketText,
+                                'value': '%0.0f'%((line['param_finished_quantity_'+line.estimate_id.selectedQuantity] * line.estimate_id.SelectedQtyRatio) + (line.param_finished_quantity_run_on * line.estimate_id.selectedRatio))
+                            }) for line in estimate.estimate_line if (not line.isExtra) and (line.option_type == 'material') and (line.documentCatergory not in ['Packing','Despatch']) and (line.JobTicketText)]
+                if materials:
+                    return {
+                    'name': _('Delivery Note'),
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'bb_estimate.delivery_note',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'target': 'new',
+                    'context': {
+                        'default_delivery_id': self.id,
+                        }
+                    }
+                else:
+                    raise UserError("No Material on this Job Ticket")       
+        raise UserError("This is not a bespoke order.")
     
