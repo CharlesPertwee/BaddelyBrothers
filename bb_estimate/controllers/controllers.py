@@ -70,7 +70,7 @@ class BbEstimate(http.Controller):
         sec_header.left_margin = Cm(0)
         header_tp = sec_header.add_paragraph(style='No Spacing')  # Add a paragraph in the header, you can add any anything in the paragraph
         header_run = header_tp.add_run()   # Add a run in the paragraph. In the run you can set the values 
-        header_run.add_picture('/opt/Bb/BaddelyBrothers/bb_estimate/static/src/img/HeaderNew.jpg',width=Inches(6.57)) 
+        header_run.add_picture('/opt/odoo/BaddelyBrothers/bb_estimate/static/src/img/HeaderNew.jpg',width=Inches(6.57)) 
         universalTableStyle = "borderColor:white"
         styles = document.styles['No Spacing']
         font = styles.font
@@ -480,7 +480,7 @@ class BbEstimate(http.Controller):
         footer_p = default_footer.add_paragraph()
         footer_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         footer_r = footer_p.add_run()
-        footer_r.add_picture('/opt/Bb/BaddelyBrothers/bb_estimate/static/src/img/FooterNew.jpg',width=Inches(3.5)) 
+        footer_r.add_picture('/opt/odoo/BaddelyBrothers/bb_estimate/static/src/img/FooterNew.jpg',width=Inches(3.5)) 
         
         docx_stream = io.BytesIO()
         document.save(docx_stream)
