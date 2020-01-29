@@ -28,7 +28,7 @@
 
                 </xpath>
             <xpath expr="//field[@name='typeOfLead']" position="after">
-                <field name="Project" options="{'no_create_edit': True}" domain="['|',('partner_id','=',partner_id),('partner_id','parent_of',partner_id)]"/>
+                <field name="Project" options="{'no_create_edit': True}" domain="['|','|',('partner_id','=',partner_id),('partner_id','parent_of',partner_id),('partner_id','=',False)]" widget="selection"/>
                 <field name="analytic_account" widget="selection"/>
             </xpath>
             <xpath expr="//notebook" position="inside">

@@ -19,7 +19,7 @@
     'version': '1.2',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','web','website_crm','bb_crm','crm','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock','sale_crm','purchase_stock','account'],
+    'depends': ['base','web','hr_timesheet','website_crm','bb_crm','crm','bb_process','bb_products','product','mrp','purchase','project','uom','sale','sale_management','delivery','mrp_account','account','stock','sale_crm','purchase_stock','account'],
 
     # always loaded
     'data': [
