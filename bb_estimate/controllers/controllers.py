@@ -186,9 +186,9 @@ class BbEstimate(http.Controller):
                     new_col += 2
         
         record_length = len([x for x in Estimate.estimate_line if x.customer_description and (not x.isExtra)])
-        addtitional = sum([1 for x in ['quantity_1','quantity_2','quantity_3','quantity_4','run_on'] if Estimate[x] > 0]) + new_col
+        addtitional = sum([1 for x in ['1','2','3','4','run_on'] if abs(Estimate['total_price_'+x] - Estimate['total_price_extra_'+x]) >0]) + new_col
         data_table = document.add_table((record_length + addtitional) , 2)  
-        #raise Exception((record_length + addtitional))
+        # raise Exception((record_length + addtitional))
         data_table.alignment = WD_TABLE_ALIGNMENT.CENTER
         data_table.allow_autofit = True
         data_table.autofit = True
@@ -232,8 +232,8 @@ class BbEstimate(http.Controller):
         y = 2             
 
         for estimate_line_material in Estimate.estimate_line:
-            if estimate_line_material.option_type == 'material' and estimate_line_material.customer_description and (not estimate_line_material.isExtra):
-                data_table.cell(y,0).text = "Material: "
+            if estimate_line_material.option_type == 'material' and estimate_line_material.customer_description and estimate_line_material.documentCatergory and (not estimate_line_material.isExtra) and ( not estimate_line_material.material.productType=='Delivery'):
+                data_table.cell(y,0).text = "%s: "%(estimate_line_material.documentCatergory)
                 #data_table.cell(y,0).width = Inches(inches)
                 data_table.cell(y,1).text = estimate_line_material.customer_description
                 y += 1
@@ -275,49 +275,55 @@ class BbEstimate(http.Controller):
         
         
         for estimate_line_process in Estimate.estimate_line:
-            if estimate_line_process.option_type == 'process' and estimate_line_process.customer_description and (not estimate_line_process.isExtra):
-                data_table.cell(y,0).text = "Process: "
+            if estimate_line_process.option_type == 'process' and estimate_line_process.documentCatergory and estimate_line_process.customer_description and (not estimate_line_process.isExtra):
+                data_table.cell(y,0).text = "%s: "%(estimate_line_process.documentCatergory)
                 #data_table.cell(y,0).width = Inches(inches)
                 data_table.cell(y,1).text = estimate_line_process.customer_description
                 y += 1
+        for estimate_line_material in Estimate.estimate_line:   
+            if estimate_line_material.option_type == 'material' and estimate_line_material.documentCatergory and estimate_line_material.customer_description and (not estimate_line_material.isExtra) and estimate_line_material.material.productType=='Delivery':
+                data_table.cell(y,0).text = "%s: "%(estimate_line_material.documentCatergory)
+                #data_table.cell(y,0).width = Inches(inches)
+                data_table.cell(y,1).text = estimate_line_material.customer_description
+                y += 1
         
-        if Estimate.quantity_1:
+        if abs(Estimate.total_price_1 - Estimate.total_price_extra_1) >0:
             data_table.cell(y,0).text="Qty/Price:"
             price = 0
             if Estimate.total_price_1 > Estimate.total_price_extra_1:
                 price =  (Estimate.total_price_1 - Estimate.total_price_extra_1)
             else:
                 price = (Estimate.total_price_extra_1 - Estimate.total_price_1)
-            
-            if price:
+                
+            if price:                
                 data_table.cell(y,1).text="%d    @    £%.2f"%(Estimate.quantity_1,price)
                 y+=1
         
-        if Estimate.quantity_2:
+        if abs(Estimate.total_price_2 - Estimate.total_price_extra_2) >0:
             data_table.cell(y,0).text=""
             price = 0
             if Estimate.total_price_2 > Estimate.total_price_extra_2:
                 price =  (Estimate.total_price_2 - Estimate.total_price_extra_2)
             else:
                 price = (Estimate.total_price_extra_2 - Estimate.total_price_2)
-               
-            if price:
+                
+            if price:                
                 data_table.cell(y,1).text="%d    @    £%.2f"%(Estimate.quantity_2,price)
                 y+=1
         
-        if Estimate.quantity_3:
+        if abs(Estimate.total_price_3 - Estimate.total_price_extra_3) >0:
             data_table.cell(y,0).text=""
             price = 0
             if Estimate.total_price_3 > Estimate.total_price_extra_3:
                 price =  (Estimate.total_price_3 - Estimate.total_price_extra_3)
             else:
                 price = (Estimate.total_price_extra_3 - Estimate.total_price_3)
-                   
-            if price:        
+            
+            if price:            
                 data_table.cell(y,1).text="%s    @    £%.2f"%(Estimate.quantity_3,price)
                 y+=1
         
-        if Estimate.quantity_4:
+        if abs(Estimate.total_price_4 - Estimate.total_price_extra_4) >0:
             data_table.cell(y,0).text=""
             price = 0
             if Estimate.total_price_4 > Estimate.total_price_extra_4:
@@ -325,18 +331,17 @@ class BbEstimate(http.Controller):
             else:
                 price = (Estimate.total_price_extra_4 - Estimate.total_price_4)
             
-            if price:
+            if price:                   
                 data_table.cell(y,1).text="%s    @    £%.2f"%(Estimate.quantity_4,price)
                 y+=1
         
-        if Estimate.total_price_run_on:
+        if abs(Estimate.total_price_run_on - Estimate.total_price_extra_run_on) >0:
             data_table.cell(y,0).text=""
             price = 0
             if Estimate.total_price_run_on > Estimate.total_price_extra_run_on:
                 price =  (Estimate.total_price_run_on - Estimate.total_price_extra_run_on)
             else:
                 price = (Estimate.total_price_extra_run_on - Estimate.total_price_run_on)
-            
             if price:
                 data_table.cell(y,1).text="Run on: £%.2f per %s"%(price,Estimate.run_on)
                 y+=1
@@ -346,6 +351,8 @@ class BbEstimate(http.Controller):
         for row in data_table.rows:
             for cell in row.cells:
                 paragraphs = cell.paragraphs
+                row.cells[0].width = Inches(inches)
+                row.cells[1].width = Inches(5.06)
                 for paragraph in paragraphs:
                     for run in paragraph.runs:
                         font = run.font
@@ -379,7 +386,8 @@ class BbEstimate(http.Controller):
         
         if Estimate.hasExtra:
             extra_length = (len([x for x in Estimate.estimate_line if (x.isExtra and x.extraDescription)]))
-            extra_table = document.add_table(extra_length*(addtitional-new_col+1), 2)  
+            addtitional1 = sum([1 for x in ['total_price_1','total_price_2','total_price_3','total_price_4','total_price_run_on'] if Estimate[x] > 0]) + new_col
+            extra_table = document.add_table(extra_length*(addtitional1-new_col+1), 2)  
             extra_table.alignment = WD_TABLE_ALIGNMENT.CENTER
             extra_table.style = 'Table Grid'
             tblExtraData = extra_table._tbl # get xml element in table
@@ -426,12 +434,14 @@ class BbEstimate(http.Controller):
                         extra_table.cell(z,1).text = "%s    @    £%s"%(str(extra.quantity_4).encode("utf-8").decode("utf-8"),str(extra.total_price_4).encode("utf-8").decode("utf-8"))
                     if extra.run_on and extra.total_price_run_on:
                         z += 1
-                        extra_table.cell(z,1).text = "Run on: £%s per %s"%(str(extra.total_price_run_on).encode("utf-8").decode("utf-8"),str(extra.run_on).encode("utf-8").decode("utf-8"))
+                        extra_table.cell(z,1).text = "Run on: £ %s per %s"%(str(extra.total_price_run_on).encode("utf-8").decode("utf-8"),str(extra.run_on).encode("utf-8").decode("utf-8"))
                     z += 1
                     
             for row in extra_table.rows:
                 for cell in row.cells:
                     paragraphs = cell.paragraphs
+                    row.cells[0].width = Inches(inches)
+                    row.cells[1].width = Inches(5.06)
                     for paragraph in paragraphs:
                         for run in paragraph.runs:
                             font = run.font
