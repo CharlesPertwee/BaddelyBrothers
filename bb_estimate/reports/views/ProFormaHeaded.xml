@@ -11,20 +11,12 @@
                             <div class="container" style="padding:3em; font-size:14px;">
                                 <div class="row">
                                     <div class="col-7">
-                                        <t t-if="o.partner_id.parent_id">
-                                            <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/><br/>
-                                                <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id"/></p>
-                                        </t>
-                                        <t t-else="">
-                                            <p><span t-field="o.partner_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/><br/>
-                                                <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id"/></p>
-                                        </t>
+                                        <p>
+                                        <span t-esc="o.partner_id.parent_id.name if o.partner_id.parent_id else o.partner_id.name"/><br/>
+                                        <span t-field="o.partner_invoice_id.street"/><br/>
+                                        <span t-field="o.partner_invoice_id.city"/><br/>
+                                        <span t-field="o.partner_invoice_id.zip"/><br/>
+                                        <span t-field="o.partner_invoice_id.country_id"/></p>
                                     </div>
                                     <div class="col-5 pull-right">
                                         <div class="row">
