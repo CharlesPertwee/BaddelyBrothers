@@ -386,7 +386,7 @@ class BbEstimate(http.Controller):
         
         if Estimate.hasExtra:
             extra_length = (len([x for x in Estimate.estimate_line if (x.isExtra and x.extraDescription)]))
-            addtitional1 = sum([1 for x in ['total_price_1','total_price_2','total_price_3','total_price_4','total_price_run_on'] if Estimate[x] > 0]) + new_col
+            addtitional1 = sum([1 for x in ['total_price_extra_1','total_price_extra_2','total_price_extra_3','total_price_extra_4','total_price_extra_run_on'] if Estimate[x] > 0]) + new_col
             extra_table = document.add_table(extra_length*(addtitional1-new_col+1), 2)  
             extra_table.alignment = WD_TABLE_ALIGNMENT.CENTER
             extra_table.style = 'Table Grid'
