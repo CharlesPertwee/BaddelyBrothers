@@ -766,7 +766,12 @@ class EstimateLine(models.Model):
         return_values = {}
         process_type = workcenterId.process_type
         #data dictionaries which would ne updated with values in Workcenter
-        
+        qty_break = False
+        if workcenterId:
+            compare_quantity = max([quantity_1,quantity_2,quantity_3,quantity_4]) if qty == 'run_on' else finished_quantity
+            qty_break_ids = workcenterId.qty_break_params.search([('process_id','=',workcenterId.id),('qty_greater_than','<',compare_quantity),('weight_greater_than','<',param_grammage),('isDefault','=',False)], order='qty_greater_than desc, weight_greater_than desc')
+            qty_break = (qty_break_ids[0] if any(qty_break_ids) else False) or workcenterId.qty_break_params.search([('process_id','=',workcenterId.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+
         qty_params = {
             'workcenterId':workcenterId,
             'param_number_out':param_number_out,
@@ -796,7 +801,7 @@ class EstimateLine(models.Model):
             'param_additional_charge':param_additional_charge,
             'param_die_size':param_die_size,
             'param_misc_charge_per_cm2_area':param_misc_charge_per_cm2_area,
-            'param_minimum_price': 0,
+            'param_minimum_price': qty_break.minimum_price if qty_break else 0,
             'param_misc_charge_per_cm2':param_misc_charge_per_cm2,
             'param_no_of_ink_mixes':param_no_of_ink_mixes,
             'working_width':param_working_width,
