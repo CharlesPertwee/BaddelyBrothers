@@ -478,7 +478,7 @@ class BbEstimate(http.Controller):
         p1 = document.add_paragraph('')
         paragraph_format3 = p1.paragraph_format
         paragraph_format3.left_indent = Inches(0.09)
-        sen1 = p1.add_run('Yours faithfully,')
+        sen1 = p1.add_run('Yours sincerely,')
         sen1.font.name = 'Tahoma'
         sen1.add_break()
         sen2 = p1.add_run(Estimate.estimator.name)
