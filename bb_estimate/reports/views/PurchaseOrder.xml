@@ -87,7 +87,7 @@
                                             <p class="pull-left">Total Cost Ex VAT:  </p>
                                         </div>
                                         <div class="col-6">
-                                            <p class="pull-left" style="margin-left: 19px;"><span t-field="o.amount_total"/></p>
+                                            <p class="pull-left" style="margin-left: 19px;"><span t-field="o.amount_untaxed"/></p>
                                         </div>
                                     </div>
                                 </div>
