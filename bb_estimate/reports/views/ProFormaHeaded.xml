@@ -12,7 +12,7 @@
                                 <div class="row">
                                     <div class="col-7">
                                         <p>
-                                        <span t-esc="o.partner_id.parent_id.name if o.partner_id.parent_id else o.partner_id.name"/><br/>
+                                        <span t-esc="o.partner_invoice_id.parent_id.name if o.partner_invoice_id.parent_id else o.partner_invoice_id.name"/><br/>
                                         <span t-field="o.partner_invoice_id.street"/><br/>
                                         <span t-field="o.partner_invoice_id.city"/><br/>
                                         <span t-field="o.partner_invoice_id.zip"/><br/>

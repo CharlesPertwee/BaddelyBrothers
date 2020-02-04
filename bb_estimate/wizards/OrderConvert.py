@@ -159,7 +159,7 @@ class OrderConvert(models.TransientModel):
                                    {
                                         'product_id': outwork.workcenterId.outworkProcessProduct.id,
                                         'price_unit': outwork['cost_per_unit_'+str(self.QuantityRequired)] + (outwork['cost_per_unit_run_on'] * runOnRatio),
-                                        'name': '%s: %s'%(self.EstimateId.title, outwork.JobTicketText or outwork.lineName),
+                                        'name': '[%s] %s: %s'%(mo.name, self.EstimateId.title, outwork.JobTicketText or outwork.lineName),
                                         'date_planned': datetime.now(), # + timedelta(days=1)
                                         'product_qty': 1,
                                         'product_uom': outwork.workcenterId.outworkProcessProduct.uom_po_id.id
