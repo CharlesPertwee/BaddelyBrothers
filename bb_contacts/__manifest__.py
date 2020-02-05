@@ -24,6 +24,8 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'data/LabelFormat.xml',
+        'reports/views/AddressLabel.xml',
         'views/views.xml',
         #'views/contact_link.xml',
         'views/templates.xml',
