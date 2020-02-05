@@ -1,5 +1,18 @@
 <odoo>
   <data> 
+
+    <report 
+        id="bb_address_label_report" 
+        string="Address Label Report" 
+        model="res.partner" 
+        report_type="qweb-pdf" 
+        name="bb_contacts.address_label" 
+        file="bb_contacts.address_label" 
+        attachment="('Address Label-'+(object.name or '').replace('/','')+'.pdf')"
+        print_report_name="'Address Label - %s ' % object.name"
+        paperformat="bb_contacts.address_label_paper_format"
+        />
+
        <record id="view_partners_form_website" model="ir.ui.view">
           <field name="name">view.res.partner.form.website.bb</field>
           <field name="model">res.partner</field>
