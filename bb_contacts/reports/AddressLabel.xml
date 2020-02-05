@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="address_label">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.basic_layout">
+                        <div class="page">
+                            <div class="container" style="font-family:Tahoma; font-size:13pt; padding:1px;">
+                                <div class="row">
+                                    <p>
+                                    <span t-esc="o.name"/><br/>
+                                    <span t-field="o.street"/><br/>
+                                    <span t-field="o.city"/><br/>
+                                    <span t-field="o.zip"/><br/>
+                                    <span t-field="o.country_id"/></p>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+</odoo>
