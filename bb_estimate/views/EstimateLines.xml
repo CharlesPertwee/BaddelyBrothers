@@ -232,6 +232,7 @@
                                         </group>
                                         <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','=',False)]}">
                                             <group>
+                                                <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Non-Stockable'}" domain="[('productType','=', MaterialTypes)]" string="Existing Material"/>
                                                 <field name="MaterialName" colspan="4" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                             </group>
                                             <group>
