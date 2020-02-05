@@ -323,7 +323,7 @@ class EstimateLine(models.Model):
     def computePricesNonStockCost(self):
         for record in self:
             if record.CharegeRate:
-                record.Margin = ((record.CharegeRate / record.CostRate) - 1) * 100
+                record.Margin = ((record.CharegeRate / (record.CostRate or 1)) - 1) * 100
             elif record.Margin:
                 record.CharegeRate = ((record.Margin / 100) + 1) * record.CostRate
                 
@@ -338,7 +338,7 @@ class EstimateLine(models.Model):
     def computePricesNonStockPrice(self):
         for record in self:
             if record.CharegeRate:
-                record.Margin = ((record.CharegeRate / record.CostRate) - 1) * 100
+                record.Margin = ((record.CharegeRate / (record.CostRate or 1)) - 1) * 100
             elif record.Margin:
                 record.CostRate = record.CharegeRate / ((record.Margin / 100) + 1)
             
@@ -409,6 +409,13 @@ class EstimateLine(models.Model):
                 
                 if record.MaterialTypes == "Non-Stockable":
                     record.MaterialName = record.material.name
+                    record.CostRate = record.material.standard_price
+                    record.Margin = record.material.margin
+                    record.PurchaseUnit = record.material.uom_id
+                    if record.material.seller_ids:
+                        record.Supplier = record.material.seller_ids[0].name
+                        record.MinimumQty = record.material.seller_ids[0].min_qty
+                        record.PackSize = record.material.seller_ids[0].multiplier
                 
                 if record.WhiteCutting:
                     record.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
@@ -1266,7 +1273,7 @@ class EstimateLine(models.Model):
                             newProduct['uom_id'] = lineId.PurchaseUnit.id
                             newProduct['uom_po_id'] = lineId.PurchaseUnit.id
 
-                        if  (not lineId.material) or lineId.NonStockMaterialType == 'Bespoke Material':
+                        if  (not lineId.material):
                             productId = product.create(newProduct)	             
                         else:
                             productId = lineId.material
