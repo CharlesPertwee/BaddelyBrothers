@@ -120,7 +120,7 @@
                 </t>
                 <t t-else="">
                   <div class="page" style="font-family: Georgia !important;">
-                    <h2 class="text-center"><b>DELIVERY NOTE</b></h2>
+                    <h2 class="text-center"><b>DELIVERY NOTE</b></h2><br/>
                       <h2 class="text-center"><b><span t-field="o.name"/></b></h2>                   
                       
                       <span style="text-decoration:underline;">Delivery Address</span><br/>                  
@@ -229,12 +229,7 @@
                               </tr>
                           </tbody>
                       </table>
-                     <div class="row" style="position: relative; left: 0; bottom: 0;padding-top:25em;">
-                         <p class="text-right" style="width:84%;">
-                             Total Boxes:          <t t-esc="o.TotalBoxes()"/>
-                         </p>
-                         
-                     </div>
+                     <div class="row" style="padding:1em;padding-bottom: 0em;padding-top:30em;">
                       <table style="width:100%">
                              <tbody>
                                  <tr>
@@ -251,6 +246,13 @@
                                          
                                      </td>
                                  </tr>
+                             </tbody>
+                         </table>
+                         
+                     </div>
+                     <div class="row" style="padding-left:1em;padding-top:2em;padding-right:1em;">
+                         <table style="width:100%">
+                             <tbody>
                                  <tr>
                                      <td width="25%">
                                          Print Name
@@ -267,6 +269,8 @@
                                  </tr>
                              </tbody>
                          </table>
+                         
+                     </div>
                   </div>
                 </t>
             </t>
