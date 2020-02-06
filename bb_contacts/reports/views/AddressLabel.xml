@@ -9,10 +9,11 @@
                                 <div class="row">
                                     <p>
                                     <span t-esc="o.name"/><br/>
-                                    <span t-field="o.street"/><br/>
-                                    <span t-field="o.city"/><br/>
-                                    <span t-field="o.zip"/><br/>
-                                    <span t-field="o.country_id"/></p>
+                                    <t t-if="o.parent_id.name">
+                                        <span t-esc="o.parent_id.name"/><br/>
+                                    </t>
+                                    <span t-field="o.street"/>&#160;<span t-field="o.city"/><br/>
+                                    <span t-field="o.zip"/><br/></p>
                                 </div>
                             </div>
                         </div>
