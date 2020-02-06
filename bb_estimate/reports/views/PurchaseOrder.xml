@@ -64,12 +64,7 @@
                                 <tr>
                                     <td  width="25%"><span t-esc="int(float(order.product_qty))"/></td>
                                     <td  width="64%">
-                                        <t t-if="order.product_id.type == 'service'">
-                                            <span t-field="order.name"/>
-                                        </t>
-                                        <t t-else="">
-                                            <span t-field="order.product_id.name"/>
-                                        </t>
+                                        <span t-field="order.name"/>
                                     </td>
                                     <td  width="32%" align="left"><span t-field="order.price_subtotal"/></td>
                                 </tr>
