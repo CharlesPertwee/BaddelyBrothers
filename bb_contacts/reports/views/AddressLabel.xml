@@ -4,15 +4,16 @@
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
                     <t t-call="web.basic_layout">
-                        <div class="page">
-                            <div class="container" style="font-family:Tahoma; font-size:13pt; padding:1px;">
-                                <div class="row">
+                        <div class="page" style="font-family: Georgia !important;">
+                            <div class="container" style="font-size:14pt; padding:1px;">
+                                <div>
                                     <p>
                                     <span t-esc="o.name"/><br/>
                                     <t t-if="o.parent_id.name">
                                         <span t-esc="o.parent_id.name"/><br/>
                                     </t>
-                                    <span t-field="o.street"/>&#160;<span t-field="o.city"/><br/>
+                                    <span t-field="o.street"/><br/>
+                                    <span t-field="o.city"/><br/>
                                     <span t-field="o.zip"/><br/></p>
                                 </div>
                             </div>

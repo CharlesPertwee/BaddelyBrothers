@@ -9,7 +9,7 @@
             <field name="orientation">Portrait</field>
             <field name="margin_top">12</field>
             <field name="margin_bottom">1</field>
-            <field name="margin_left">8</field>
+            <field name="margin_left">6</field>
             <field name="margin_right">1</field>
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
