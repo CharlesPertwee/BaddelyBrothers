@@ -82,8 +82,8 @@
                                       </t>
                                   </td>
                                   <td>
-                                      <t t-if="estimate">
-                                          <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
+                                      <t t-if="o.origin">
+                                          <p>Our Ref: <!--span t-field="estimate.manufacturingOrder.name"/--><span t-field="o.origin"/></p>
                                       </t>
                                   </td>
                               </tr>
@@ -98,7 +98,7 @@
                                               Price: <t t-esc="'%.2f'%(float(o.calculatePrice()))"/>
                                       </t>
                                       <t t-else="">
-                                          <span t-field="o.origin"/><br/>
+                                          <!--span t-field="o.origin"/><br/-->
                                            <t t-foreach="o.GetProductData()" t-as="line">
                                               <t t-esc="line"> </t><br/>
                                           </t>
