@@ -14,18 +14,18 @@
                                 <div class="row">
                                     <div class="col-7">
                                         <t t-if="o.partner_id.parent_id">
-                                            <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/><br/>
-                                                <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id"/></p>
+                                            <p> <t t-if="o.partner_id.parent_id.name"><span t-field="o.partner_id.parent_id.name"/></t><br/>
+                                                <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/><br/></t>
+                                                <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/><br/></t>
+                                                <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/><br/></t>
+                                                <t t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id"/></t></p>
                                         </t>
                                         <t t-else="">
-                                            <p><span t-field="o.partner_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/><br/>
-                                                <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id"/></p>
+                                            <p> <t t-if="o.partner_id.name"><span t-field="o.partner_id.name"/></t><br/>
+                                                <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/><br/></t>
+                                                <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/><br/></t>
+                                                <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/><br/></t>
+                                                <t t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id"/></t></p>
                                         </t>
                                     </div>
                                     <div class="col-5 pull-right">
@@ -169,3 +169,4 @@
         </t>
     </template>  
 </odoo>
+†
