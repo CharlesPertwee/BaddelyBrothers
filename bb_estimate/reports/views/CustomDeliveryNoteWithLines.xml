@@ -72,8 +72,8 @@
               </t>
             </div>
             <div class="col-6">
-              <t t-if="estimate">
-                <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
+              <t t-if="o.origin">
+                <p>Our Ref: <!--span t-field="estimate.manufacturingOrder.name"/--><span t-field="o.origin"/></p>
               </t>
             </div>
           </div>
