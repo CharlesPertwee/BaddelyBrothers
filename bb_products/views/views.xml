@@ -12,6 +12,7 @@
                 <field name="customerDescription"/>
                 <field name="jobTicketDescription"/>
                 <field name="productType" />
+                <field name="productSubType" attrs="{'invisible': [('productType', '!=', 'Non-Stockable')]}"/>
                 <field name="isEnvelope" />
             </xpath>
             <!--field name="categ_id" postition="after">
