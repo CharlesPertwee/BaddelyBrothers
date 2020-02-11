@@ -4,275 +4,160 @@
             <t t-call="web.basic_layout">
             <t t-call="web.html_container">
                 <t t-set="estimate" t-value="o.getEstimateData()"/>
-                <t t-if="o.partner_id.specialReport">
-                  <div class="page" style="font-family: Georgia !important;">
-                      <h2 class="text-center"><b>DELIVERY NOTIFICATION</b></h2>              
-                      
-                      <!-- <span style="text-decoration: underline;">Delivery Address</span><br/> -->        
-                      <div class="row" style="padding:4em; padding-top:0em; padding-bottom:0em;">
-                          <div class="col">
-                              <div class="row">
-                                <p class="col-8" style="text-decoration: underline;">Delivery Address</p>
-                              </div>
-                              <div class="row">
-                                  <div class="col-8">
-                                      <t t-if="o.partner_id.parent_id">
-                                          <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                                          <span t-field="o.partner_id.street"/><br/>
-                                          <span t-field="o.partner_id.city"/><br/>
-                                          <span t-field="o.partner_id.zip"/><br/>
-                                          <span t-field="o.partner_id.country_id"/></p>
-                                          
-                                      </t>
-                                      <t t-else="">
-                                          <p><span t-field="o.partner_id.name"/><br/>
-                                          <span t-field="o.partner_id.street"/><br/>
-                                          <span t-field="o.partner_id.city"/><br/>
-                                          <span t-field="o.partner_id.zip"/><br/>
-                                          <span t-field="o.partner_id.country_id"/></p>
-                                      </t>                                      
-                                  </div>
-                                  <div class="col-4 pull-right">
-                                      <div class="row">
-                                          <div class="col-sm-12">
-                                              <t t-if="o.state == 'done'">
-                                                  <p class="pull-left">Date: <span t-field="o.date_done" t-options="{'widget': 'date'}"/></p>
-                                              </t>
-                                              <t t-if="o.state != 'done'">
-                                                  <p class="pull-left">Date: <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/></p>
-                                              </t>
-                                          </div>
-                                      </div>
-                                      <div class="row">
-                                          <div class="col-11">
-                                              <p class="pull-left">E-mail: <br/>
-                                                  <span t-field="o.partner_id.email"/></p>
-                                          </div>
-                                      </div>
-                                      <div class="row">
-                                          <div class="col-11">
-                                              <p class="pull-left">Tel: <span t-field="o.partner_id.phone"/> </p>
-                                          </div>
-                                      </div>
-                                      <div class="row">
-                                          <div class="col">
-                                              <div class="row">
-                                                  <div class="col-4">
-                                                      <p class="pull-left">Method: </p>
-                                                  </div>
-                                                  <div class="col-8">
-                                                      <p class="pull-left"><span t-field="o.carrier_id"/></p>
-                                                  </div>
-                                              </div>
-                                              <t t-if="o.carrier_tracking_ref">
-                                                  <div class="row">
-                                                      <div class="col-7">
-                                                          <p class="pull-left">Consignment No: </p>
-                                                      </div>
-                                                      <div class="col-5">
-                                                          <p class="pull-left"><span t-field="o.carrier_tracking_ref"/></p>
-                                                      </div>
-                                                  </div>
-                                              </t>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                          Attn: <span t-field="o.partner_id.name"/>
-                      <hr/>
-                      <table style="width:100%">
-                          <tbody>
-                              <tr>
-                                  <td>
-                                      <t t-if="o.customerRef">
-                                          <p>Your Ref: <span t-field="o.customerRef"/></p>
-                                      </t>
-                                  </td>
-                                  <td>
-                                      <t t-if="estimate">
-                                          <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
-                                      </t>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>
-                                    <t t-if="estimate">
-                                         Job Title: <t t-esc="o.move_ids_without_package[0].product_id.name if not estimate else estimate.title"/>
-                                    </t>
-                                  </td>
-                                  <td>
-                                      <t t-if="estimate">
-                                              Price: <t t-esc="'%.2f'%(float(o.calculatePrice()))"/>
-                                      </t>
-                                      <t t-else="">
-                                          <span t-field="o.origin"/><br/>
-                                           <t t-foreach="o.GetProductData()" t-as="line">
-                                              <t t-esc="line"> </t><br/>
-                                          </t>
-                                      </t>
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-                </t>
-                <t t-else="">
-                  <div class="page" style="font-family: Georgia !important;">
-                    <h2 class="text-center"><b>DELIVERY NOTE</b></h2><br/>
-                      <h2 class="text-center"><b><span t-field="o.name"/></b></h2>                   
-                      
-                      <span style="text-decoration:underline;">Delivery Address</span><br/>                  
-                      <div class="row" style="padding:4em; padding-top:0em; padding-bottom:0em;">
-                          <div class="col-7">
-                             <t t-if="o.partner_id.parent_id">
-                                  <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                                  <span t-field="o.partner_id.street"/><br/>
-                                  <span t-field="o.partner_id.city"/><br/>
-                                  <span t-field="o.partner_id.zip"/><br/>
-                                  <span t-field="o.partner_id.country_id"/></p>
-                                 
-                              </t>
-                              <t t-else="">
-                                  <p><span t-field="o.partner_id.name"/><br/>
-                                  <span t-field="o.partner_id.street"/><br/>
-                                  <span t-field="o.partner_id.city"/><br/>
-                                  <span t-field="o.partner_id.zip"/><br/>
-                                  <span t-field="o.partner_id.country_id"/></p>
-                                  
-                              </t>
-                          </div>
-                          <div class="col-5 pull-right">
-                              <div class="row">
-                                  <div class="col-4">
-                                      <p class="pull-left">Date: </p>
-                                  </div>
-                                  <div class="col-8">
-                                      <t t-if="o.state == 'done'">
-                                          <span t-field="o.date_done" t-options="{'widget': 'date'}"/>
-                                     </t>
-                                     <t t-if="o.state != 'done'">
-                                          <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/>
-                                     </t>
-                                  </div>
-                              </div>
-                              <div class="row">
-                                  <div class="col-4">
-                                      <p class="pull-left">E-mail: </p>
-                                  </div>
-                                  <div class="col-8">
-                                      <p class="pull-left"><span t-field="o.partner_id.email"/></p>
-                                  </div>
-                              </div>
-                              <div class="row">
-                                  <div class="col-4">
-                                      <p class="pull-left">Tel: </p>
-                                  </div>
-                                  <div class="col-8">
-                                      <p class="pull-left"><span t-field="o.partner_id.phone"/></p>
-                                  </div>
-                              </div>
-                              <div class="row">
-                                  <div class="col">
-                                      <div class="row">
-                                          <div class="col-4">
-                                              <p class="pull-left">Method: </p>
-                                          </div>
-                                          <div class="col-8">
-                                              <p class="pull-left"><span t-field="o.carrier_id"/></p>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                          Attn: <span t-field="o.partner_id.name"/>
-                      <hr/>
-                      <table style="width:100%">
-                          <thead>
-                              <tr>
-                                  <th width="25%">Quantity</th>
-                                  <th>Description</th>
-                                  <th width="28%"> </th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr>
-                                  <td>
+              <div class="page" style="font-family: Georgia !important;">
+                <h2 class="text-center"><b>DELIVERY NOTE</b></h2><br/>
+                  <h2 class="text-center"><b><span t-field="o.name"/></b></h2>                   
 
-                                  </td>
-                                  <td>
-                                      <t t-if="o.customerRef">
-                                          <p>Your Ref: <span t-field="o.customerRef"/></p>
-                                      </t>
-                                  </td>
-                                  <td>
-                                      <t t-if="estimate">
-                                          <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
-                                      </t>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>
-                                      <span t-esc="'%0.0f'%(o.move_ids_without_package[0].quantity_done)"/>
-                                  </td>
-                                  <td>
-                                      <t t-esc="o.move_ids_without_package[0].product_id.name if not estimate else estimate.title"/>
-                                  </td>
-                                  <td>
-                                      <span t-field="o.origin"/><br/>
-                                       <t t-foreach="o.GetProductData()" t-as="line">
-                                          <t t-esc="line"> </t><br/>
-                                      </t>
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
-                     <div class="row" style="padding:1em;padding-bottom: 0em;padding-top:30em;">
-                      <table style="width:100%">
-                             <tbody>
-                                 <tr>
-                                     <td width="25%">
-                                         Received by (Signature)
-                                     </td>
-                                     <td style="border-bottom:1px black solid">
-                                        
-                                     </td>
-                                     <td width="5%">
-                                         Date
-                                     </td>
-                                     <td style="border-bottom:1px black solid">
-                                         
-                                     </td>
-                                 </tr>
-                             </tbody>
-                         </table>
-                         
-                     </div>
-                     <div class="row" style="padding-left:1em;padding-top:2em;padding-right:1em;">
-                         <table style="width:100%">
-                             <tbody>
-                                 <tr>
-                                     <td width="25%">
-                                         Print Name
-                                     </td>
-                                     <td style="border-bottom:1px black solid">
-                                         
-                                     </td>
-                                     <td width="5%">
-                                         Time
-                                     </td>
-                                     <td style="border-bottom:1px black solid">
-                                         
-                                     </td>
-                                 </tr>
-                             </tbody>
-                         </table>
-                         
-                     </div>
+                  <span style="text-decoration:underline;">Delivery Address</span><br/>                  
+                  <div class="row" style="padding:4em; padding-top:0em; padding-bottom:0em;">
+                      <div class="col-7">
+                         <t t-if="o.partner_id.parent_id">
+                              <p><span t-field="o.partner_id.parent_id.name"/><br/>
+                              <span t-field="o.partner_id.street"/><br/>
+                              <span t-field="o.partner_id.city"/><br/>
+                              <span t-field="o.partner_id.zip"/><br/>
+                              <span t-field="o.partner_id.country_id"/></p>
+
+                          </t>
+                          <t t-else="">
+                              <p><span t-field="o.partner_id.name"/><br/>
+                              <span t-field="o.partner_id.street"/><br/>
+                              <span t-field="o.partner_id.city"/><br/>
+                              <span t-field="o.partner_id.zip"/><br/>
+                              <span t-field="o.partner_id.country_id"/></p>
+
+                          </t>
+                      </div>
+                      <div class="col-5 pull-right">
+                          <div class="row">
+                              <div class="col-4">
+                                  <p class="pull-left">Date: </p>
+                              </div>
+                              <div class="col-8">
+                                  <t t-if="o.state == 'done'">
+                                      <span t-field="o.date_done" t-options="{'widget': 'date'}"/>
+                                 </t>
+                                 <t t-if="o.state != 'done'">
+                                      <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/>
+                                 </t>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-4">
+                                  <p class="pull-left">E-mail: </p>
+                              </div>
+                              <div class="col-8">
+                                  <p class="pull-left"><span t-field="o.partner_id.email"/></p>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-4">
+                                  <p class="pull-left">Tel: </p>
+                              </div>
+                              <div class="col-8">
+                                  <p class="pull-left"><span t-field="o.partner_id.phone"/></p>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col">
+                                  <div class="row">
+                                      <div class="col-4">
+                                          <p class="pull-left">Method: </p>
+                                      </div>
+                                      <div class="col-8">
+                                          <p class="pull-left"><span t-field="o.carrier_id"/></p>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                   </div>
-                </t>
+                      Attn: <span t-field="o.partner_id.name"/>
+                  <hr/>
+                  <table style="width:100%">
+                      <thead>
+                          <tr>
+                              <th width="25%">Quantity</th>
+                              <th>Description</th>
+                              <th width="28%"> </th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>
+
+                              </td>
+                              <td>
+                                  <t t-if="o.customerRef">
+                                      <p>Your Ref: <span t-field="o.customerRef"/></p>
+                                  </t>
+                              </td>
+                              <td>
+                                  <t t-if="estimate">
+                                      <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
+                                  </t>
+                              </td>
+                          </tr>
+                          <tr>
+                              <td>
+                                  <span t-esc="'%0.0f'%(o.move_ids_without_package[0].quantity_done)"/>
+                              </td>
+                              <td>
+                                  <t t-esc="o.move_ids_without_package[0].product_id.name if not estimate else estimate.title"/>
+                              </td>
+                              <td>
+                                  <span t-field="o.origin"/><br/>
+                                   <t t-foreach="o.GetProductData()" t-as="line">
+                                      <t t-esc="line"> </t><br/>
+                                  </t>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+                 <div class="row" style="padding:1em;padding-bottom: 0em;padding-top:20em;">
+                  <table style="width:100%">
+                         <tbody>
+                             <tr>
+                                 <td width="25%">
+                                     Received by (Signature)
+                                 </td>
+                                 <td style="border-bottom:1px black solid">
+
+                                 </td>
+                                 <td width="5%">
+                                     Date
+                                 </td>
+                                 <td style="border-bottom:1px black solid">
+
+                                 </td>
+                             </tr>
+                         </tbody>
+                     </table>
+
+                 </div>
+                 <div class="row" style="padding-left:1em;padding-top:2em;padding-right:1em;">
+                     <table style="width:100%">
+                         <tbody>
+                             <tr>
+                                 <td width="25%">
+                                     Print Name
+                                 </td>
+                                 <td style="border-bottom:1px black solid">
+
+                                 </td>
+                                 <td width="5%">
+                                     Time
+                                 </td>
+                                 <td style="border-bottom:1px black solid">
+
+                                 </td>
+                             </tr>
+                         </tbody>
+                     </table>
+
+                 </div>
+              </div>
+               
             </t>
          </t>
         </t>
