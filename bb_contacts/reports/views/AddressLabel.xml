@@ -13,6 +13,7 @@
                                         <span t-esc="o.parent_id.name"/><br/>
                                     </t>
                                     <t t-if="o.street"><span t-field="o.street"/><br/></t>
+                                    <t t-if="o.street2"><span t-field="o.street2"/><br/></t>
                                     <t t-if="o.city"><span t-field="o.city"/><br/></t>
                                     <t t-if="o.state_id"><span t-field="o.state_id"/><br/></t>
                                     <t t-if="o.zip"><span t-field="o.zip"/><br/></t></p>
