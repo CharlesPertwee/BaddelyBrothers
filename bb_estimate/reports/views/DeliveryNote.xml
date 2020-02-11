@@ -85,7 +85,7 @@
                               </td>
                               <td>
                                   <t t-if="estimate">
-                                      <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
+                                      <p>Our Ref: <!--span t-field="estimate.manufacturingOrder.name"/--><span t-field="o.origin"/></p>
                                   </t>
                               </td>
                           </tr>
@@ -97,7 +97,7 @@
                                   <t t-esc="o.move_ids_without_package[0].product_id.name if not estimate else estimate.title"/>
                               </td>
                               <td>
-                                  <span t-field="o.origin"/><br/>
+                                  <!--span t-field="o.origin"/><br/-->
                                    <t t-foreach="o.GetProductData()" t-as="line">
                                       <t t-esc="line"> </t><br/>
                                   </t>
