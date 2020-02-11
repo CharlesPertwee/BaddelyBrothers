@@ -84,7 +84,7 @@
                                   </t>
                               </td>
                               <td>
-                                  <t t-if="estimate">
+                                  <t t-if="o.origin">
                                       <p>Our Ref: <!--span t-field="estimate.manufacturingOrder.name"/--><span t-field="o.origin"/></p>
                                   </t>
                               </td>
