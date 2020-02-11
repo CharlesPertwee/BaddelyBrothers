@@ -7,14 +7,15 @@
                         <div class="page" style="font-family: Georgia !important;">
                             <div class="container" style="font-size:14pt; padding:1px;">
                                 <div>
-                                    <p>
+                                    <p><br/>
                                     <span t-esc="o.name"/><br/>
                                     <t t-if="o.parent_id.name">
                                         <span t-esc="o.parent_id.name"/><br/>
                                     </t>
-                                    <span t-field="o.street"/><br/>
-                                    <span t-field="o.city"/><br/>
-                                    <span t-field="o.zip"/><br/></p>
+                                    <t t-if="o.street"><span t-field="o.street"/><br/></t>
+                                    <t t-if="o.city"><span t-field="o.city"/><br/></t>
+                                    <t t-if="o.state_id"><span t-field="o.state_id"/><br/></t>
+                                    <t t-if="o.zip"><span t-field="o.zip"/><br/></t></p>
                                 </div>
                             </div>
                         </div>
