@@ -15,7 +15,7 @@
                     <td style="width:24%; border: 1px black solid; line-height: 30px;">
                       <span class="pull-left">Date: <b><span t-field="o.create_date" t-options="{'widget': 'date'}" /></b></span><br/>
                       <span class="pull-left">Est No: <b><t t-esc="o.Estimate.estimate_number" /></b></span><br/>
-                      <span class="pull-left">Sales Ord: <b><t t-esc="o.Estimate.salesOrder.name" /></b></span>
+                      <span class="pull-left">Sales Ord: <b><t t-esc="o.Estimate.salesOrder.name" /></b></span><br/>
                       <span class="pull-left">Prev Job Ref: <b><t t-esc="o.previousJobRef" /></b></span>
                     </td>
                     <td colspan="2" style="width:33%; border: 1px black solid;">
