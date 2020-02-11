@@ -58,10 +58,10 @@
                 </xpath>
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="Estimate" readonly="1"/>
-                    <field name="Project" readonly="1" widget="selection"/>
+                    <field name="Project" readonly="1" options="{'no_create': True, 'no_create_edit': True}"/>
                     <field name="SpecifcationType" />
                     <field name="JobType" />
-                    <field name="analytic_account" widget="selection"/>
+                    <field name="analytic_account" options="{'no_create': True, 'no_create_edit': True}"/>
                 </xpath>
                 <xpath expr="//field[@name='availability']" position="after">
                     <field name="NoOfCopiesRequired"/>

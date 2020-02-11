@@ -1265,6 +1265,7 @@ class EstimateLine(models.Model):
                             'lastUsedEstimateDate': str(datetime.now().date()),
                             'lastUsedEstimateNumber': lineId.estimate_id.estimate_number,
                             'margin': lineId.Margin,
+                            'productSubType' : lineId.NonStockMaterialType 
                         }
                         if mto and buy and lineId.NonStockMaterialType == 'Bespoke Material':
                             newProduct['route_ids'] = [(4,mto.id),(4,buy.id)]

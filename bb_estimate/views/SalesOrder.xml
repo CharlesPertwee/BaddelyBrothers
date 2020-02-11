@@ -87,7 +87,7 @@
               <xpath expr="//field[@name='partner_id']" position="after">
                   <field name="partnerOnHold"/>
                   <field name="Estimate" readonly="1"/>
-                  <field name="Project" readonly="1" widget="selection"/>
+                  <field name="Project" readonly="1" options="{'no_create': True, 'no_create_edit': True}"/>
                   <field name="JobTicket" readonly="1"/>
                   <field name="ProFormaLines" widget="html" invisible="1"/>
               </xpath>
@@ -118,7 +118,7 @@
                     </page>
 	    </xpath>
 	    <xpath expr="//group[@name='sales_person']/field[@name='analytic_account_id']" position="replace">
-            <field name="analytic_account_id" required="True" widget="selection"/>
+            <field name="analytic_account_id" required="True" options="{'no_create': True, 'no_create_edit': True}"/>
         </xpath>
         
         <xpath expr="//field[@name='team_id']" position="attributes">

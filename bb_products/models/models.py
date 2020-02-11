@@ -21,7 +21,8 @@ class ProductsTemplate(models.Model):
     staticPrice = fields.Boolean('Static Price')
     lastUsedEstimateDate = fields.Date(string="Last Used Estimate Date")
     lastUsedEstimateNumber = fields.Char(string="Last Used Estimate Number")
-
+    productSubType = fields.Selection([('Bespoke Material','Bespoke Material'),('Customer Supplied Material','Customer Supplied Material')],string="Material Type")
+    
     
     @api.onchange('margin')
     def calcPriceChange(self):

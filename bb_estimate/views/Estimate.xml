@@ -63,22 +63,22 @@
                     </h1>
                     <group>
                         <group>
-                            <field name="partner_id" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('is_company','=',True)]" />
-                            <field name="contact" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('parent_id','=',partner_id)]" />
-                            <field name="project" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="['|','|',('partner_id','=',partner_id),('partner_id','parent_of',partner_id),('partner_id','=',False)]" widget="selection"/>
+                            <field name="partner_id" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create': True, 'no_create_edit': True}" domain="[('is_company','=',True)]" />
+                            <field name="contact" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create': True, 'no_create_edit': True}" domain="[('parent_id','=',partner_id)]" />
+                            <field name="project" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create': True, 'no_create_edit': True}" domain="['|','|',('partner_id','=',partner_id),('partner_id','parent_of',partner_id),('partner_id','=',False)]" />
                             <field name="invoice_account" options="{'no_create_edit': True}" required="1" attrs="{'readonly':[('isLocked','=',True)]}"/>
                             <field name="AppendLog" invisible="1"/>
                             <field name="lead" attrs="{'readonly':[('isLocked','=',True)]}" domain="[('typeOfLead','=','Bespoke')]" />
                         </group>
                         <group>
-                            <field name="product_type" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" domain="[('productType','=','Finished')]" required="1"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
+                            <field name="product_type" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create': True, 'no_create_edit': True}" domain="[('productType','=','Finished')]" required="1"/> <!-- <domain="[('categ_id.name','=','Finished Goods')]" /-->
                             <field name="estimate_date" attrs="{'readonly':[('isLocked','=',True)]}" required="1"/>
-                            <field name="estimator" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create_edit': True}" required="1"/>
+                            <field name="estimator" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create': True, 'no_create_edit': True}" required="1"/>
                             <field name="office_copy" attrs="{'readonly':[('isLocked','=',True)]}"/>
                             <field name="estimate_number" attrs="{'readonly':[('isLocked','=',True)]}" readonly="1"/>
                             <field name="event_date" attrs="{'readonly':[('isLocked','=',True)]}"/>
                             <field name="target_dispatch_date" attrs="{'readonly':[('isLocked','=',True)]}" required="1"/>
-                            <field name="analytic_account" widget="selection"/>
+                            <field name="analytic_account" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create': True, 'no_create_edit': True}"/>
                         </group>
                     </group>
                     <group>
