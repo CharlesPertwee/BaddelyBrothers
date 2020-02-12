@@ -17,7 +17,9 @@
                                         <p>
                                             <span t-esc="o.partner_invoice_id.parent_id.name if o.partner_invoice_id.parent_id else o.partner_invoice_id.name"/><br/>
                                             <t t-if="o.partner_invoice_id.street"><span t-field="o.partner_invoice_id.street"/><br/></t>
+                                            <t t-if="o.partner_invoice_id.street2"><span t-field="o.partner_invoice_id.street2"/><br/></t>
                                             <t t-if="o.partner_invoice_id.city"><span t-field="o.partner_invoice_id.city"/><br/></t>
+                                            <t t-if="o.partner_invoice_id.state_id"><span t-field="o.partner_invoice_id.state_id"/><br/></t>
                                             <t t-if="o.partner_invoice_id.zip"><span t-field="o.partner_invoice_id.zip"/><br/></t>
                                             <t t-if="o.partner_invoice_id.country_id"><span t-field="o.partner_invoice_id.country_id"/></t>
                                         </p>
