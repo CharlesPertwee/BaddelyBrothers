@@ -18,8 +18,8 @@ function hideEnvelopes(){
     
     document.getElementById("morePara").style.display = "flex";
     document.getElementById("moreEnv").style.display = "none";
-    document.getElementById("enquirySizeHeight").style.display = "none";
-    document.getElementById("enquirySizeWidth").style.display = "none";
+    document.getElementById("enquirySizeHeight").style.display = "flex";
+    document.getElementById("enquirySizeWidth").style.display = "flex";
     document.getElementById("enquiryEdgeColor").style.display = "none";
 }
 
@@ -42,8 +42,8 @@ function hidePrints(){
     
     document.getElementById("morePara").style.display = "flex";
     document.getElementById("moreEnv").style.display = "flex";
-    document.getElementById("enquirySizeHeight").style.display = "none";
-    document.getElementById("enquirySizeWidth").style.display = "none";
+    document.getElementById("enquirySizeHeight").style.display = "flex";
+    document.getElementById("enquirySizeWidth").style.display = "flex";
     document.getElementById("enquiryEdgeColor").style.display = "none";
 }
 
@@ -55,7 +55,6 @@ function hideQuantities(){
 }
 
 function showMoreQuantities(){
-    console.log('THS IS SPARTA')
     let extraPrints = document.getElementsByClassName('extra')
         for (i = 0; i<extraPrints.length;i++){
             extraPrints[i].style.display = "flex";
