@@ -16,6 +16,13 @@ from odoo.exceptions import ValidationError
 class WebToLead(WebsiteForm):
     @http.route('/contactus', type='http', auth='public', website='True')
     def contactData(self,**kw):
+        return self.render_form_data()
+
+    @http.route('/estimate-enquiry', type='http', auth='public', website='True')
+    def enquiryForm(self,**kw):
+        return self.render_form_data()
+
+    def render_form_data(self):
         countries = request.env['res.country'].sudo().search([])
         envelopeSize = request.env['bb_products.material_size'].sudo().search([('isEnvelopeEstimate','=',True),('isEnquirySize','=',True)])
         printSize = request.env['bb_products.material_size'].sudo().search([('isPrintSize','=',True),('isEnquirySize','=',True)])
