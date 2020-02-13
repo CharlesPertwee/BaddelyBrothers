@@ -98,6 +98,7 @@
               </xpath>
               <xpath expr="//field[@name='confirmation_date']" position="after">
                 <field name="orderStatus" />
+                <field name="orderDelivered" invisible="1" />
               </xpath>
               <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
                   <attribute name="attrs">{'invisible':['|',('partnerOnHold','=',True),('state', 'not in', ['sent'])]}</attribute>

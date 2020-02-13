@@ -12,6 +12,14 @@ class Sales(models.Model):
     priceHistory = fields.One2many('bb_estimate.price_history','SalesOrder','Price Adjustments')
     ProFormaLines = fields.Html('Pro-Forma Line')
     orderStatus = fields.Selection([('To Deliver', 'To Deliver'),('Delivered', 'Delivered'), ('To Invoice', 'To Invoice'),('Fully Invoiced', 'Fully Invoiced')],string='Order Status',default='To Deliver')
+    orderDelivered = fields.Boolean("Order Delivered",compute="DeliverOrder")
+
+    @api.depends("order_line")
+    def DeliverOrder(self):
+        for record in self:
+            record.orderDelivered = all([x for x in map(lambda x: bool(x.qty_delivered>=x.product_uom_qty),record.order_line)])
+            if record.orderDelivered and record.orderStatus == "To Deliver":
+                record.write({"orderStatus":'Delivered'})
 
     @api.onchange('partner_id')
     def check_hold(self):
@@ -22,12 +30,7 @@ class Sales(models.Model):
                 else:
                     record.partnerOnHold = False
 
-    @api.onchange("order_line")
-    def OrderStatus(self):
-        for record in self:
-            if all([x for x in map(lambda x: bool(record.qty_delivered>=record.product_uom_qty),record.order_line)]) and record.orderStatus == "To Deliver":
-                record.orderStatus = 'Delivered'
-
+    
     def AdjustPrice(self):
         return {
                 'view_type' : 'form',
