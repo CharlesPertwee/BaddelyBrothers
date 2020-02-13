@@ -1283,7 +1283,7 @@ class EstimateLine(models.Model):
                                 'product_id' : productId.id,
                                 'product_tmpl_id' : productId.product_tmpl_id.id,
                                 'product_name' : lineId.MaterialName,
-                                'price': lineId.CharegeRate,
+                                'price': lineId.CostRate,
                                 'name' : lineId.Supplier.id,
                                 'minQuantity' : lineId.MinimumQty,
                                 'multiplier' : lineId.PackSize
