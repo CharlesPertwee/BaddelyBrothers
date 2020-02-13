@@ -6,6 +6,9 @@
                     <div style="font-family: Georgia;">
                         <t t-set="estimate" t-value="o.Estimate"/>
                         <t t-set="currentDate" t-value="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/> 
+                        <div class="backgroundimage" style="position:absolute;z-index:-999;padding-right:30px;"> 
+                            <img class="img-responsive" src="/bb_estimate/static/src/img/headerimg.jpg" width="950px" height="1429px"/>
+                        </div> 
                         <div class="page" style="padding-top:16em; padding-left:2em; padding-right:2em;"> 
                             <t t-set="o" t-value="o.with_context({'lang': lang})"/>
                             <div class="container" style="padding:3em; font-size:14px;">

@@ -95,7 +95,10 @@
                 <button class="oe_stat_button" icon="fa-pencil" type="object" name="EditProFormaLine">
                       <span>Edit Pro-Forma Lines</span>
                   </button>
-            </xpath>
+              </xpath>
+              <xpath expr="//field[@name='confirmation_date']" position="after">
+                <field name="orderStatus" />
+              </xpath>
               <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
                   <attribute name="attrs">{'invisible':['|',('partnerOnHold','=',True),('state', 'not in', ['sent'])]}</attribute>
               </xpath>
@@ -116,17 +119,32 @@
                              </tree>
                         </field>
                     </page>
-	    </xpath>
-	    <xpath expr="//group[@name='sales_person']/field[@name='analytic_account_id']" position="replace">
-            <field name="analytic_account_id" required="True" options="{'no_create': True, 'no_create_edit': True}"/>
-        </xpath>
-        
-        <xpath expr="//field[@name='team_id']" position="attributes">
-            <attribute name="invisible">1</attribute>
-        </xpath>
-
+              </xpath>
+              <xpath expr="//group[@name='sales_person']/field[@name='analytic_account_id']" position="replace">
+                <field name="analytic_account_id" required="True" options="{'no_create': True, 'no_create_edit': True}"/>
+              </xpath>
+          
+              <xpath expr="//field[@name='team_id']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='effective_date']" position="attributes">
+                    <attribute name="string">Delivery Date</attribute>
+              </xpath>  
 
           </field>
       </record>
+
+      
+      <!--record id="view_sale_order_kanban" model="ir.ui.view">
+          <field name="name">sale.order.kanban.bb</field>
+          <field name="model">sale.order</field>
+          <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+          <field name="arch" type="xml">
+              <kanban position="attributes">
+                <attribute name="default_group_by">orderStatus</attribute>
+              </kanban>
+          </field>
+      </record-->
+
   </data>
 </odoo>
