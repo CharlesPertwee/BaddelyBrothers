@@ -162,6 +162,7 @@ class OrderConvert(models.TransientModel):
                                         'name': '[%s] %s: %s'%(mo.name, self.EstimateId.title, outwork.JobTicketText or outwork.lineName),
                                         'date_planned': datetime.now(), # + timedelta(days=1)
                                         'product_qty': 1,
+                                        'taxes_id': [(4,x) for x in outwork.workcenterId.outworkProcessProduct.supplier_taxes_id.ids],
                                         'product_uom': outwork.workcenterId.outworkProcessProduct.uom_po_id.id
                                         
                                    })]
