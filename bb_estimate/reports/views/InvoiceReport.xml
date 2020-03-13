@@ -29,7 +29,7 @@
                                                 <p class="pull-left">Date/Tax Point: </p>
                                             </div>
                                             <div class="col-6">
-                                                <p class="pull-left"><span t-field="o.date_invoice" t-options="{'widget': 'date'}"/></p>
+                                                <p class="pull-left"><span t-field="o.date_invoice" t-options='{"format": "dd/MM/yyyy"}'/></p>
                                             </div>
                                         </div>
                                         <div class="row">

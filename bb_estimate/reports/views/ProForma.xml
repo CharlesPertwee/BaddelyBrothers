@@ -5,7 +5,7 @@
             <t t-call="web.html_container">
                     <div style="font-family: Georgia;">
                         <t t-set="estimate" t-value="o.Estimate"/>
-                        <t t-set="currentDate" t-value="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
+                        <t t-set="currentDate" t-value="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/>
                         <div class="backgroundimage" style="position:absolute;z-index:-999;padding-right:30px;"> 
                             <img class="img-responsive" src="/bb_estimate/static/src/img/BB_invoice.jpg" width="950px" height="1429px"/>
                         </div> 

@@ -28,10 +28,10 @@
                               </div>
                               <div class="col-8">
                                   <t t-if="o.state == 'done'">
-                                      <span t-field="o.date_done" t-options="{'widget': 'date'}"/>
+                                      <span t-field="o.date_done" t-options='{"format": "dd/MM/yyyy"}'/>
                                  </t>
                                  <t t-if="o.state != 'done'">
-                                      <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/>
+                                      <span t-field="o.scheduled_date" t-options='{"format": "dd/MM/yyyy"}'/>
                                  </t>
                               </div>
                           </div>
