@@ -61,7 +61,7 @@ class Partner(models.Model):
     contactHistory = fields.One2many('res.partner','history_id',string='Contact Links', compute="_compute_contact_history",store=False)
     
     accountStatus = fields.Selection(ACCOUNT_STATUS, string="Account Status")
-    onHold = fields.Boolean('On Hold')
+    onHold = fields.Boolean('On Hold', default=True)
     
     specialReport = fields.Boolean('Custom Delivery Note')
     
