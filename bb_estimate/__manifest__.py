@@ -49,6 +49,7 @@
         'reports/views/EnquiryConversionReport.xml',
         'reports/views/EnquiryMonthlyRates.xml',
         'reports/views/EnquiryTimesReport.xml',
+        'reports/views/DeliverySlip.xml',
         'views/EstimateLines.xml',
         'views/Estimate.xml',
         'views/EstimateStages.xml',
