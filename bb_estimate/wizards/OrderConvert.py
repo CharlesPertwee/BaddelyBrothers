@@ -55,6 +55,9 @@ class OrderConvert(models.TransientModel):
                 record.TotalPrice = record.RunOnPrice + (record.RunOnPrice * ratio)
             
     def CreateOrder(self):
+        if (self.EstimateId.partner_id.parent_id if self.EstimateId.partner_id.parent_id else self.EstimateId.partner_id).onHold:
+            raise ValidationError("Selected account is on Hold. Order cannot be processed at moment")
+
         processes = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','process'),('isExtra','=',False)])
         materials = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','material'),('isExtra','=',False)])
         outworks = [x for x in processes if x.workcenterId.outworkProcessProduct]
