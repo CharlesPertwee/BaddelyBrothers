@@ -104,7 +104,7 @@
                                             <tr>
                                                 <t t-if="estimate">
                                                     <td name="account_invoice_line_name">
-                                                      <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/> <t t-if="estimate.salesOrder.client_order_ref">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Your Ref: <span t-field="estimate.salesOrder.client_order_ref"/></t><br/>
+                                                      <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/> <t t-if="estimate.salesOrder.client_order_ref">      Your Ref: <span t-field="estimate.salesOrder.client_order_ref"/></t><br/>
                                                       Qty: <span t-esc="int(o.invoice_line_ids[0].quantity)"/> <span t-field="estimate.title"/><br/>
                                                       Size: <span t-field="estimate.finished_width"/> x <span t-field="estimate.finished_height"/>
                                                   </p>
