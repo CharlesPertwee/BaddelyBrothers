@@ -85,7 +85,8 @@
                   <button name="AdjustPrice" type="object" string="Adjust Price" />
               </xpath>
               <xpath expr="//field[@name='partner_id']" position="after">
-                  <field name="partnerOnHold"/>
+                  <field name="partnerOnHold" attrs="{'readonly':[('readOnlyGroup','=',True)]}"/>
+                  <field name="readOnlyGroup" invisible="1"/>
                   <field name="Estimate" readonly="1"/>
                   <field name="Project" readonly="1" options="{'no_create': True, 'no_create_edit': True}"/>
                   <field name="JobTicket" readonly="1"/>

@@ -8,11 +8,16 @@ class Sales(models.Model):
     Project = fields.Many2one('project.project','Project')
     Estimate = fields.Many2one('bb_estimate.estimate',string='Originating Estimate',ondelete='restrict')
     JobTicket = fields.Many2one('mrp.production',string="Job Ticket")
-    partnerOnHold = fields.Boolean('Account on Hold',compute="compute_hold")
+    partnerOnHold = fields.Boolean('Account on Hold')
     priceHistory = fields.One2many('bb_estimate.price_history','SalesOrder','Price Adjustments')
     ProFormaLines = fields.Html('Pro-Forma Line')
     orderStatus = fields.Selection([('To Deliver', 'To Deliver'),('Delivered', 'Delivered'), ('To Invoice', 'To Invoice'),('Fully Invoiced', 'Fully Invoiced')],string='Order Status',default='To Deliver')
     orderDelivered = fields.Boolean("Order Delivered",compute="DeliverOrder")
+
+    readOnlyGroup = fields.Boolean('Read Only Group', compute="_compute_group_access", default=lambda self: self.env.user.has_group('bb_contacts.group_contacts_user'))
+
+    def _compute_group_access(self):
+        self.readOnlyGroup = not self.env.user.has_group('bb_contacts.group_contacts_user')
 
     @api.depends("order_line")
     def DeliverOrder(self):
@@ -21,7 +26,7 @@ class Sales(models.Model):
             if record.orderDelivered and record.orderStatus == "To Deliver":
                 record.write({"orderStatus":'Delivered'})
 
-    @api.depends('partner_id')
+    @api.onchange('partner_id')
     def compute_hold(self):
         for record in self:
             if record.partner_id:
@@ -47,8 +52,10 @@ class Sales(models.Model):
         if 'Estimate' in vals.keys():
             Estimate = self.env['bb_estimate.estimate'].browse(vals['Estimate'])
             vals['ProFormaLines'] = "<br/>".join([x.customer_description for x in Estimate.estimate_line if isinstance(x.customer_description,str) and (not x.isExtra)])
-            
-        return super(Sales,self).create(vals)
+
+        order = super(Sales,self).create(vals)
+        order.compute_hold()
+        return order
     
     def EditProFormaLine(self):
         return {
