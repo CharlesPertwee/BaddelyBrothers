@@ -67,6 +67,13 @@ class Partner(models.Model):
     
     specialReport = fields.Boolean('Custom Delivery Note')
 
+    payeeName = fields.Char("Payee Name")
+
+    @api.onchange('name')
+    def _on_change_name(self):
+        for record in self:
+            record.payeeName = record.name
+
     def _compute_group_access(self):
         self.readOnlyGroup = not self.env.user.has_group('bb_contacts.group_contacts_user')
     

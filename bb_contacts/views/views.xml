@@ -51,6 +51,7 @@
             </xpath>
             <xpath expr="//field[@name='type']" position="before">
 				<field name="mainContact" attrs="{'invisible': [('is_company', '=', True)]}"/>
+                <field name="payeeName" attrs="{'invisible': [('is_company', '=', False)]}"/>
 			</xpath>
             
             <xpath expr="//field[@name='type']" position="after">
