@@ -1,0 +1,14 @@
+<odoo>
+	<data>
+        <record model="ir.module.category" id="contact_manager">
+          <field name="name">Contact</field>
+          <field name="description">Contact Acess to relieve on hold</field>
+          <field name="sequence">3</field>
+        </record>
+
+        <record id="group_contacts_user" model="res.groups">
+         <field name="name">Manager</field>
+         <field name="category_id" ref="bb_contacts.contact_manager"/>
+        </record>		
+	</data>
+</odoo>

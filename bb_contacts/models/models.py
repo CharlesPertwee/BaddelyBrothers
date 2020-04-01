@@ -62,8 +62,13 @@ class Partner(models.Model):
     
     accountStatus = fields.Selection(ACCOUNT_STATUS, string="Account Status")
     onHold = fields.Boolean('On Hold', default=True)
+
+    readOnlyGroup = fields.Boolean('Read Only Group', compute="_compute_group_access")
     
     specialReport = fields.Boolean('Custom Delivery Note')
+
+    def _compute_group_access(self):
+        self.readOnlyGroup = not self.env.user.has_group('bb_contacts.group_contacts_user')
     
     def _compute_contact_history(self):
         self.contactHistory = self.history_id.contacts

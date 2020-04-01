@@ -35,7 +35,8 @@
           <field name="arch" type="xml">
               <xpath expr="//field[@name='property_account_payable_id']" position="after">
                       <field name="accountStatus"/>
-                      <field name="onHold" attrs="{'invisible':['|',('accountStatus','=','open'),('accountStatus','=','newAccount')]}"/>
+                      <field name="readOnlyGroup" invisible="1"/>
+                      <field name="onHold" attrs="{'invisible':['|',('accountStatus','=','open'),('accountStatus','=','newAccount')], 'readonly':[('readOnlyGroup','=',True)]}" />
               </xpath>
           </field>
       </record>
