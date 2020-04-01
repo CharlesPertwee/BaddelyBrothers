@@ -9,16 +9,11 @@ class Sales(models.Model):
     Estimate = fields.Many2one('bb_estimate.estimate',string='Originating Estimate',ondelete='restrict')
     EstimateTitle = fields.Char("Job Title", related="Estimate.title")
     JobTicket = fields.Many2one('mrp.production',string="Job Ticket")
-    partnerOnHold = fields.Boolean('Account on Hold')
+    partnerOnHold = fields.Boolean('Account on Hold',compute="compute_hold")
     priceHistory = fields.One2many('bb_estimate.price_history','SalesOrder','Price Adjustments')
     ProFormaLines = fields.Html('Pro-Forma Line')
     orderStatus = fields.Selection([('To Deliver', 'To Deliver'),('Delivered', 'Delivered'), ('To Invoice', 'To Invoice'),('Fully Invoiced', 'Fully Invoiced')],string='Order Status',default='To Deliver')
     orderDelivered = fields.Boolean("Order Delivered",compute="DeliverOrder")
-
-    readOnlyGroup = fields.Boolean('Read Only Group', compute="_compute_group_access", default=lambda self: self.env.user.has_group('bb_contacts.group_contacts_user'))
-
-    def _compute_group_access(self):
-        self.readOnlyGroup = not self.env.user.has_group('bb_contacts.group_contacts_user')
 
     @api.depends("order_line")
     def DeliverOrder(self):
