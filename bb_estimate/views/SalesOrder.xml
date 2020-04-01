@@ -153,7 +153,17 @@
           </field>
       </record>
 
-      
+      <record id="view_sale_stock_order" model="ir.ui.view">
+          <field name="name">Sale.Order.Form.bb</field>
+          <field name="model">sale.order</field>
+          <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+          <field name="arch" type="xml">
+              <xpath expr="//button[@name='action_view_delivery']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|',('partnerOnHold', '=', True),('delivery_count', '=', 0)]}</attribute>
+              </xpath>
+          </field>
+      </record>
+
       <!--record id="view_sale_order_kanban" model="ir.ui.view">
           <field name="name">sale.order.kanban.bb</field>
           <field name="model">sale.order</field>
