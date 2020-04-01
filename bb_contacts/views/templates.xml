@@ -4,8 +4,7 @@
             <xpath expr="//address/div" position="after">
                 <div t-if="object.payeeName and 'payeeName' in fields" 
                     class='css_editable_mode_hidden'>
-                    <div itemprop="payeeName" t-esc="object.payeeName" 
-                        style="margin-top:4px;margin-bottom:4px;font-size:10px;"/>
+                    <div itemprop="payeeName" t-esc="object.payeeName"/>
                 </div>
            </xpath>
         </template>
