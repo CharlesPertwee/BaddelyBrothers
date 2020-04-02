@@ -18,9 +18,10 @@ class Sales(models.Model):
     @api.depends("order_line")
     def DeliverOrder(self):
         for record in self:
-            record.orderDelivered = all([x for x in map(lambda x: bool(x.qty_delivered>=x.product_uom_qty),record.order_line)])
-            if record.orderDelivered and record.orderStatus == "To Deliver":
-                record.write({"orderStatus":'Delivered'})
+            if record.order_line:
+                record.orderDelivered = all([x for x in map(lambda x: bool(x.qty_delivered>=x.product_uom_qty),record.order_line)])
+                if record.orderDelivered and record.orderStatus == "To Deliver":
+                    record.write({"orderStatus":'Delivered'})
 
     @api.onchange('partner_id')
     def compute_hold(self):
