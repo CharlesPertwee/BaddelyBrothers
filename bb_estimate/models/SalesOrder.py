@@ -8,6 +8,7 @@ class Sales(models.Model):
     Project = fields.Many2one('project.project','Project')
     Estimate = fields.Many2one('bb_estimate.estimate',string='Originating Estimate',ondelete='restrict')
     JobTicket = fields.Many2one('mrp.production',string="Job Ticket")
+    EstimateTitle = fields.Char("Job Title", related="Estimate.title")
     partnerOnHold = fields.Boolean('Account on Hold',compute="compute_hold")
     priceHistory = fields.One2many('bb_estimate.price_history','SalesOrder','Price Adjustments')
     ProFormaLines = fields.Html('Pro-Forma Line')
@@ -17,9 +18,10 @@ class Sales(models.Model):
     @api.depends("order_line")
     def DeliverOrder(self):
         for record in self:
-            record.orderDelivered = all([x for x in map(lambda x: bool(x.qty_delivered>=x.product_uom_qty),record.order_line)])
-            if record.orderDelivered and record.orderStatus == "To Deliver":
-                record.write({"orderStatus":'Delivered'})
+            if record.order_line:
+                record.orderDelivered = all([x for x in map(lambda x: bool(x.qty_delivered>=x.product_uom_qty),record.order_line)])
+                if record.orderDelivered and record.orderStatus == "To Deliver":
+                    record.write({"orderStatus":'Delivered'})
 
     @api.onchange('partner_id')
     def compute_hold(self):
