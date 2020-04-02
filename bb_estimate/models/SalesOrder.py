@@ -7,8 +7,8 @@ class Sales(models.Model):
     
     Project = fields.Many2one('project.project','Project')
     Estimate = fields.Many2one('bb_estimate.estimate',string='Originating Estimate',ondelete='restrict')
-    JobTicket = fields.Many2one('mrp.production',string="Job Ticket")
     EstimateTitle = fields.Char("Job Title", related="Estimate.title")
+    JobTicket = fields.Many2one('mrp.production',string="Job Ticket")
     partnerOnHold = fields.Boolean('Account on Hold',compute="compute_hold")
     priceHistory = fields.One2many('bb_estimate.price_history','SalesOrder','Price Adjustments')
     ProFormaLines = fields.Html('Pro-Forma Line')
