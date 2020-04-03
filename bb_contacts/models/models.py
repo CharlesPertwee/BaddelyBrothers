@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError, ValidationError
 from docx import Document
 import datetime
 
 
 ACCOUNT_STATUS = [
-    ('open','Open'),
-    ('newCustomer','New Customer - Awaiting Credit Approval'),
-    ('newAccount','New Account'),
-    ('cashChq','Cash/chq on delievery only'),
-    ('settleAccount','Settle a/c prior to ordering'),
-    ('onStop','On stop - see DP or CP'),
-    ('inCourt','In court - on stop'),
-    ('liquidation','In liquidation on stop'),
-    ('closed','Closed'),
-    ('deleteAccount','Delete Account')
-]
+    ('Open','Open'),
+    ('New Customer - Awaiting Credit Approval','New Customer - Awaiting Credit Approval'),
+    ('New Account','New Account'),
+    ('Cash/chq on delievery only','Cash/chq on delievery only'),
+    ('Settle a/c prior to ordering','Settle a/c prior to ordering'),
+    ('On stop - see DP or CP','On stop - see DP or CP'),
+    ('In court - on stop','In court - on stop'),
+    ('In liquidation on stop','In liquidation on stop'),
+    ('Closed','Closed'),
+    ('Delete Account','Delete Account')
+  ]
 
 class HistoryGroup(models.Model):
     _name = 'bb_contacts.history'
@@ -61,13 +62,20 @@ class Partner(models.Model):
     contactHistory = fields.One2many('res.partner','history_id',string='Contact Links', compute="_compute_contact_history",store=False)
     
     accountStatus = fields.Selection(ACCOUNT_STATUS, string="Account Status")
-    onHold = fields.Boolean('On Hold', default=True)
+    onHold = fields.Boolean('Account on Hold', default=True)
 
     readOnlyGroup = fields.Boolean('Read Only Group', compute="_compute_group_access")
     
     specialReport = fields.Boolean('Custom Delivery Note')
 
     payeeName = fields.Char("Payee Name")
+
+    @api.constrains('onHold','accountStatus')
+    def on_hold_constraint(self):
+        for record in self:
+            if not record.accountStatus in ['Open','New Account'] and not record.onHold:
+                raise ValidationError("For Account Status: %s, Account on hold must be true"%(str(record.accountStatus)))
+
 
     @api.onchange('name')
     def _on_change_name(self):

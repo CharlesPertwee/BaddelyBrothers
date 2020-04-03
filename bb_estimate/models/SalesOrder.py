@@ -2,6 +2,20 @@
 
 from odoo import models, fields, api
 
+
+ACCOUNT_STATUS = [
+    ('Open','Open'),
+    ('New Customer - Awaiting Credit Approval','New Customer - Awaiting Credit Approval'),
+    ('New Account','New Account'),
+    ('Cash/chq on delievery only','Cash/chq on delievery only'),
+    ('Settle a/c prior to ordering','Settle a/c prior to ordering'),
+    ('On stop - see DP or CP','On stop - see DP or CP'),
+    ('In court - on stop','In court - on stop'),
+    ('In liquidation on stop','In liquidation on stop'),
+    ('Closed','Closed'),
+    ('Delete Account','Delete Account')
+]
+
 class Sales(models.Model):
     _inherit = "sale.order"
     
@@ -10,6 +24,7 @@ class Sales(models.Model):
     EstimateTitle = fields.Char("Job Title", related="Estimate.title")
     JobTicket = fields.Many2one('mrp.production',string="Job Ticket")
     partnerOnHold = fields.Boolean('Account on Hold',compute="compute_hold")
+    partnerStatus = fields.Selection(ACCOUNT_STATUS,compute="compute_hold")
     priceHistory = fields.One2many('bb_estimate.price_history','SalesOrder','Price Adjustments')
     ProFormaLines = fields.Html('Pro-Forma Line')
     orderStatus = fields.Selection([('To Deliver', 'To Deliver'),('Delivered', 'Delivered'), ('To Invoice', 'To Invoice'),('Fully Invoiced', 'Fully Invoiced')],string='Order Status',default='To Deliver')
@@ -29,6 +44,7 @@ class Sales(models.Model):
             if record.partner_id:
                 if record.partner_id.onHold or (record.partner_id.company_type == 'person' and record.partner_id.parent_id.onHold):
                     record.partnerOnHold = True
+                    record.partnerStatus = record.partner_id.partner_id.accountStatus if record.partner_id.company_type == 'person' else record.partner_id.accountStatus
                 else:
                     record.partnerOnHold = False
 
