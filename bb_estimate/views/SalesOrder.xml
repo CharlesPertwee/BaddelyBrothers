@@ -164,10 +164,7 @@
           </field>
       </record>
 
-
-
-      
-      <!--record id="view_sale_order_kanban" model="ir.ui.view">
+    <!--record id="view_sale_order_kanban" model="ir.ui.view">
           <field name="name">sale.order.kanban.bb</field>
           <field name="model">sale.order</field>
           <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
