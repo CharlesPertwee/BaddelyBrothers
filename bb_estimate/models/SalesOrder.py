@@ -44,7 +44,7 @@ class Sales(models.Model):
             if record.partner_id:
                 if record.partner_id.onHold or (record.partner_id.company_type == 'person' and record.partner_id.parent_id.onHold):
                     record.partnerOnHold = True
-                    record.partnerStatus = record.partner_id.partner_id.accountStatus if record.partner_id.company_type == 'person' else record.partner_id.accountStatus
+                    record.partnerStatus = record.partner_id.parent_id.accountStatus if record.partner_id.company_type == 'person' else record.partner_id.accountStatus
                 else:
                     record.partnerOnHold = False
 
