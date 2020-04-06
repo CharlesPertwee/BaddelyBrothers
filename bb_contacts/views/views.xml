@@ -34,7 +34,7 @@
           <field name="inherit_id" ref="account.view_partner_property_form"/>
           <field name="arch" type="xml">
               <xpath expr="//field[@name='property_account_payable_id']" position="after">
-                      <field name="accountStatus"/>
+                      <field name="accountStatus" required="1"/>
                       <field name="readOnlyGroup" invisible="1"/>
                       <field name="onHold" attrs="{'readonly':[('readOnlyGroup','=',True)]}" />
               </xpath>

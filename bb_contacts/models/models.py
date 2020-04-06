@@ -61,7 +61,7 @@ class Partner(models.Model):
     contact_id = fields.Many2one('res.partner',store=False)
     contactHistory = fields.One2many('res.partner','history_id',string='Contact Links', compute="_compute_contact_history",store=False)
     
-    accountStatus = fields.Selection(ACCOUNT_STATUS, string="Account Status")
+    accountStatus = fields.Selection(ACCOUNT_STATUS, string="Account Status", default="New Customer - Awaiting Credit Approval")
     onHold = fields.Boolean('Account on Hold', default=True)
 
     readOnlyGroup = fields.Boolean('Read Only Group', compute="_compute_group_access")
@@ -75,6 +75,9 @@ class Partner(models.Model):
         for record in self:
             if not record.accountStatus in ['Open','New Account'] and not record.onHold:
                 raise ValidationError("For Account Status: %s, Account on hold must be true"%(str(record.accountStatus)))
+            elif record.accountStatus in ['Open','New Account'] and record.onHold:
+                raise ValidationError("For Account Status: %s, Account on hold must be false"%(str(record.accountStatus)))
+
 
 
     @api.onchange('name')
