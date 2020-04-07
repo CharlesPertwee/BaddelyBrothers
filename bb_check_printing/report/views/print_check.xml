@@ -13,7 +13,7 @@
 
         <template id="ckin_check">
             <div class="ckin_check">
-                <div class="ckin_payee_address" t-esc="page['partner_id']" t-options='{"widget": "contact", "fields": ["address", "payeeName"], "no_marker": True}'/>
+                <div class="ckin_payee_address" t-esc="page['partner_id'].payeeName or page['partner_id']" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
                 <div class="ckin_memo1"><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></div>
                 <div class="ckin_memo2"><span t-esc="'%06d'%(o.check_number)"/></div>
                 <div class="ckin_memo3">
@@ -54,10 +54,10 @@
                 </div>
                 <div class ="stub_total_amount3"><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></div>
                 <t t-if="page['partner_id'].parent_id">
-                    <div class="stub_total_amount4"><t t-esc="page['partner_id'].parent_id.payeeName"/>**</div>
+                    <div class="stub_total_amount4"><t t-esc="page['partner_id'].parent_id.payeeName.name or page['partner_id'].parent_id.name"/>**</div>
                 </t>
                 <t t-else="">
-                    <div class="stub_total_amount4"><t t-esc="page['partner_id'].payeeName"/>**</div>
+                    <div class="stub_total_amount4"><t t-esc="page['partner_id'].payeeName.name or page['partner_id'].name"/>**</div>
                 </t>
                 <div class="stub_total_amount5">**<t t-esc="'%.2f'%(float(o.amount))"/>**</div>
                 <div class ="stub_total_amount6"><span t-esc="o.wordamount()[0]"/></div>
