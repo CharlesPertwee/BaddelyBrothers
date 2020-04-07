@@ -68,6 +68,7 @@ class Partner(models.Model):
     specialReport = fields.Boolean('Custom Delivery Note')
 
     payeeName = fields.Char("Payee Name")
+    AdminContact = fields.Selection([('Special','Special')],"Privilege")
 
     @api.onchange('name')
     def _on_change_name(self):
