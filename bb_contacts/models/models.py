@@ -68,7 +68,8 @@ class Partner(models.Model):
     
     specialReport = fields.Boolean('Custom Delivery Note')
 
-    payeeName = fields.Char("Payee Name")
+    payeeName = fields.Many2one("res.partner",'Payee')
+    isPayee = fields.Boolean('Is a Payee?')
     AdminContact = fields.Selection([('Special','Special')],"Privilege")
 
     @api.constrains('onHold','accountStatus')
@@ -79,12 +80,6 @@ class Partner(models.Model):
             elif record.accountStatus in ['Open','New Account'] and record.onHold:
                 raise ValidationError("For Account Status: %s, Account on hold must be false"%(str(record.accountStatus)))
 
-
-
-    @api.onchange('name')
-    def _on_change_name(self):
-        for record in self:
-            record.payeeName = record.name
 
     def _compute_group_access(self):
         self.readOnlyGroup = not self.env.user.has_group('bb_contacts.group_contacts_user')
@@ -134,6 +129,3 @@ class Partner(models.Model):
             "target": "new",
             
         }
-        
-    
-        
