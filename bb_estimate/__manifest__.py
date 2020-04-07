@@ -36,6 +36,7 @@
         'reports/views/AsBeforeLetter.xml',
         'reports/views/DieLabel.xml',
         'reports/views/InvoiceReport.xml',
+        'reports/views/SaleQuote.xml',
         'reports/views/ProForma.xml',
         'reports/views/CreditNote.xml',
         'reports/views/CreditNoteHeaded.xml',
