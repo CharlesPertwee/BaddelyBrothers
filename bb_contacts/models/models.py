@@ -75,7 +75,7 @@ class Partner(models.Model):
     @api.constrains('onHold','accountStatus')
     def on_hold_constraint(self):
         for record in self:
-            if not record.accountStatus in ['Open','New Account'] and not record.onHold:
+            if record.accountStatus in ['New Customer - Awaiting Credit Approval','Cash/chq on delievery only','Settle a/c prior to ordering','On stop - see DP or CP','In court - on stop','In liquidation on stop','Closed','Delete Account'] and not record.onHold:
                 raise ValidationError("For Account Status: %s, Account on hold must be true"%(str(record.accountStatus)))
             elif record.accountStatus in ['Open','New Account'] and record.onHold:
                 raise ValidationError("For Account Status: %s, Account on hold must be false"%(str(record.accountStatus)))
