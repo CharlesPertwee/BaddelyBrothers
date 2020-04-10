@@ -68,7 +68,7 @@ class Partner(models.Model):
     
     specialReport = fields.Boolean('Custom Delivery Note')
 
-    AdminContact = fields.Selection([('Yes','Yes')],"Restricted")
+    AdminContact = fields.Boolean("Restricted")
     payeeName = fields.Many2one("res.partner",'Payee')
     isPayee = fields.Boolean('Is a Payee?')
 
