@@ -68,9 +68,9 @@ class Partner(models.Model):
     
     specialReport = fields.Boolean('Custom Delivery Note')
 
+    AdminContact = fields.Boolean("Restricted")
     payeeName = fields.Many2one("res.partner",'Payee')
     isPayee = fields.Boolean('Is a Payee?')
-    AdminContact = fields.Selection([('Special','Special')],"Privilege")
 
     @api.constrains('onHold','accountStatus')
     def on_hold_constraint(self):
