@@ -33,10 +33,15 @@
           <field name="model">res.partner</field>
           <field name="inherit_id" ref="account.view_partner_property_form"/>
           <field name="arch" type="xml">
-              <xpath expr="//field[@name='property_account_payable_id']" position="after">
-                      <field name="accountStatus"/>
-                      <field name="readOnlyGroup" invisible="1"/>
-                      <field name="onHold" attrs="{'readonly':[('readOnlyGroup','=',True)]}" />
+              <xpath expr="//group[@name='accounting_entries']" position="replace">
+                <group string="Accounting Entries" name="accounting_entries">
+                    <field name="currency_id" invisible="1" groups="account.group_account_user"/>
+                    <field name="property_account_receivable_id" groups="account.group_account_user"/>
+                    <field name="property_account_payable_id" groups="account.group_account_user"/>
+                    <field name="accountStatus"/>
+                    <field name="readOnlyGroup" invisible="1"/>
+                    <field name="onHold" attrs="{'readonly':[('readOnlyGroup','=',True)]}" />
+                </group>
               </xpath>
           </field>
       </record>
