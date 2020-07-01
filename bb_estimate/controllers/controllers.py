@@ -119,27 +119,28 @@ class BbEstimate(http.Controller):
         
         x = 1
         
-        if Estimate.invoice_account.street:
-            table.cell(x,0).text = Estimate.invoice_account.street
+        
+        if (Estimate.contact  or Estimate.partner_id).street:
+            table.cell(x,0).text = (Estimate.contact  or Estimate.partner_id).street
             table.cell(x,1).text = " "
             x += 1
             
-        if Estimate.invoice_account.street2 :
-            table.cell(x,0).text = Estimate.invoice_account.street2 
+        if (Estimate.contact  or Estimate.partner_id).street2 :
+            table.cell(x,0).text = (Estimate.contact  or Estimate.partner_id).street2 
             table.cell(x,1).text = " "
             x += 1
             
-        if Estimate.invoice_account.city:
-            table.cell(x,0).text = Estimate.invoice_account.city 
+        if (Estimate.contact  or Estimate.partner_id).city:
+            table.cell(x,0).text = (Estimate.contact  or Estimate.partner_id).city 
             table.cell(x,1).text = " "
             x += 1
         
-        if Estimate.invoice_account.zip:
-            table.cell(x,0).text = Estimate.invoice_account.zip 
+        if (Estimate.contact  or Estimate.partner_id).zip:
+            table.cell(x,0).text = (Estimate.contact  or Estimate.partner_id).zip 
             table.cell(x,1).text = " "
             x += 1
-          
-        table.cell(x,0).text = "\nAttn: %s"%(Estimate.contact.name)
+      
+        table.cell(x,0).text = "\nAttn: %s"%((Estimate.contact  or Estimate.partner_id).name)
         
         table.cell(x,2).paragraphs[0].text = "\nEstimate no: %s"%(str(Estimate.estimate_number))
         table.cell(x,2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -160,7 +161,7 @@ class BbEstimate(http.Controller):
         parag1 = document.add_paragraph("")
         paragraph_format1 = parag1.paragraph_format
         paragraph_format1.left_indent = Inches(0.09)
-        senten1 = parag1.add_run("\nDear %s,"%(Estimate.contact.name.split()[0]))
+        senten1 = parag1.add_run("\nDear %s,"%((Estimate.contact  or Estimate.partner_id).name.split()[0]))
         senten1.font.name = "Tahoma"
         senten1 = parag1.add_run("\nThank you for your enquiry, we have pleasure in submitting our estimate as follows:")
         senten1.font.name = "Tahoma"
