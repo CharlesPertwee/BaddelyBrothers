@@ -119,26 +119,46 @@ class BbEstimate(http.Controller):
         
         x = 1
         
-        
-        if (Estimate.contact  or Estimate.partner_id).street:
-            table.cell(x,0).text = (Estimate.contact  or Estimate.partner_id).street
-            table.cell(x,1).text = " "
-            x += 1
+        if Estimate.contact:        
+            if Estimate.contact.street:
+                table.cell(x,0).text = Estimate.contact.street
+                table.cell(x,1).text = " "
+                x += 1
+                
+            if Estimate.contact.street2 :
+                table.cell(x,0).text = Estimate.contact.street2 
+                table.cell(x,1).text = " "
+                x += 1
+                
+            if Estimate.contact.city:
+                table.cell(x,0).text = Estimate.contact.city 
+                table.cell(x,1).text = " "
+                x += 1
             
-        if (Estimate.contact  or Estimate.partner_id).street2 :
-            table.cell(x,0).text = (Estimate.contact  or Estimate.partner_id).street2 
-            table.cell(x,1).text = " "
-            x += 1
+            if Estimate.contact.zip:
+                table.cell(x,0).text = Estimate.contact.zip 
+                table.cell(x,1).text = " "
+                x += 1
+        else:
+            if Estimate.partner_id.street:
+                table.cell(x,0).text = Estimate.partner_id.street
+                table.cell(x,1).text = " "
+                x += 1
+                
+            if Estimate.partner_id.street2 :
+                table.cell(x,0).text = Estimate.partner_id.street2 
+                table.cell(x,1).text = " "
+                x += 1
+                
+            if Estimate.partner_id.city:
+                table.cell(x,0).text = Estimate.partner_id.city 
+                table.cell(x,1).text = " "
+                x += 1
             
-        if (Estimate.contact  or Estimate.partner_id).city:
-            table.cell(x,0).text = (Estimate.contact  or Estimate.partner_id).city 
-            table.cell(x,1).text = " "
-            x += 1
-        
-        if (Estimate.contact  or Estimate.partner_id).zip:
-            table.cell(x,0).text = (Estimate.contact  or Estimate.partner_id).zip 
-            table.cell(x,1).text = " "
-            x += 1
+            if Estimate.partner_id.zip:
+                table.cell(x,0).text = Estimate.partner_id.zip 
+                table.cell(x,1).text = " "
+                x += 1
       
         table.cell(x,0).text = "\nAttn: %s"%((Estimate.contact  or Estimate.partner_id).name)
         
