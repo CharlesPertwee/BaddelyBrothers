@@ -101,7 +101,7 @@
                        <b><span t-esc="line.GenerateMaterialDetails(line)" /></b>
                      </td>
                      <td style="border-top: 0px; width:15%; line-height: 18px;">
-                       <b><span t-esc="'%0.2f'%((line['quantity_required_'+o.Estimate.selectedQuantity]  * o.Estimate.SelectedQtyRatio) + (line['quantity_required_run_on'] * o.Estimate.selectedRatio))"/></b>
+                       <b><span t-esc="'%d'%((line['quantity_required_'+o.Estimate.selectedQuantity]  * o.Estimate.SelectedQtyRatio) + (line['quantity_required_run_on'] * o.Estimate.selectedRatio))"/></b>
                      </td>
                      <td style="border-top: 0px; width:15%; line-height: 18px;">
                       <b><span>Cut <t t-esc="line.param_number_out"/> out </span></b>
