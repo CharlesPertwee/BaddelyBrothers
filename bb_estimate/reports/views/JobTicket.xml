@@ -50,7 +50,7 @@
                          <span class="pull-left">Job Type: &#160;&#160;&#160;&#160; <b><span t-field="o.JobType"/></b></span>
                        </td>
                        <td style="border-right: 1px black solid; width:54% line-height: 15px;">
-                         <span class="pull-left">Spec: &#160;&#160;&#160; <b><span t-field="o.SpecifcationType"/></b></span><span class="pull-right">Quantity:  &#160;&#160;<b><span t-esc="o.product_qty"/></b></span>
+                         <span class="pull-left">Spec: &#160;&#160;&#160; <b><span t-field="o.SpecifcationType"/></b></span><span class="pull-right">Quantity:  &#160;&#160;<b><span t-esc="'%d'%(o.product_qty)"/></b></span>
                        </td>
                        <td style="border-right: 1px black solid; width:23%; line-height: 15px;">
                         <span class="pull-right">Fin Size:&#160;&#160;&#160;<b>(<span t-field="o.Estimate.finished_height" /> x <span t-field="o.Estimate.finished_width" />)</b></span>
