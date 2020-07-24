@@ -6,3 +6,4 @@ from . import PriceAdjustment
 from . import PriceAdjustmentSalesOrder
 from . import AmendQty
 from . import DeliveryNote
+from . import DispatchDate
