@@ -13,7 +13,7 @@ class DispatchDate(models.TransientModel):
 
 	def confirm(self):
 		if self.Estimate:
-			self.Estimate.write({'target_dispatch_Date': self.target_dispatch_Date})
+			self.Estimate.write({'target_dispatch_date': self.target_dispatch_Date})
 
 			if self.Estimate.salesOrder:
 				pickings = self.Estimate.salesOrder.picking_ids.filtered(lambda x: x.state not in ['done', 'cancel'])
