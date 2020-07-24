@@ -8,7 +8,7 @@ from datetime import timedelta
 class DispatchDate(models.TransientModel):
 	_name = "bb_estimate.dispatch_date"
 
-	target_dispatch_Date = fields.Date('Target Dispatch Date', default=lambda self: (datetime.datetime.now() + datetime.timedelta(days=14)).strftime('%Y-%m-%d'))
+	target_dispatch_Date = fields.Date('Target Dispatch Date', default=lambda self: (datetime.now() + timedelta(days=14)).strftime('%Y-%m-%d'))
 	Estimate = fields.Many2one('bb_estimate.estmate')
 
 	def confirm(self):
