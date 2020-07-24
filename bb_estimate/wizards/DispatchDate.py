@@ -17,6 +17,6 @@ class DispatchDate(models.TransientModel):
 
 			if self.Estimate.salesOrder:
 				pickings = self.Estimate.salesOrder.picking_ids.filtered(lambda x: x.state not in ['done', 'cancel'])
-				pickings.write({'scheduled_date': self.target_dispatch_Date})
+				pickings.write({'scheduled_date': fields.Datetime.to_string( self.target_dispatch_Date) })
 
 
