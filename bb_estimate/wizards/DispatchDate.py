@@ -13,10 +13,12 @@ class DispatchDate(models.TransientModel):
 
 	def confirm(self):
 		if self.Estimate:
-			self.Estimate.write({'target_dispatch_date': self.target_dispatch_Date})
+			self.Estimate.sudo().write({'target_dispatch_date': self.target_dispatch_Date})
+			
+			self.Estimate.message_post(body="Target Dispatch Date has been updated.")
 
 			if self.Estimate.salesOrder:
-				pickings = self.Estimate.salesOrder.picking_ids.filtered(lambda x: x.state not in ['done', 'cancel'])
-				pickings.write({'scheduled_date': fields.Datetime.to_string( self.target_dispatch_Date) })
+				pickings = self.Estimate.salesOrder.picking_ids.sudo().filtered(lambda x: x.state not in ['done', 'cancel'])
+				pickings.sudo().write({'scheduled_date': fields.Datetime.to_string( self.target_dispatch_Date) })
 
 
