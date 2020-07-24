@@ -12,7 +12,7 @@
                             <field name="target_dispatch_Date"/>
                         </group>
                         <footer>
-                            <button name="Confirm" string="Confirm" class="oe_right oe_highlight" type="object"/>
+                            <button name="confirm" string="Confirm" class="oe_right oe_highlight" type="object"/>
                             <button string="Cancel" class="oe_right" special="cancel"/>
                         </footer>
                     </sheet>
