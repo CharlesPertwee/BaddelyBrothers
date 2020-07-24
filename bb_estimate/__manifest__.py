@@ -80,6 +80,7 @@
         'wizards/views/SalesAdjustment.xml',
         'wizards/views/AmmendQty.xml',
         'wizards/views/DeliveryNote.xml',
+        'wizards/views/DispatchDate.xml',
         'reports/views/EstimateConversionReport.xml',
         'reports/views/EstimateMonthlyRates.xml',
         'reports/views/EstimateTimesReport.xml',
