@@ -1167,10 +1167,10 @@ class EstimateLine(models.Model):
         currentRecord = super(EstimateLine, self).write(vals)
         
         if set(vals.keys()) - set(['hasComputed','customer_description','JobTicketText','documentCatergory','StandardCustomerDescription','StandardJobDescription','UseStadandardDescription','Details','EstimatorNotes','isExtra','extraDescription','Sequence']):
-            if self.option_type == 'process':
-                for mat in self.process_ids:
-                    mat.ComputePrice()
-            elif self.option_type == 'material':
+            # if self.option_type == 'process':
+            #     for mat in self.process_ids:
+            #         mat.ComputePrice()
+            if self.option_type == 'material':
                 recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
                 for process in recs:
                     process.calc_param_material_line_id_charge()
