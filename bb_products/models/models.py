@@ -53,21 +53,12 @@ class ProductsTemplate(models.Model):
                 record.sheet_width = record.sheetSize.width
                 record.sheet_height = record.sheetSize.height
 
-class Products(models.Model):
-    _inherit = 'product.product'
+
+class ProductCategory(models.Model):
+    _inherit = "product.category"
+
+    productType = fields.Selection([('Stock','Stock Material'),('Trade Counter','Trade Counter'),('Non-Stockable','Non Stockable Product'),('Finished','Finished Product'),('Package','Package'),('Delivery','Delivery'),('Outwork','Outwork')],string="Material Type",default="Trade Counter")
+
+
+
     
-#     def _get_name(self):
-#         product = self
-#         name = product.name
-#         if product.sheetSize:
-#             name = "%s (%d X %d) - %s G.S.M"%(name,product.sheet_width,product.sheet_height,product.grammage)            
-#             #name = name + "  " + product.sheetSize.name
-#         return name
-    
-#     @api.multi
-#     def name_get(self):
-#         res = []
-#         for product in self:
-#             name = product._get_name()
-#             res.append((product.id, name))
-#         return res

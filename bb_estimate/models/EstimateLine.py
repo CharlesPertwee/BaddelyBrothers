@@ -1250,6 +1250,11 @@ class EstimateLine(models.Model):
                         seller = self.env['product.supplierinfo'].sudo()
                         mto =self.env['stock.location.route'].sudo().search([('name','=','Make To Order')],limit=1)
                         buy =self.env['stock.location.route'].sudo().search([('name','=','Buy')],limit=1)
+                        categ_id = False
+                        if lineId.NonStockMaterialType == "Customer Supplied Material":
+                            categ = self.env['product.category'].sudo().search([('productType','=','Non-Stockable')], limit=1)
+                            categ_id = categ.id if categ else False
+
                         newProduct = {
                             'name' : lineId.MaterialName,
                             'type': 'product',
@@ -1266,6 +1271,7 @@ class EstimateLine(models.Model):
                             'lastUsedEstimateDate': str(datetime.now().date()),
                             'lastUsedEstimateNumber': lineId.estimate_id.estimate_number,
                             'margin': lineId.Margin,
+                            'categ_id': categ_id,
                             'productSubType' : lineId.NonStockMaterialType 
                         }
                         if mto and buy and lineId.NonStockMaterialType == 'Bespoke Material':
@@ -1276,7 +1282,7 @@ class EstimateLine(models.Model):
                             newProduct['uom_po_id'] = lineId.PurchaseUnit.id
 
                         if  (not lineId.material):
-                            productId = product.create(newProduct)	             
+                            productId = product.create(newProduct)               
                         else:
                             productId = lineId.material
                         if productId and lineId.Supplier:

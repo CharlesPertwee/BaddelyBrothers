@@ -101,8 +101,12 @@
               <xpath expr="//header" position="inside">
                   <button name="AdjustPrice" type="object" string="Adjust Price" />
               </xpath>
+              <xpath expr="//field[@name='confirmation_date']" position="after">
+                <field name="partnerOnHold"/>
+                <field name="orderStatus" />
+                <field name="orderDelivered" invisible="1" />
+              </xpath>
               <xpath expr="//field[@name='partner_id']" position="after">
-                  <field name="partnerOnHold"/>
                   <field name="partnerStatus" string="Account Status" attrs="{'invisible':[('partnerOnHold','=',False)]}"/>
                   <field name="Estimate" readonly="1"/>
                   <field name="Project" readonly="1" options="{'no_create': True, 'no_create_edit': True}"/>
@@ -113,10 +117,6 @@
                 <button class="oe_stat_button" icon="fa-pencil" type="object" name="EditProFormaLine">
                       <span>Edit Pro-Forma Lines</span>
                   </button>
-              </xpath>
-              <xpath expr="//field[@name='confirmation_date']" position="after">
-                <field name="orderStatus" />
-                <field name="orderDelivered" invisible="1" />
               </xpath>
               <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
                   <attribute name="attrs">{'invisible':['|',('partnerOnHold','=',True),('state', 'not in', ['sent'])]}</attribute>
