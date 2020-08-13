@@ -35,7 +35,7 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-6">
-                                                <p class="pull-left">Our Ref: </p>
+                                                <p class="pull-left">SO Ref: </p>
                                             </div>
                                             <div class="col-6">
                                                 <p class="pull-left"><span t-field="o.name" /></p>
