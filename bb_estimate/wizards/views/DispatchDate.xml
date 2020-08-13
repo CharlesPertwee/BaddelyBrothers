@@ -1,0 +1,24 @@
+<odoo>
+    <data>
+        
+        <record id="wizard_dispatch_date" model="ir.ui.view">
+            <field name="name">Update Dispatch Date</field>
+            <field name="model">bb_estimate.dispatch_date</field>
+            <field name="arch" type="xml">
+                <form string="Adjustments">
+                    <sheet>
+                        <field name="Estimate" invisible="1"/>
+                        <group>
+                            <field name="target_dispatch_Date"/>
+                        </group>
+                        <footer>
+                            <button name="confirm" string="Confirm" class="oe_right oe_highlight" type="object"/>
+                            <button string="Cancel" class="oe_right" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

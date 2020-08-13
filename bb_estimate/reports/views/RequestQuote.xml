@@ -11,22 +11,25 @@
                                 <div class="container">
                                     <div class="row">
                                         <p><span t-field="o.company_id.name"/><br/>
-                                            <span t-field="o.company_id.street"/><br/>
-                                            <span t-field="o.company_id.city"/> <span t-field="o.company_id.state_id.code"/> <span t-field="o.company_id.zip"/><br/>
-                                            <span t-field="o.company_id.country_id.name"/><br/></p>
+                                            <t t-if="o.company_id.street"><span t-field="o.company_id.street"/><br/></t>
+                                            <t t-if="o.company_id.street2"><span t-field="o.company_id.street2"/><br/></t>
+                                            <t t-if="o.company_id.city"><span t-field="o.company_id.city"/></t> <t t-if="o.company_id.state_id.code"><span t-field="o.company_id.state_id.code"/></t> <t t-if="o.company_id.zip"><span t-field="o.company_id.zip"/><br/></t>
+                                            <t t-if="o.company_id.country_id.name"><span t-field="o.company_id.country_id.name"/><br/></t></p>
                                     </div>
                                     <div class="row pull-right">
                                         <t t-if="o.partner_id.parent_id">
                                             <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/> <span t-field="o.partner_id.state_id.code"/> <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id.name"/><br/></p>
+                                                <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/><br/></t>
+                                                <t t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/><br/></t>
+                                                <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/></t> <t t-if="o.partner_id.state_id.code"><span t-field="o.partner_id.state_id.code"/></t> <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/><br/></t>
+                                                <t t-if="o.partner_id.country_id.name"><span t-field="o.partner_id.country_id.name"/><br/></t></p>
                                         </t>
                                         <t t-else="">
                                             <p><span t-field="o.partner_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/> <span t-field="o.partner_id.state_id.code"/> <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id.name"/><br/></p>
+                                                <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/><br/></t>
+                                                <t t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/><br/></t>
+                                                <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/></t> <t t-if="o.partner_id.state_id.code"><span t-field="o.partner_id.state_id.code"/></t> <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/><br/></t>
+                                                <t t-if="o.partner_id.country_id.name"><span t-field="o.partner_id.country_id.name"/><br/></t></p>
                                         </t>
                                     </div>
                                 </div>

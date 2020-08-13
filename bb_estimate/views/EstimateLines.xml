@@ -91,7 +91,7 @@
                                 <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','process')]}">
                                     <div class="form-group">
                                         <label for="workcenterId" class="col-md-4" />
-                                        <field name="workcenterId" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}" options="{'no_create_edit': True}" class="col-md-7" create="false" domain="[('process_type','!=',False)]"/>
+                                        <field name="workcenterId" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}" options="{'no_create': True, 'no_create_edit': True}" class="col-md-7" create="false" domain="[('process_type','!=',False)]"/>
                                     </div>
                                 </div>
                                 <div class="col-md-8 pull-right" attrs="{'invisible':[('option_type','!=','material')]}">
@@ -124,13 +124,13 @@
 
                                 <page string="Link" attrs="{'invisible':['|',('option_type','=','process'),('option_type','=',False)]}">
                                     <sheet>
-                                        <field name="material_ids" context="{'default_estimate':estimate_id}" options="{'no_create_edit': True}" />
+                                        <field name="material_ids" context="{'default_estimate':estimate_id}" options="{'no_create': True, 'no_create_edit': True}" />
                                     </sheet>
                                 </page>
 
                                 <page string="Link" attrs="{'invisible':['|',('option_type','=','material'),('option_type','=',False)]}">
                                     <sheet>
-                                        <field name="process_ids" context="{'default_estimate':estimate_id}" options="{'no_create_edit': True}" />
+                                        <field name="process_ids" context="{'default_estimate':estimate_id}" options="{'no_create': True, 'no_create_edit': True}" />
                                     </sheet>
                                 </page>
 
@@ -157,7 +157,7 @@
                                             <field name="param_time_per_box" attrs="{'invisible':[('req_param_time_per_box','=',False)],'required':[('req_param_time_per_box','=',True)],'readonly':[('isLocked','=',True)]}"/>
                                             <field name="param_misc_charge_per_cm2" attrs="{'invisible':[('req_param_misc_charge_per_cm2','=',False)],'readonly':[('isLocked','=',True)]}"/>
                                             <field name="param_misc_charge_per_cm2_area" attrs="{'invisible':[('req_param_misc_charge_per_cm2_area','=',False)],'readonly':[('isLocked','=',True)]}"/>
-                                            <field name="param_material_line_id" options="{'no_create_edit': True}" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)],'required':[('req_param_material_line_id','=',True)],'readonly':[('isLocked','=',True)]}" />
+                                            <field name="param_material_line_id" options="{'no_create': True, 'no_create_edit': True}" domain="['&amp;',('option_type','=','material'),('estimate_id','=',estimate_id)]" attrs="{'invisible':[('req_param_material_line_id','=',False)],'required':[('req_param_material_line_id','=',True)],'readonly':[('isLocked','=',True)]}" />
                                         </group>
                                         <group>
                                             <field name="param_number_of_colors_rev" attrs="{'invisible':[('req_param_number_of_colors_rev','=',False)],'required':[('req_param_number_of_colors_rev','=',True)],'readonly':[('isLocked','=',True)]}" />
@@ -174,7 +174,7 @@
                                     
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Stock')]}">
                                         <group>
-                                            <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Stock'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                            <field name="material" options="{'no_create': True, 'no_create_edit': True}" context="{'default_productType':'Stock'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                         </group>
                                         <group string="Stock Material Properties">
                                             <group>
@@ -193,8 +193,8 @@
                                             </group>
                                             <group>
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="WhiteCutting" options="{'no_create': True, 'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" options="{'no_create': True, 'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
@@ -206,7 +206,7 @@
                                     </group>
                                     <group col="1" attrs="{'invisible':['|',('option_type','=','process'),('MaterialTypes','!=','Trade Counter')]}">
                                         <group>
-                                            <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Trade Counter'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Trade Counter')],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                            <field name="material" options="{'no_create': True, 'no_create_edit': True}" context="{'default_productType':'Trade Counter'}" domain="[('productType','=', MaterialTypes)]" string="Select Material" attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Trade Counter')],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                         </group>
                                         <group string="Material Parameters" col="1">
                                             <group>
@@ -215,8 +215,8 @@
                                             </group>
                                             <group >
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="WhiteCutting" options="{'no_create': True, 'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" options="{'no_create': True, 'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
@@ -232,6 +232,7 @@
                                         </group>
                                         <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','=',False)]}">
                                             <group>
+                                                <field name="material" string="Existing Material" options="{'no_create': True, 'no_create_edit': True}" domain="[('productType','=', MaterialTypes),('productSubType','=',NonStockMaterialType)]"  attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)],'invisible':[('NonStockMaterialType','=','Customer Supplied Material')]}"/>
                                                 <field name="MaterialName" colspan="4" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                             </group>
                                             <group>
@@ -247,15 +248,15 @@
                                                     <field name="SheetHeight" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                     <field name="SheetWidth" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                     <field name="CharegeRate" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
-                                                    <field name="Supplier" options="{'no_create_edit': True}" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="Supplier" options="{'no_create': True,'no_create_edit': True}" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                     <field name="MinimumQty" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
-                                                    <field name="PackSize" options="{'no_create_edit': True}" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
+                                                    <field name="PackSize" options="{'no_create': True,'no_create_edit': True}" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                                 </group>
                                             </group>
                                         </group>
                                         <group string="Non-Stock Material Properties" col="1" attrs="{'invisible':['|',('NonStockMaterialType','=','Bespoke Material'),('NonStockMaterialType','=',False)]}">
                                             <group>
-                                                <field name="material" options="{'no_create_edit': True}" context="{'default_productType':'Non-Stockable'}" domain="[('productType','=', MaterialTypes)]" string="Existing Material" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)],'invisible':[('NonStockMaterialType','!=','Customer Supplied Material')]}"/>
+                                                <field name="material" options="{'no_create': True, 'no_create_edit': True}" context="{'default_productType':'Non-Stockable'}" domain="[('productType','=', MaterialTypes),('productSubType','=',NonStockMaterialType)]" string="Existing Material" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)],'invisible':[('NonStockMaterialType','!=','Customer Supplied Material')]}"/>
                                                 
                                                 <field name="MaterialName" colspan="4" string="New Material" attrs="{'required':['&amp;','&amp;',('option_type','=','material'),('MaterialTypes','=','Non-Stockable'),'&amp;',('NonStockMaterialType','=','Customer Supplied Material'),('NonStockMaterialType','!=',False)],'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>
                                             </group>
@@ -277,8 +278,8 @@
                                             </group>
                                             <group>
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">
-                                                    <field name="WhiteCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
-                                                    <field name="PrintedCutting" options="{'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="WhiteCutting" options="{'no_create': True, 'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/>  <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
+                                                    <field name="PrintedCutting" options="{'no_create': True, 'no_create_edit': True}" widget="selection" attrs="{'readonly':['|',('isLocked','=',True),('id','!=',False)]}"/> <!--attrs="{'required':['&amp;',('option_type','=','material'),('MaterialTypes','=','Stock')]}"/-->
                                                 </group>
 
                                                 <group attrs="{'invisible':[('isEnvelope','=',True)]}">

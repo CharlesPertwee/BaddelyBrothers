@@ -55,6 +55,9 @@ class OrderConvert(models.TransientModel):
                 record.TotalPrice = record.RunOnPrice + (record.RunOnPrice * ratio)
             
     def CreateOrder(self):
+        if (self.EstimateId.partner_id.parent_id if self.EstimateId.partner_id.parent_id else self.EstimateId.partner_id).onHold:
+            raise ValidationError("Selected account is on Hold. Order cannot be processed at moment")
+
         processes = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','process'),('isExtra','=',False)])
         materials = self.EstimateId.estimate_line.search([('estimate_id','=',self.EstimateId.id),('option_type','=','material'),('isExtra','=',False)])
         outworks = [x for x in processes if x.workcenterId.outworkProcessProduct]
@@ -159,9 +162,10 @@ class OrderConvert(models.TransientModel):
                                    {
                                         'product_id': outwork.workcenterId.outworkProcessProduct.id,
                                         'price_unit': outwork['cost_per_unit_'+str(self.QuantityRequired)] + (outwork['cost_per_unit_run_on'] * runOnRatio),
-                                        'name': '%s: %s'%(self.EstimateId.title, outwork.JobTicketText or outwork.lineName),
+                                        'name': '[%s] %s: %s'%(mo.name, self.EstimateId.title, outwork.JobTicketText or outwork.lineName),
                                         'date_planned': datetime.now(), # + timedelta(days=1)
                                         'product_qty': 1,
+                                        'taxes_id': [(4,x) for x in outwork.workcenterId.outworkProcessProduct.supplier_taxes_id.ids],
                                         'product_uom': outwork.workcenterId.outworkProcessProduct.uom_po_id.id
                                         
                                    })]

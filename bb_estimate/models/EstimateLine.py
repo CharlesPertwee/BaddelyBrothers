@@ -323,7 +323,7 @@ class EstimateLine(models.Model):
     def computePricesNonStockCost(self):
         for record in self:
             if record.CharegeRate:
-                record.Margin = ((record.CharegeRate / record.CostRate) - 1) * 100
+                record.Margin = ((record.CharegeRate / (record.CostRate or 1)) - 1) * 100
             elif record.Margin:
                 record.CharegeRate = ((record.Margin / 100) + 1) * record.CostRate
                 
@@ -338,7 +338,7 @@ class EstimateLine(models.Model):
     def computePricesNonStockPrice(self):
         for record in self:
             if record.CharegeRate:
-                record.Margin = ((record.CharegeRate / record.CostRate) - 1) * 100
+                record.Margin = ((record.CharegeRate / (record.CostRate or 1)) - 1) * 100
             elif record.Margin:
                 record.CostRate = record.CharegeRate / ((record.Margin / 100) + 1)
             
@@ -409,6 +409,13 @@ class EstimateLine(models.Model):
                 
                 if record.MaterialTypes == "Non-Stockable":
                     record.MaterialName = record.material.name
+                    record.CostRate = record.material.standard_price
+                    record.Margin = record.material.margin
+                    record.PurchaseUnit = record.material.uom_id
+                    if record.material.seller_ids:
+                        record.Supplier = record.material.seller_ids[0].name
+                        record.MinimumQty = record.material.seller_ids[0].min_qty
+                        record.PackSize = record.material.seller_ids[0].multiplier
                 
                 if record.WhiteCutting:
                     record.NoWhiteCuts = self.WhiteCutting.process_type.get_white_cuts_for_number_out(record.param_number_out)
@@ -766,7 +773,12 @@ class EstimateLine(models.Model):
         return_values = {}
         process_type = workcenterId.process_type
         #data dictionaries which would ne updated with values in Workcenter
-        
+        qty_break = False
+        if workcenterId:
+            compare_quantity = max([quantity_1,quantity_2,quantity_3,quantity_4]) if qty == 'run_on' else finished_quantity
+            qty_break_ids = workcenterId.qty_break_params.search([('process_id','=',workcenterId.id),('qty_greater_than','<',compare_quantity),('weight_greater_than','<',param_grammage),('isDefault','=',False)], order='qty_greater_than desc, weight_greater_than desc')
+            qty_break = (qty_break_ids[0] if any(qty_break_ids) else False) or workcenterId.qty_break_params.search([('process_id','=',workcenterId.id),('isDefault','=',True)])#,('process_id','=',workcenter.id)])
+
         qty_params = {
             'workcenterId':workcenterId,
             'param_number_out':param_number_out,
@@ -796,7 +808,7 @@ class EstimateLine(models.Model):
             'param_additional_charge':param_additional_charge,
             'param_die_size':param_die_size,
             'param_misc_charge_per_cm2_area':param_misc_charge_per_cm2_area,
-            'param_minimum_price': 0,
+            'param_minimum_price': qty_break.minimum_price if qty_break else 0,
             'param_misc_charge_per_cm2':param_misc_charge_per_cm2,
             'param_no_of_ink_mixes':param_no_of_ink_mixes,
             'working_width':param_working_width,
@@ -1154,16 +1166,17 @@ class EstimateLine(models.Model):
         
         currentRecord = super(EstimateLine, self).write(vals)
         
-        if self.option_type == 'process':
-            for mat in self.process_ids:
-                mat.ComputePrice()
-        elif self.option_type == 'material':
-            recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
-            for process in recs:
-                process.calc_param_material_line_id_charge()
-                dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
-                dictProcess.pop('hasComputed')
-                process.write(dictProcess)
+        if set(vals.keys()) - set(['hasComputed','customer_description','JobTicketText','documentCatergory','StandardCustomerDescription','StandardJobDescription','UseStadandardDescription','Details','EstimatorNotes','isExtra','extraDescription','Sequence']):
+            # if self.option_type == 'process':
+            #     for mat in self.process_ids:
+            #         mat.ComputePrice()
+            if self.option_type == 'material':
+                recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
+                for process in recs:
+                    process.calc_param_material_line_id_charge()
+                    dictProcess = {key:process[key] for key in process._fields if type(process[key]) in [int,str,bool,float]}
+                    dictProcess.pop('hasComputed')
+                    process.write(dictProcess)
         return currentRecord
         
     
@@ -1237,6 +1250,11 @@ class EstimateLine(models.Model):
                         seller = self.env['product.supplierinfo'].sudo()
                         mto =self.env['stock.location.route'].sudo().search([('name','=','Make To Order')],limit=1)
                         buy =self.env['stock.location.route'].sudo().search([('name','=','Buy')],limit=1)
+                        categ_id = False
+                        if lineId.NonStockMaterialType == "Customer Supplied Material":
+                            categ = self.env['product.category'].sudo().search([('productType','=','Non-Stockable')], limit=1)
+                            categ_id = categ.id if categ else False
+
                         newProduct = {
                             'name' : lineId.MaterialName,
                             'type': 'product',
@@ -1253,6 +1271,8 @@ class EstimateLine(models.Model):
                             'lastUsedEstimateDate': str(datetime.now().date()),
                             'lastUsedEstimateNumber': lineId.estimate_id.estimate_number,
                             'margin': lineId.Margin,
+                            'categ_id': categ_id,
+                            'productSubType' : lineId.NonStockMaterialType 
                         }
                         if mto and buy and lineId.NonStockMaterialType == 'Bespoke Material':
                             newProduct['route_ids'] = [(4,mto.id),(4,buy.id)]
@@ -1261,8 +1281,8 @@ class EstimateLine(models.Model):
                             newProduct['uom_id'] = lineId.PurchaseUnit.id
                             newProduct['uom_po_id'] = lineId.PurchaseUnit.id
 
-                        if  (not lineId.material) or lineId.NonStockMaterialType == 'Bespoke Material':
-                            productId = product.create(newProduct)	             
+                        if  (not lineId.material):
+                            productId = product.create(newProduct)               
                         else:
                             productId = lineId.material
                         if productId and lineId.Supplier:
@@ -1270,7 +1290,7 @@ class EstimateLine(models.Model):
                                 'product_id' : productId.id,
                                 'product_tmpl_id' : productId.product_tmpl_id.id,
                                 'product_name' : lineId.MaterialName,
-                                'price': lineId.CharegeRate,
+                                'price': lineId.CostRate,
                                 'name' : lineId.Supplier.id,
                                 'minQuantity' : lineId.MinimumQty,
                                 'multiplier' : lineId.PackSize

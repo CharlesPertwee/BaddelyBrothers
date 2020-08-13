@@ -5,25 +5,23 @@
             <t t-call="web.html_container">
                     <div style="font-family: Georgia;">
                         <t t-set="estimate" t-value="o.getEstimateData()"/>
+                        <div class="backgroundimage" style="position:absolute;z-index:-999;padding-right:30px;"> 
+                            <img class="img-responsive" src="/bb_estimate/static/src/img/headerimg.jpg" width="950px" height="1429px"/>
+                        </div>
                         <div class="page" style="padding-top:16em; padding-left:2em; padding-right:2em;">
                             <t t-set="o" t-value="o.with_context({'lang': lang})" />
                             <div class="container" style="padding:3em; font-size:14px;">
                                 <div class="row">
                                     <div class="col-7">
-                                        <t t-if="o.partner_id.parent_id">
-                                            <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/><br/>
-                                                <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id"/></p>
-                                        </t>
-                                        <t t-else="">
-                                            <p><span t-field="o.partner_id.name"/><br/>
-                                                <span t-field="o.partner_id.street"/><br/>
-                                                <span t-field="o.partner_id.city"/><br/>
-                                                <span t-field="o.partner_id.zip"/><br/>
-                                                <span t-field="o.partner_id.country_id"/></p>
-                                        </t>
+                                        <p>
+                                            <span t-esc="o.partner_id.parent_id.name if o.partner_id.parent_id else o.partner_id.name"/><br/>
+                                            <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/><br/></t>
+                                            <t t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/><br/></t>
+                                            <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/><br/></t>
+                                            <t t-if="o.partner_id.state_id"><span t-field="o.partner_id.state_id"/><br/></t>
+                                            <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/><br/></t>
+                                            <t t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id"/></t>
+                                        </p>
                                     </div>
                                     <div class="col-5 pull-right">
                                         <div class="row">

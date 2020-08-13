@@ -5,25 +5,23 @@
                 <t t-call="web.html_container">
                     <div style="font-family: Georgia;">
                         <t t-set="estimate" t-value="o.getEstimateData()"/>
+                        <div class="backgroundimage" style="position:absolute;z-index:-999;padding-right:30px;"> 
+                            <img class="img-responsive" src="/bb_estimate/static/src/img/headerimg.jpg" width="950px" height="1429px"/>
+                        </div>
                         <div class="page" style="padding-top:16em; padding-left:2em; padding-right:2em;">
                             <t t-set="o" t-value="o.with_context({'lang': lang})"/>
                             <div class="container" style="padding:3em; font-size:14px;">
                                 <div class="row">
                                     <div class="col-7">
-                                        <t t-if="o.partner_id.parent_id">
-                                            <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                                            <span t-field="o.partner_id.street"/><br/>
-                                            <span t-field="o.partner_id.city"/><br/>
-                                            <span t-field="o.partner_id.zip"/><br/>
-                                            <span t-field="o.partner_id.country_id"/></p>
-                                        </t>
-                                        <t t-else="">
-                                            <p><span t-field="o.partner_id.name"/><br/>
-                                            <span t-field="o.partner_id.street"/><br/>
-                                            <span t-field="o.partner_id.city"/><br/>
-                                            <span t-field="o.partner_id.zip"/><br/>
-                                            <span t-field="o.partner_id.country_id"/></p>
-                                        </t>
+                                        <p>
+                                            <span t-esc="o.partner_id.parent_id.name if o.partner_id.parent_id else o.partner_id.name"/><br/>
+                                            <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/><br/></t>
+                                            <t t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/><br/></t>
+                                            <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/><br/></t>
+                                            <t t-if="o.partner_id.state_id"><span t-field="o.partner_id.state_id"/><br/></t>
+                                            <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/><br/></t>
+                                            <t t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id"/></t>
+                                        </p>
                                     </div>
                                     <div class="col-5 pull-right">
                                         <div class="row">
@@ -31,7 +29,7 @@
                                                 <p class="pull-left">Date/Tax Point: </p>
                                             </div>
                                             <div class="col-6">
-                                                <p class="pull-left"><span t-field="o.date_invoice" t-options="{'widget': 'date'}"/></p>
+                                                <p class="pull-left"><span t-field="o.date_invoice" t-options='{"format": "dd/MM/yyyy"}'/></p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -106,8 +104,8 @@
                                             <tr>
                                                 <t t-if="estimate">
                                                     <td name="account_invoice_line_name">
-                                                      <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/> <t t-if="o.name">Your Ref: <span t-field="o.name"/></t><br/>
-                                                      <span t-field="estimate.title"/><br/>
+                                                      <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/> <t t-if="estimate.salesOrder.client_order_ref">&#160;&#160;&#160;&#160;&#160;&#160;Your Ref: <span t-field="estimate.salesOrder.client_order_ref"/></t><br/>
+                                                      Qty: <span t-esc="int(o.invoice_line_ids[0].quantity)"/> <span t-field="estimate.title"/><br/>
                                                       Size: <span t-field="estimate.finished_width"/> x <span t-field="estimate.finished_height"/>
                                                   </p>
                                                   <p>
@@ -115,27 +113,55 @@
                                                   </p>
                                               </td>
                                           </t>
-                                          <td/>
-                                          <td/>
-                                          <td/>
+                                          <td class="text-right">
+                                            <span t-field="o.invoice_line_ids[0].price_subtotal"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="', '.join(map(lambda x: str(x.amount), o.invoice_line_ids[0].invoice_line_tax_ids))"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <t t-set="tax" t-value="o.invoice_line_ids[0].price_subtotal * (sum(map(lambda x: x.amount,o.invoice_line_ids[0].invoice_line_tax_ids))/100)"/>
+                                            <span t-esc="'%.2f'%tax if tax &gt; 0 else 0"/>
+                                        </td>
                                       </tr>
                                   </t>
                                   <t t-foreach="o.invoice_line_ids" t-as="in_line">
-                                    <tr>
-                                        <td>
-                                            <p><span t-field="in_line.name"/></p>
-                                        </td>
-                                        <td class="text-right">
-                                            <span t-field="in_line.price_subtotal"/>
-                                        </td>
-                                        <td class="text-right">
-                                            <span t-esc="', '.join(map(lambda x: str(x.amount), in_line.invoice_line_tax_ids))"/>
-                                        </td>
-                                        <td class="text-right">
-                                            <t t-set="tax" t-value="in_line.price_subtotal * (sum(map(lambda x: x.amount,in_line.invoice_line_tax_ids))/100)"/>
-                                            <span t-esc="'%.2f'%tax if tax &gt; 0 else 0"/>
-                                        </td>
-                                    </tr>
+                                    <t t-if="estimate">
+                                        <t t-if="not o.invoice_line_ids[0] == in_line">
+                                            <tr>
+                                                <td>
+                                                    <p><span t-field="in_line.name"/></p>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="in_line.price_subtotal"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="', '.join(map(lambda x: str(x.amount), in_line.invoice_line_tax_ids))"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <t t-set="tax" t-value="in_line.price_subtotal * (sum(map(lambda x: x.amount,in_line.invoice_line_tax_ids))/100)"/>
+                                                    <span t-esc="'%.2f'%tax if tax &gt; 0 else 0"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <tr>
+                                                <td>
+                                                    <p><span t-field="in_line.name"/></p>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="in_line.price_subtotal"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="', '.join(map(lambda x: str(x.amount), in_line.invoice_line_tax_ids))"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <t t-set="tax" t-value="in_line.price_subtotal * (sum(map(lambda x: x.amount,in_line.invoice_line_tax_ids))/100)"/>
+                                                    <span t-esc="'%.2f'%tax if tax &gt; 0 else 0"/>
+                                                </td>
+                                            </tr>
+                                    </t>
                                 </t>
                             </tbody>
                         </table>

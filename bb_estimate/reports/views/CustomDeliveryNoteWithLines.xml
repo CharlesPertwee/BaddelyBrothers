@@ -11,22 +11,15 @@
             <span style="text-decoration:underline;">Delivery Address</span><br/>                  
             <div class="row" style="padding:4em; padding-top:0em; padding-bottom:0em;">
               <div class="col-7">
-               <t t-if="o.partner_id.parent_id">
-                <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                <span t-field="o.partner_id.street"/><br/>
-                <span t-field="o.partner_id.city"/><br/>
-                <span t-field="o.partner_id.zip"/><br/>
-                <span t-field="o.partner_id.country_id"/></p>
-
-              </t>
-              <t t-else="">
-                <p><span t-field="o.partner_id.name"/><br/>
-                <span t-field="o.partner_id.street"/><br/>
-                <span t-field="o.partner_id.city"/><br/>
-                <span t-field="o.partner_id.zip"/><br/>
-                <span t-field="o.partner_id.country_id"/></p>
-
-              </t>
+               <p>
+                  <span t-esc="o.partner_id.parent_id.name if o.partner_id.parent_id else o.partner_id.name"/><br/>
+                  <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/><br/></t>
+                  <t t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/><br/></t>
+                  <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/><br/></t>
+                  <t t-if="o.partner_id.state_id"><span t-field="o.partner_id.state_id"/><br/></t>
+                  <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/><br/></t>
+                  <t t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id"/></t>
+              </p>
             </div>
             <div class="col-5 pull-right">
               <div class="row">
@@ -35,10 +28,10 @@
                 </div>
                 <div class="col-8">
                   <t t-if="o.state == 'done'">
-                    <span t-field="o.date_done" t-options="{'widget': 'date'}"/>
+                    <span t-field="o.date_done" t-options='{"format": "dd/MM/yyyy"}'/>
                   </t>
                   <t t-if="o.state != 'done'">
-                    <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/>
+                    <span t-field="o.scheduled_date" t-options='{"format": "dd/MM/yyyy"}'/>
                   </t>
                 </div>
               </div>
@@ -81,8 +74,8 @@
               </t>
             </div>
             <div class="col-6">
-              <t t-if="estimate">
-                <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
+              <t t-if="o.origin">
+                <p>Our Ref: <!--span t-field="estimate.manufacturingOrder.name"/--><span t-field="o.origin"/></p>
               </t>
             </div>
           </div>
@@ -109,12 +102,7 @@
               </t>
             </tbody>
           </table>
-          <div class="row" style="position: relative; left: 0; bottom: 0;padding-top:25em;">
-           <p class="text-right" style="width:84%;">
-             
-           </p>
-
-         </div>
+         <div class="row" style="padding:1em;padding-bottom: 0em;padding-top:22em;">
          <table style="width:100%">
            <tbody>
              <tr>
@@ -131,6 +119,13 @@
 
                </td>
              </tr>
+                             </tbody>
+                         </table>
+                         
+                     </div>
+                     <div class="row" style="padding-left:1em;padding-top:2em;padding-right:1em;">
+                         <table style="width:100%">
+                             <tbody>
              <tr>
                <td width="25%">
                  Print Name
@@ -147,6 +142,8 @@
              </tr>
            </tbody>
          </table>
+                         
+                     </div>
        </div>
      </t>
    </t>
@@ -160,7 +157,7 @@
   report_type="qweb-pdf"
   name="bb_estimate.report_custom_delivery_note_with_line"
   file="bb_estimate.report_custom_delivery_note_with_line"
-  attachment="((object.name or '').replace('/','')+'.pdf')"
+  attachment="(('Delivery Note With Lines' or '').replace('/','')+'.pdf')"
   print_report_name="(object.name or '')"
   />
 </odoo>

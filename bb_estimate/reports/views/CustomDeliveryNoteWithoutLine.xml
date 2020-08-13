@@ -15,30 +15,24 @@
                               </div>
                               <div class="row">
                                   <div class="col-8">
-                                      <t t-if="o.partner_id.parent_id">
-                                          <p><span t-field="o.partner_id.parent_id.name"/><br/>
-                                          <span t-field="o.partner_id.street"/><br/>
-                                          <span t-field="o.partner_id.city"/><br/>
-                                          <span t-field="o.partner_id.zip"/><br/>
-                                          <span t-field="o.partner_id.country_id"/></p>
-                                          
-                                      </t>
-                                      <t t-else="">
-                                          <p><span t-field="o.partner_id.name"/><br/>
-                                          <span t-field="o.partner_id.street"/><br/>
-                                          <span t-field="o.partner_id.city"/><br/>
-                                          <span t-field="o.partner_id.zip"/><br/>
-                                          <span t-field="o.partner_id.country_id"/></p>
-                                      </t>                                      
+                                      <p>
+                                        <span t-esc="o.partner_id.parent_id.name if o.partner_id.parent_id else o.partner_id.name"/><br/>
+                                        <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/><br/></t>
+                                        <t t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/><br/></t>
+                                        <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/><br/></t>
+                                        <t t-if="o.partner_id.state_id"><span t-field="o.partner_id.state_id"/><br/></t>
+                                        <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/><br/></t>
+                                        <t t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id"/></t>
+                                      </p>                                   
                                   </div>
                                   <div class="col-4 pull-right">
                                       <div class="row">
                                           <div class="col-sm-12">
                                               <t t-if="o.state == 'done'">
-                                                  <p class="pull-left">Date: <span t-field="o.date_done" t-options="{'widget': 'date'}"/></p>
+                                                  <p class="pull-left">Date: <span t-field="o.date_done" t-options='{"format": "dd/MM/yyyy"}'/></p>
                                               </t>
                                               <t t-if="o.state != 'done'">
-                                                  <p class="pull-left">Date: <span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/></p>
+                                                  <p class="pull-left">Date: <span t-field="o.scheduled_date" t-options='{"format": "dd/MM/yyyy"}'/></p>
                                               </t>
                                           </div>
                                       </div>
@@ -90,8 +84,8 @@
                                       </t>
                                   </td>
                                   <td>
-                                      <t t-if="estimate">
-                                          <p>Our Ref: <span t-field="estimate.manufacturingOrder.name"/></p>
+                                      <t t-if="o.origin">
+                                          <p>Our Ref: <!--span t-field="estimate.manufacturingOrder.name"/--><span t-field="o.origin"/></p>
                                       </t>
                                   </td>
                               </tr>
@@ -106,7 +100,7 @@
                                               Price: <t t-esc="'%.2f'%(float(o.calculatePrice()))"/>
                                       </t>
                                       <t t-else="">
-                                          <span t-field="o.origin"/><br/>
+                                          <!--span t-field="o.origin"/><br/-->
                                            <t t-foreach="o.GetProductData()" t-as="line">
                                               <t t-esc="line"> </t><br/>
                                           </t>
@@ -128,7 +122,7 @@
         report_type="qweb-pdf"
         name="bb_estimate.report_custom_delivery_note_without_line"
         file="bb_estimate.report_custom_delivery_note_without_line"
-        attachment="((object.name or '').replace('/','')+'.pdf')"
+        attachment="(('Smythson D.Note' or '').replace('/','')+'.pdf')"
         print_report_name="(object.name or '')"
       />
 </odoo>
