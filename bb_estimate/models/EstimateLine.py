@@ -1167,10 +1167,10 @@ class EstimateLine(models.Model):
         currentRecord = super(EstimateLine, self).write(vals)
         
         if set(vals.keys()) - set(['hasComputed','customer_description','JobTicketText','documentCatergory','StandardCustomerDescription','StandardJobDescription','UseStadandardDescription','Details','EstimatorNotes','isExtra','extraDescription','Sequence']):
-            if self.option_type == 'process':
-                for mat in self.process_ids:
-                    mat.ComputePrice()
-            elif self.option_type == 'material':
+            # if self.option_type == 'process':
+            #     for mat in self.process_ids:
+            #         mat.ComputePrice()
+            if self.option_type == 'material':
                 recs = [x for x in self.estimate_id.estimate_line if (x.param_material_line_id.id == self.id) and x.param_material_line_id]
                 for process in recs:
                     process.calc_param_material_line_id_charge()
@@ -1250,11 +1250,6 @@ class EstimateLine(models.Model):
                         seller = self.env['product.supplierinfo'].sudo()
                         mto =self.env['stock.location.route'].sudo().search([('name','=','Make To Order')],limit=1)
                         buy =self.env['stock.location.route'].sudo().search([('name','=','Buy')],limit=1)
-                        categ_id = False
-                        if lineId.NonStockMaterialType == "Customer Supplied Material":
-                            categ = self.env['product.category'].sudo().search([('productType','=','Non-Stockable')], limit=1)
-                            categ_id = categ.id if categ else False
-
                         newProduct = {
                             'name' : lineId.MaterialName,
                             'type': 'product',
@@ -1271,9 +1266,12 @@ class EstimateLine(models.Model):
                             'lastUsedEstimateDate': str(datetime.now().date()),
                             'lastUsedEstimateNumber': lineId.estimate_id.estimate_number,
                             'margin': lineId.Margin,
-                            'categ_id': categ_id,
                             'productSubType' : lineId.NonStockMaterialType 
                         }
+                        if lineId.NonStockMaterialType == "Customer Supplied Material":
+                            categ = self.env['product.category'].sudo().search([('productType','=','Non-Stockable')], limit=1)
+                            if categ:
+                                newProduct['categ_id'] = categ.id
                         if mto and buy and lineId.NonStockMaterialType == 'Bespoke Material':
                             newProduct['route_ids'] = [(4,mto.id),(4,buy.id)]
                             newProduct['generatesPO'] = True

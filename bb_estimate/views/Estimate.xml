@@ -77,7 +77,13 @@
                             <field name="office_copy" attrs="{'readonly':[('isLocked','=',True)]}"/>
                             <field name="estimate_number" attrs="{'readonly':[('isLocked','=',True)]}" readonly="1"/>
                             <field name="event_date" attrs="{'readonly':[('isLocked','=',True)]}"/>
-                            <field name="target_dispatch_date" attrs="{'readonly':[('isLocked','=',True)]}" required="1"/>
+			   
+			    	        <label for="target_dispatch_date"/>
+            				<div class="o_row">
+            					<field name="target_dispatch_date" attrs="{'readonly':[('isLocked','=',True)]}" required="1"/>
+            					<button type="object" class="btn btn-link" string="Update Date" name="update_date" attrs="{'invisible': [('isLocked','!=',True)]}"/>
+            				</div>
+            			    
                             <field name="analytic_account" attrs="{'readonly':[('isLocked','=',True)]}" options="{'no_create': True, 'no_create_edit': True}"/>
                         </group>
                     </group>
