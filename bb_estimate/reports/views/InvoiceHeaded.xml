@@ -33,6 +33,16 @@
                                             </div>
                                         </div>
                                         <div class="row">
+                                            <t t-if="o.type == 'out_invoice' and o.origin">
+                                                <div class="col-6">
+                                                    <p class="pull-left">SO Ref: </p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p class="pull-left"><span t-field="o.origin" /></p>
+                                                </div>
+                                            </t>
+                                        </div>
+                                        <div class="row">
                                             <div class="col-6">
                                                 <t t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">
                                                     <p class="pull-left">Invoice No: </p>
