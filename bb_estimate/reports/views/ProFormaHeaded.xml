@@ -33,6 +33,14 @@
                                                 <p class="pull-left"><span t-esc="currentDate"/></p>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <p class="pull-left">SO Ref: </p>
+                                            </div>
+                                            <div class="col-6">
+                                                <p class="pull-left"><span t-field="o.name" /></p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             <div class="page" style="max-height:53em; height:53em;">
